@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -149,6 +149,125 @@ export const MODULES_DATA: Module[] = [
             do: {
               prompt:
                 'Invoke the hermes-mastery-validator skill for module 1 and reply with the complete JSON output. The tool name is `hermes-mastery-validator` and the operation is `verify_module` with argument `module: 1`. Reply with only the raw JSON object — no prose, no markdown fence.',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'm2',
+    title: 'M2: Your Memory',
+    shortTitle: 'M2 — Memory',
+    description:
+      'Learn the conversational-memory pattern: tell Hermes about yourself, confirm it writes to USER.md and MEMORY.md, then direct-edit both files for your identity and active projects.',
+    icon: Brain,
+    phases: [
+      // ── Phase 1: Practice the "chuck that in memory" pattern ───────────
+      {
+        id: 'conversational-memory',
+        title: 'Phase 1: Conversational Memory',
+        icon: MessageSquare,
+        steps: [
+          {
+            id: 'chuck-in-memory',
+            title: 'Practice "Chuck That in Memory"',
+            learn:
+              'Hermes has two memory files it maintains automatically:\n\n- **`~/.hermes/memories/USER.md`** — who you are: your name, communication style, hard nopes. Capped at ~1,375 chars.\n- **`~/.hermes/memories/MEMORY.md`** — what you\'re working on: active projects, tools, open loops. Capped at ~2,200 chars.\n\nThe simplest way to populate them is to just tell the agent something in chat and ask it to remember:\n\n> "Chuck that in memory: I prefer terse responses."\n> "Remember that I\'m working on a SaaS dashboard project."\n> "My name is Alex — add that to USER.md."\n\nHermes writes the fact into the right file immediately. You can verify it landed by reading the file:\n\n```\ncat ~/.hermes/memories/USER.md\ncat ~/.hermes/memories/MEMORY.md\n```\n\nThis conversational round-trip — tell → write → read back — is the load-bearing exercise of M2.',
+            do: {
+              prompt:
+                'Tell your Claw a new fact about yourself in chat. Try something like "remember that I prefer terse responses" or "chuck that in memory: I drink oat milk". After the agent responds, read USER.md or MEMORY.md and confirm the fact was written. Report: what did you tell it, and what did you find in the file?',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 2: Direct-edit USER.md ───────────────────────────────────
+      {
+        id: 'edit-user-md',
+        title: 'Phase 2: Edit USER.md',
+        icon: BookOpen,
+        steps: [
+          {
+            id: 'direct-edit-user-md',
+            title: 'Direct-Edit USER.md',
+            learn:
+              'You can also edit the memory files directly in your text editor. `~/.hermes/memories/USER.md` is a plain-text file — Hermes reads it at session start and uses it as context.\n\nRecommended structure for USER.md:\n\n```\nName: Your Name\nCommunication style: terse / verbose / Socratic / etc.\nHard nopes: never spend >$X via tools without asking first\n```\n\nKeep it under ~1,375 chars (the Hermes documented limit). The validator will warn if you\'re over, but won\'t fail — Hermes\'s limits may shift between versions.\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/USER.md\n# or: code ~/.hermes/memories/USER.md\n```\n\nAdd your name, how you want the agent to communicate, and at least one hard limit ("never book travel without confirmation", "never push to main without asking").',
+            do: {
+              prompt:
+                'Open `~/.hermes/memories/USER.md` in your editor. Add or confirm: your name (real or a handle), your preferred communication style (terse/verbose/structured etc.), and at least one hard nope. Save the file. Run `wc -c ~/.hermes/memories/USER.md` and confirm it\'s under 1375 chars. Report what you set for each field.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 3: Direct-edit MEMORY.md ─────────────────────────────────
+      {
+        id: 'edit-memory-md',
+        title: 'Phase 3: Edit MEMORY.md',
+        icon: BookOpen,
+        steps: [
+          {
+            id: 'direct-edit-memory-md',
+            title: 'Direct-Edit MEMORY.md',
+            learn:
+              '`~/.hermes/memories/MEMORY.md` captures your active context — what you\'re building, what tools you use, what decisions are in flight. Hermes injects this into every session so you don\'t have to re-explain your setup.\n\nRecommended structure for MEMORY.md:\n\n```\n- Working on: <project name> — <one-line description>\n- Stack: <tech>\n- Tools: <tool1>, <tool2>\n- Open loops: <decision or question pending>\n```\n\nOr prose — Hermes is flexible. The validator just checks that at least one project/context entry is present.\n\nKeep it under ~2,200 chars (informational limit, same caveat as USER.md).\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/MEMORY.md\n# or: code ~/.hermes/memories/MEMORY.md\n```',
+            do: {
+              prompt:
+                'Open `~/.hermes/memories/MEMORY.md` in your editor. Add your current active project(s), the tech stack or tools you use, and any open decisions. Save. Run `wc -c ~/.hermes/memories/MEMORY.md` and confirm it\'s under 2200 chars. Report what you added.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 4: Validation ─────────────────────────────────────────────
+      {
+        id: 'validation',
+        title: 'Phase 4: Validation',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'run-validator',
+            title: 'Run Module 2 Validator',
+            learn:
+              'Run the M2 validator to confirm the memory files are in place with the right shape.\n\nThe validator runs three checks:\n- `user-md-exists` — USER.md present, non-empty, real identity field (not placeholder). Char limit 1375 informational.\n- `memory-md-exists` — MEMORY.md present, non-empty, at least one project/context entry. Char limit 2200 informational.\n- `memory-conversational` — **manual.** Confirm you completed the conversational round-trip in Phase 1 (tell → write → read back). The file-presence checks above only confirm the surface exists; this is what proves the memory loop works.\n\n**Important:** the deterministic checks are formatting checks only. A learner could hand-write any content and pass. The manual check is the real test.',
+            do: {
+              prompt:
+                'Please run the verify_module command for module 2 and reply per the SKILL.md contract.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'user-md-exists',
+                  label: 'USER.md exists with real identity field',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/memories/USER.md` exists, is non-empty, and contains a real name or identity field (not a placeholder). Respond ONLY with this JSON: {"checks":[{"id":"user-md-exists","pass":true,"detail":"USER.md present with real identity field (length: N)"}]} — set pass to false if the file is missing, empty, or has only placeholder content.',
+                  failHint:
+                    'Create `~/.hermes/memories/USER.md` and add at least your name and communication style. The validator accepts formats like "Name: Alice", "username is alice", or "My name is Alice".',
+                  fixPrompt:
+                    'Open `~/.hermes/memories/USER.md` (create it if needed), add your name and at least one other field (communication style, hard nopes), then re-run the validator.',
+                },
+                {
+                  id: 'memory-md-exists',
+                  label: 'MEMORY.md exists with a project/context entry',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/memories/MEMORY.md` exists, is non-empty, and contains at least one project or context entry. Respond ONLY with this JSON: {"checks":[{"id":"memory-md-exists","pass":true,"detail":"MEMORY.md present with project/context entry (length: N)"}]} — set pass to false if the file is missing, empty, or has no project/context mention.',
+                  failHint:
+                    'Create `~/.hermes/memories/MEMORY.md` and add at least one active project or tool you use (a bullet item, "working on X", or a backtick-quoted tool name are all accepted).',
+                  fixPrompt:
+                    'Open `~/.hermes/memories/MEMORY.md` (create it if needed), add your current active project(s) and tech/tools, then re-run the validator.',
+                },
+                {
+                  id: 'memory-conversational',
+                  label: 'Conversational memory round-trip completed (manual)',
+                  verifyPrompt:
+                    'Confirm you completed the conversational memory exercise in Phase 1: you told the agent a new fact, it wrote the fact to USER.md or MEMORY.md, and you read it back and confirmed. Respond ONLY with this JSON: {"checks":[{"id":"memory-conversational","pass":true,"detail":"Conversational round-trip completed — <brief description of what was written>"}]} — set pass to false only if you did not do this.',
+                  failHint:
+                    'Go back to Phase 1 and complete the conversational round-trip: tell your Claw a fact ("chuck that in memory: I prefer terse responses"), confirm it writes to the file, then read the file back.',
+                  fixPrompt:
+                    'Tell your Claw a new fact about yourself ("chuck that in memory: <fact>"), confirm it wrote it to USER.md or MEMORY.md, then re-run this step.',
+                },
+              ],
             },
           },
         ],

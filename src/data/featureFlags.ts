@@ -1,4 +1,4 @@
-const PASTE_VALIDATOR_ENABLED_MODULES = new Set<string>(['m1']);
+const PASTE_VALIDATOR_ENABLED_MODULES = new Set<string>(['m1', 'm2']);
 
 export function isPasteValidatorEnabled(moduleId: string): boolean {
   return PASTE_VALIDATOR_ENABLED_MODULES.has(moduleId);
