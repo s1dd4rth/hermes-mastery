@@ -1,0 +1,29 @@
+# Staging / PR build-only workflow.
+# Builds the bundle so pushes to the staging branch and PRs targeting main
+# catch breakage before merging. Does NOT deploy to GitHub Pages.
+#
+# NOTE: GitHub Pages only supports one source per repo. The production Pages
+# deploy is handled by deploy.yml (main branch). Adding a second Pages deploy
+# here would compete for the same slot and is not supported without a separate
+# repo. This workflow is intentionally build-only.
+
+name: Build check (staging / PRs)
+
+on:
+  push:
+    branches: ["staging"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@f4d14e03ff726c06358e5557344e1da148b56cf7 # v1
+      - name: Install dependencies
+        run: bun install
+      - name: Build
+        run: bun run build
