@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -549,6 +549,125 @@ export const MODULES_DATA: Module[] = [
                     'Make sure the gateway is running (`hermes gateway status`), check `hermes gateway logs` for errors, confirm you sent `/start` to the bot, and verify your Telegram user ID matches the one entered in `hermes gateway setup`.',
                   fixPrompt:
                     'Check `hermes gateway status` and `hermes gateway logs`. Common fixes: run `hermes gateway start`, send `/start` to the bot first, or re-run `hermes gateway setup` with the correct Telegram user ID.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'm5',
+    title: 'M5: Skills (Pillar 3)',
+    shortTitle: 'M5 — Skills',
+    description:
+      'Discover the Hermes skill hub, install an official skill, create your own custom skill conversationally, then validate the whole pillar.',
+    icon: Wrench,
+    phases: [
+      // ── Phase 1: Discover the Hub ──────────────────────────────────────
+      {
+        id: 'discover-hub',
+        title: 'Phase 1: Discover the Hub',
+        icon: Wrench,
+        steps: [
+          {
+            id: 'search-skills',
+            title: 'Search the Skill Hub',
+            learn:
+              'Hermes ships with a skill hub — a registry of community-built and official skills you can install with one command.\n\n**Explore what\'s available:**\n\n```\nhermes skills search coding\nhermes skills search writing\nhermes skills search <any topic you care about>\n```\n\nEach result shows a skill slug (e.g. `s1dd4rth/github-code-review`), a short description, and an author. Skill slugs follow the format `<owner>/<slug>`.\n\n**Browse all skills:**\n\n```\nhermes skills list --remote\n```\n\nThis lists everything available in the hub, not just what\'s installed locally.\n\n**What makes a skill useful?** Look for skills that:\n- Automate something you do repeatedly (code review, email drafting, research)\n- Add a tool integration (GitHub, Notion, Slack)\n- Encode a workflow you want repeatable (debugging, planning, writing)',
+            do: {
+              prompt:
+                'Run `hermes skills search <topic>` with a topic relevant to your work (try "coding", "writing", "research", or "github"). Share the top 3 results — just the skill slugs and one-line descriptions. Which one looks most useful to you?',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 2: Install an Official Skill ────────────────────────────
+      {
+        id: 'install-skill',
+        title: 'Phase 2: Install an Official Skill',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'hub-install',
+            title: 'Install a Hub Skill',
+            learn:
+              'Pick a skill from your search results and install it:\n\n```\nhermes skills install <owner>/<slug>\n```\n\nFor example:\n\n```\nhermes skills install s1dd4rth/github-code-review\nhermes skills install s1dd4rth/systematic-debugging\n```\n\nAfter install, start a fresh Hermes session and verify the skill is available:\n\n```\nhermes skills list\n```\n\nThe skill you installed should appear in the list.\n\n**What happens on install:** Hermes downloads the skill to `~/.hermes/skills/<slug>/` and writes a `_meta.json` file tracking the install source. Hub-installed skills are updated via `hermes skills update <slug>`.\n\n**Try it out:** use the skill in a short task. Skills are invoked naturally in conversation — just ask your Claw to do the thing the skill was built for.',
+            do: {
+              prompt:
+                'Install the hub skill you selected in Phase 1: `hermes skills install <owner>/<slug>`. Then run `hermes skills list` and confirm it appears. Start a fresh Hermes session and try using it for a quick task. Report: which skill did you install, and what happened when you used it?',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 3: Create a Custom Skill ────────────────────────────────
+      {
+        id: 'create-custom-skill',
+        title: 'Phase 3: Create a Custom Skill',
+        icon: BookOpen,
+        steps: [
+          {
+            id: 'conversational-skill-creation',
+            title: 'Create a Skill Conversationally',
+            learn:
+              'The most natural way to create a custom skill is to do a multi-step task with your Claw, then ask it to save the workflow as a reusable skill.\n\n**Method 1 — conversational save:**\n1. Work through a multi-step task with your Hermes agent (e.g., "help me write a weekly status update", "walk me through debugging this error").\n2. At the end, say: *"That workflow was useful — save it as a skill so I can reuse it."*\n3. Hermes will prompt you for a skill name and create `~/.hermes/skills/<your-skill-name>/SKILL.md`.\n\n**Method 2 — scaffold from scratch:**\n\n```\nhermes skills new <skill-name>\n```\n\nThis creates the skill directory structure. Edit `SKILL.md` to describe what the skill does, what tools it uses, and the workflow steps.\n\n**A minimal SKILL.md:**\n\n```markdown\n# My Skill Name\n\nA short description of what this skill does.\n\n## When to use\nList the scenarios this skill applies to.\n\n## Workflow\n1. Step one...\n2. Step two...\n```\n\n**What counts as a custom skill:** any skill YOU created — not installed via `hermes skills install` from the hub, not one of the two bundled skills (`dogfood`, `yuanbao`) that ship with Hermes. The validator detects custom skills by the absence of `_meta.json` (hub installs get one; your creations don\'t) plus the bundled-skills exclusion list.',
+            do: {
+              prompt:
+                'Create a custom skill. Either: (a) do a multi-step task with your Claw and ask it to save the workflow as a skill, or (b) run `hermes skills new <skill-name>` and fill out the SKILL.md. Confirm the skill directory exists at `~/.hermes/skills/<your-skill-name>/SKILL.md`. Report: what skill did you create, and what does it do?',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 4: Validation ────────────────────────────────────────────
+      {
+        id: 'validation',
+        title: 'Phase 4: Validation',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'run-validator',
+            title: 'Run Module 5 Validator',
+            learn:
+              'Run the M5 validator to confirm you have an installed skill and a custom skill.\n\nThe validator runs three checks:\n- `at-least-one-installed-skill` — **deterministic.** `~/.hermes/skills/` contains at least one skill with `SKILL.md` that is not the validator itself. (Self-exclusion: a validator-only install does NOT satisfy this check.)\n- `at-least-one-custom-skill` — **deterministic.** At least one skill is user-created: not in the bundled-skills list (`dogfood`, `yuanbao`), not hub-installed (no `_meta.json`), and not in the hub-known override list.\n- `skills-fresh-session` — **manual.** Start a fresh session and confirm both your hub-installed skill and your custom skill load. If the custom skill doesn\'t surface, it didn\'t really get created.\n\n**Self-exclusion note:** the validator excludes itself from the installed-skill count. This is intentional — M5 measures skills you actually installed or created, not just the validator you needed for this course.',
+            do: {
+              prompt:
+                'Please run the verify_module command for module 5 and reply per the SKILL.md contract.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'at-least-one-installed-skill',
+                  label: 'At least one non-validator skill installed with SKILL.md',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/skills/` contains at least one directory (other than `hermes-mastery-validator`) that has a `SKILL.md` file at its root. Respond ONLY with this JSON: {"checks":[{"id":"at-least-one-installed-skill","pass":true,"detail":"N non-validator skill(s) with SKILL.md found"}]} — set pass to false if only the validator skill is present or if no skills have SKILL.md.',
+                  failHint:
+                    'Install a skill from the hub: `hermes skills install <owner>/<slug>`. Or create a custom skill: `hermes skills new <skill-name>`. The validator itself does not count.',
+                  fixPrompt:
+                    'Run `hermes skills install <owner>/<slug>` to install a hub skill, or `hermes skills new <skill-name>` to create a custom one. Then re-run the validator.',
+                },
+                {
+                  id: 'at-least-one-custom-skill',
+                  label: 'At least one user-created (custom) skill detected',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/skills/` contains at least one skill that is user-created: has SKILL.md, is NOT named `hermes-mastery-validator`, is NOT `dogfood` or `yuanbao` (bundled skills), and has NO `_meta.json` file (hub-installed skills have one). Respond ONLY with this JSON: {"checks":[{"id":"at-least-one-custom-skill","pass":true,"detail":"N custom skill(s) detected: <names>"}]} — set pass to false if all skills are bundled or hub-installed.',
+                  failHint:
+                    'Create a custom skill: after a multi-step task, ask your Claw "save this as a skill", or run `hermes skills new <skill-name>`. Hub-installed skills (with `_meta.json`) and bundled skills (`dogfood`, `yuanbao`) do not count as custom.',
+                  fixPrompt:
+                    'Run `hermes skills new <skill-name>` to scaffold a custom skill, edit its SKILL.md, then re-run the validator. Or work through a task with your Claw and ask it to save the workflow as a skill.',
+                },
+                {
+                  id: 'skills-fresh-session',
+                  label: 'Both skills surface in a fresh session (manual)',
+                  verifyPrompt:
+                    'Confirm you started a fresh Hermes session (`hermes /new` or equivalent) and verified that both your hub-installed skill and your custom skill are available. Respond ONLY with this JSON: {"checks":[{"id":"skills-fresh-session","pass":true,"detail":"Both skills loaded in fresh session — <brief description>"}]} — set pass to false if either skill did not surface.',
+                  failHint:
+                    'If a skill doesn\'t appear in a fresh session, confirm its directory exists at `~/.hermes/skills/<slug>/SKILL.md`. For custom skills: confirm you created the skill in the right location and the SKILL.md is valid.',
+                  fixPrompt:
+                    'Run `hermes /new` (or close and re-open your Hermes chat). Ask the agent to list available skills or invoke your skill by name. If the custom skill is missing, verify `~/.hermes/skills/<your-skill>/SKILL.md` exists and is non-empty.',
                 },
               ],
             },
