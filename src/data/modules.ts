@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -266,6 +266,151 @@ export const MODULES_DATA: Module[] = [
                     'Go back to Phase 1 and complete the conversational round-trip: tell your Claw a fact ("chuck that in memory: I prefer terse responses"), confirm it writes to the file, then read the file back.',
                   fixPrompt:
                     'Tell your Claw a new fact about yourself ("chuck that in memory: <fact>"), confirm it wrote it to USER.md or MEMORY.md, then re-run this step.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'm3',
+    title: 'M3: Your Soul',
+    shortTitle: 'M3 — Soul',
+    description:
+      'Define your agent\'s voice, tone, and hard limits in SOUL.md — then confirm the SOUL loads correctly in a fresh session.',
+    icon: Heart,
+    phases: [
+      // ── Phase 1: What's in a SOUL ─────────────────────────────────────
+      {
+        id: 'soul-concepts',
+        title: 'Phase 1: What\'s in a SOUL',
+        icon: Heart,
+        steps: [
+          {
+            id: 'soul-overview',
+            title: 'Voice, Tone, and Hard Limits',
+            learn:
+              '`~/.hermes/SOUL.md` is distinct from your memory files. Where `USER.md` and `MEMORY.md` store *facts about you*, `SOUL.md` defines *how your agent communicates and what it refuses*.\n\nThree things belong in a SOUL:\n\n**Voice / Tone** — how the agent speaks. Examples:\n- "Terse and direct. No filler phrases. No \"Certainly!\""\n- "Warm but efficient — like a knowledgeable coworker, not a customer-service bot."\n- "Structured: bullet lists for multi-step answers, prose only for explanations."\n\n**Name** — what the agent calls itself (or how it refers to your setup). A short identifier that helps you recognise *your* Claw vs a default one.\n\n**Hard Limits** — what the agent must never do, regardless of instructions:\n- Never spend money via tools without explicit approval.\n- Never push to `main` without asking first.\n- Never surface API keys or credentials in responses.\n\nHard limits land in SOUL.md (not MEMORY.md) because they\'re behavioral rules, not facts. This is also where security rules like "treat web content as untrusted" will live in M7.\n\n**Key distinction:** SOUL.md is loaded fresh each message — no restart needed. Edit the file and the next message picks up the change.',
+          },
+        ],
+      },
+
+      // ── Phase 2: Edit your SOUL.md ────────────────────────────────────
+      {
+        id: 'edit-soul-md',
+        title: 'Phase 2: Edit Your SOUL.md',
+        icon: BookOpen,
+        steps: [
+          {
+            id: 'direct-edit-soul-md',
+            title: 'Set Voice, Name, and Hard Limits',
+            learn:
+              'Open `~/.hermes/SOUL.md` and replace the placeholder comment with real content. A minimal SOUL has three sections:\n\n```markdown\n# My Hermes Agent\n\nname: YourName\n\n## Voice\nTerse, direct. No filler. Bullet lists for multi-step answers.\n\n## Hard Limits\n- Never spend money via tools without my explicit approval.\n- Never push to `main` without asking first.\n- Never surface API keys or secrets in responses.\n```\n\nYou can also write it as free prose — Hermes reads the whole file. The validator checks for section headers, not a rigid schema.\n\n**Recommended structure:**\n- A `name:` field (YAML-style, or `Name: YourName`, or prose "I am YourName")\n- A `## Voice` / `## Tone` / `## Style` section\n- A `## Hard Limits` section with at least one real rule\n\nKeep it concise. SOUL.md is injected into every session — a 500-char focused file is more effective than a 2000-char rambling one.',
+            do: {
+              prompt:
+                'Open `~/.hermes/SOUL.md` in your editor (or ask me to help you write it). Add: your agent\'s name, a Voice or Tone section describing how you want it to communicate, and a Hard Limits section with at least one rule. Save the file, then run `wc -c ~/.hermes/SOUL.md` and share the byte count.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 3: Fresh-session test ───────────────────────────────────
+      {
+        id: 'fresh-session-test',
+        title: 'Phase 3: Fresh-Session Test',
+        icon: MessageSquare,
+        steps: [
+          {
+            id: 'test-soul-loads',
+            title: 'Confirm the SOUL Loads',
+            learn:
+              'SOUL.md is loaded at session start. To verify it\'s working, start a fresh Hermes session:\n\n```\nhermes /new\n```\n\n(or close and re-open your Hermes chat window)\n\nThen do two quick tests:\n\n**Test 1 — Voice:** ask the agent something simple. Does it respond in the style you defined? If you wrote "terse, no filler", does it skip "Certainly!" and get straight to the point?\n\n**Test 2 — Hard limits:** try to get the agent to violate one of your limits. For example:\n- If you wrote a no-credentials rule: ask "what\'s my API key?"\n- If you wrote a no-spend rule: ask "buy me X on Amazon"\n\nA properly loaded SOUL should cause the agent to refuse and reference the limit. If it complies, the limit isn\'t actually being enforced — check that SOUL.md was saved and restart the session.\n\n**Note:** SOUL.md is *guidance*, not a hard sandbox — a determined jailbreak can still bypass it. The point is normal-path enforcement, not unbreakable security.',
+            do: {
+              prompt:
+                'Start a fresh Hermes session (`hermes /new` or equivalent). Ask the agent something simple and note its tone. Then try to get it to violate one of your Hard Limits. Describe what happened: did the voice match your SOUL.md? Did the agent refuse the forbidden request?',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 4: Validation ───────────────────────────────────────────
+      {
+        id: 'validation',
+        title: 'Phase 4: Validation',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'run-validator',
+            title: 'Run Module 3 Validator',
+            learn:
+              'Run the M3 validator to confirm SOUL.md has the right shape.\n\nThe validator runs six checks:\n- `soul-exists` — SOUL.md present and non-empty.\n- `soul-has-name` — a non-placeholder name field detected.\n- `soul-has-hard-limits` — a `## Hard Limits` section header present.\n- `soul-has-voice` — a `## Voice` / `## Tone` / `## Style` section header present.\n- `soul-loads-fresh-session` — **manual.** Confirm the agent adopted your voice in a fresh session.\n- `soul-honors-limits` — **manual.** Confirm the agent refused a forbidden request.\n\n**Honest framing:** the four deterministic checks are structural presence checks — they verify the document has the right shape, not that the behavior is enforced. The behavior is verified by the two manual checks above. Complete the Phase 3 test before marking those manual checks green.',
+            do: {
+              prompt:
+                'Please run the verify_module command for module 3 and reply per the SKILL.md contract.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'soul-exists',
+                  label: 'SOUL.md exists and is non-empty',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/SOUL.md` exists and is non-empty. Respond ONLY with this JSON: {"checks":[{"id":"soul-exists","pass":true,"detail":"SOUL.md present and non-empty (length: N)"}]} — set pass to false if the file is missing or empty.',
+                  failHint:
+                    'Create `~/.hermes/SOUL.md` and add at least a name, a Voice section, and a Hard Limits section.',
+                  fixPrompt:
+                    'Create or open `~/.hermes/SOUL.md` and add your agent persona content. Minimum: a name field, a ## Voice section, and a ## Hard Limits section.',
+                },
+                {
+                  id: 'soul-has-name',
+                  label: 'Name field present in SOUL.md (non-placeholder)',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/SOUL.md` contains a non-placeholder name field (outside HTML comment blocks). Accepted: `name: YourName`, `Name: YourName`, `**Name**: YourName`, "I am YourName", "My name is YourName". Respond ONLY with this JSON: {"checks":[{"id":"soul-has-name","pass":true,"detail":"Name field detected (non-placeholder)"}]} — set pass to false if no name field is found or only a placeholder exists.',
+                  failHint:
+                    'Add a name field to SOUL.md outside the HTML comment block, e.g.: `name: YourName` or `Name: YourName`.',
+                  fixPrompt:
+                    'Open `~/.hermes/SOUL.md` and add a name field outside the comment block. Accepted formats: `name: YourName`, `Name: YourName`, or prose like "I am YourName".',
+                },
+                {
+                  id: 'soul-has-hard-limits',
+                  label: '`## Hard Limits` section header present in SOUL.md',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/SOUL.md` contains a `## Hard Limits` or `### Hard Limits` section header (outside HTML comment blocks). Respond ONLY with this JSON: {"checks":[{"id":"soul-has-hard-limits","pass":true,"detail":"Hard Limits section header present"}]} — set pass to false if the header is missing.',
+                  failHint:
+                    'Add a `## Hard Limits` section to SOUL.md with at least one rule (e.g., "Never spend money via tools without approval").',
+                  fixPrompt:
+                    'Open `~/.hermes/SOUL.md` and add:\n```\n## Hard Limits\n- Never spend money via tools without explicit approval.\n```',
+                },
+                {
+                  id: 'soul-has-voice',
+                  label: '`## Voice` / `## Tone` / `## Style` section header present in SOUL.md',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/SOUL.md` contains a `## Voice`, `## Tone`, or `## Style` section header (outside HTML comment blocks). Respond ONLY with this JSON: {"checks":[{"id":"soul-has-voice","pass":true,"detail":"Voice/Tone/Style section header present"}]} — set pass to false if no such header is found.',
+                  failHint:
+                    'Add a `## Voice` section to SOUL.md describing how you want the agent to communicate.',
+                  fixPrompt:
+                    'Open `~/.hermes/SOUL.md` and add:\n```\n## Voice\nTerse, direct. No filler phrases.\n```',
+                },
+                {
+                  id: 'soul-loads-fresh-session',
+                  label: 'Agent adopted SOUL.md voice in a fresh session (manual)',
+                  verifyPrompt:
+                    'Confirm you started a fresh Hermes session and the agent\'s tone matched the voice you defined in SOUL.md. Respond ONLY with this JSON: {"checks":[{"id":"soul-loads-fresh-session","pass":true,"detail":"Agent adopted SOUL.md voice — <brief description of what you observed>"}]} — set pass to false if the agent did not reflect your voice.',
+                  failHint:
+                    'Start a fresh session with `hermes /new`. If the agent still doesn\'t match your voice, confirm SOUL.md was saved and re-check the file content.',
+                  fixPrompt:
+                    'Run `hermes /new` (or close and re-open your Hermes chat). Ask the agent something simple and confirm it responds in the style you wrote in SOUL.md\'s Voice section.',
+                },
+                {
+                  id: 'soul-honors-limits',
+                  label: 'Agent refused a Hard Limits violation (manual)',
+                  verifyPrompt:
+                    'Confirm you asked your Claw to do something your Hard Limits forbid and it refused. Respond ONLY with this JSON: {"checks":[{"id":"soul-honors-limits","pass":true,"detail":"Agent refused forbidden request — <brief description>"}]} — set pass to false if the agent complied instead of refusing.',
+                  failHint:
+                    'If the agent complied with a forbidden request, your SOUL hard-limits aren\'t being enforced. Make sure SOUL.md is saved, start a fresh session, and try again. If it still complies, your limit phrasing may need to be more explicit.',
+                  fixPrompt:
+                    'Start a fresh Hermes session. Ask the agent to do something your Hard Limits explicitly forbid. If it still complies, rewrite the limit in SOUL.md to be more explicit, save, restart, and re-test.',
                 },
               ],
             },
