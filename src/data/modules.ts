@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -668,6 +668,154 @@ export const MODULES_DATA: Module[] = [
                     'If a skill doesn\'t appear in a fresh session, confirm its directory exists at `~/.hermes/skills/<slug>/SKILL.md`. For custom skills: confirm you created the skill in the right location and the SKILL.md is valid.',
                   fixPrompt:
                     'Run `hermes /new` (or close and re-open your Hermes chat). Ask the agent to list available skills or invoke your skill by name. If the custom skill is missing, verify `~/.hermes/skills/<your-skill>/SKILL.md` exists and is non-empty.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'm6',
+    title: 'M6: Crons (Pillar 4)',
+    shortTitle: 'M6 — Crons',
+    description:
+      'Schedule recurring and one-shot cron jobs in Hermes — natural language scheduling, delivery to your Telegram channel, and end-to-end fire proof.',
+    icon: Clock,
+    phases: [
+      // ── Phase 1: One-shot cron via natural language ────────────────────
+      {
+        id: 'oneshot-cron',
+        title: 'Phase 1: Cron via Natural Language',
+        icon: Clock,
+        steps: [
+          {
+            id: 'schedule-oneshot',
+            title: 'Schedule a One-Shot Delay',
+            learn:
+              'Hermes understands natural-language schedule expressions. The easiest entry point is a one-shot delay — a job that fires once, some time from now.\n\n**Examples:**\n\n```\nSchedule a reminder in 30 minutes: "Remind me to stretch."\nSchedule a check in 2 hours: "Check the status of my deploy."\n```\n\nHermes translates these into a `cronjob` call with `schedule: "30m"` or `schedule: "2h"`. The job is stored in `~/.hermes/cron/jobs.json` and the scheduler fires it when the timer expires.\n\n**How to verify the job was created:**\n\n```\nhermes cron list\n```\n\nOr inspect the file directly:\n\n```\ncat ~/.hermes/cron/jobs.json\n```\n\n**Schedule syntax supported:**\n- `"30m"`, `"2h"`, `"1d"` — one-shot from now\n- `"every 30m"`, `"every 2h"` — recurring interval\n- `"0 9 * * *"` — cron expression (requires `croniter` in the Hermes Python env)\n- `"2026-06-01T09:00:00"` — one-shot at an ISO timestamp',
+            do: {
+              prompt:
+                'Tell your Hermes agent to schedule a reminder for 30 minutes from now. Try: "Schedule a one-shot reminder in 30 minutes: Remind me I set up a cron." Then run `hermes cron list` (or ask the agent to list your cron jobs) and confirm the job appears with a next_run_at timestamp. Report the job\'s name and scheduled time.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 2: Recurring cron with delivery channel ─────────────────
+      {
+        id: 'recurring-cron',
+        title: 'Phase 2: Recurring + Delivery',
+        icon: Send,
+        steps: [
+          {
+            id: 'schedule-recurring',
+            title: 'Schedule a Recurring Cron with Telegram Delivery',
+            learn:
+              'One-shot jobs prove the scheduler works. Recurring jobs are where crons become genuinely useful — daily summaries, hourly checks, weekly reminders.\n\n**Schedule a recurring job:**\n\n```\nSchedule a daily message at 9am: "Good morning — summarise my open tasks."\n```\n\nOr with an explicit interval:\n\n```\nEvery 2 hours, send me a message: "Quick check-in — what were the last 3 things I worked on?"\n```\n\n**Delivery to Telegram:**\n\nBy default, Hermes delivers the cron output back to the chat that scheduled it (the "origin"). If you scheduled the job from Telegram, the result arrives in Telegram automatically.\n\nTo explicitly target Telegram:\n\n```\nSchedule a daily 9am check-in, deliver to Telegram.\n```\n\nHermes will capture your current Telegram chat as the delivery target and store it in the job\'s `deliver` field.\n\n**Important:** if you schedule the job from the CLI (not from Telegram), Hermes defaults to `deliver: "local"` (save only, no external delivery). To get Telegram delivery, either schedule from a Telegram message OR ask the agent to set `deliver: "telegram"` explicitly with your chat ID.\n\n**Mac mini sleep caveat:** if your Mac sleeps or the Hermes gateway is killed, the scheduler tick stops. Cron jobs scheduled during sleep may be skipped or fire late on resume. This is environment behavior, not a validator bug. For reliable recurring jobs on a Mac, keep the gateway running as a LaunchAgent and disable sleep for the machine.',
+            do: {
+              prompt:
+                'Schedule a recurring cron job. Try: "Schedule a daily message every day at 9am: Good morning — what are my priorities today? Deliver it to Telegram." Then run `hermes cron list` and confirm the job appears with `deliver` set to something other than "local". Report the job name, schedule, and deliver value.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 3: Verify with hermes cron list ─────────────────────────
+      {
+        id: 'cron-list',
+        title: 'Phase 3: Verify with CLI',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'run-cron-list',
+            title: 'Inspect Your Cron Jobs',
+            learn:
+              'The `hermes cron list` command (or asking your Claw to list cron jobs) shows all scheduled jobs with their status, next run time, and delivery target.\n\n**Run:**\n\n```\nhermes cron list\n```\n\nOr ask the agent:\n\n```\nList my cron jobs.\n```\n\n**What to look for:**\n- Each job should have a `next_run_at` timestamp\n- The `state` should be "scheduled" (not "paused" or "error")\n- The `deliver` field should match your intended channel\n- The `enabled` field should be `true`\n\n**Pause / resume / remove:**\n\n```\n# Pause a job\nhermes cron pause <job_id>\n\n# Resume a paused job\nhermes cron resume <job_id>\n\n# Remove a job\nhermes cron remove <job_id>\n```\n\nOr conversationally:\n- "Pause my daily 9am reminder."\n- "Remove the stretch reminder cron."\n- "List my disabled cron jobs too."',
+            do: {
+              prompt:
+                'Run `hermes cron list` (or ask your agent to list all cron jobs, including paused ones). Share the output — job names, schedules, states, and deliver values. Do NOT share any chat IDs or tokens. Confirm at least one job is in "scheduled" state with a future next_run_at.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 4: Inspect ~/.hermes/cron/jobs.json ─────────────────────
+      {
+        id: 'inspect-jobs-json',
+        title: 'Phase 4: Inspect jobs.json',
+        icon: BookOpen,
+        steps: [
+          {
+            id: 'read-jobs-json',
+            title: 'Read the Persisted Job Shape',
+            learn:
+              '`~/.hermes/cron/jobs.json` is the source of truth for all your cron jobs. Hermes writes it atomically on every create/update/run. Understanding the schema helps you debug and gives you a mental model of what the validator is checking.\n\n**Read it:**\n\n```\ncat ~/.hermes/cron/jobs.json | python3 -m json.tool\n# or: jq . ~/.hermes/cron/jobs.json\n```\n\n**Key fields to note:**\n\n```json\n{\n  "jobs": [\n    {\n      "id": "abc123def456",\n      "name": "Good morning check-in",\n      "schedule": {\n        "kind": "cron",\n        "expr": "0 9 * * *",\n        "display": "0 9 * * *"\n      },\n      "enabled": true,\n      "state": "scheduled",\n      "next_run_at": "2026-05-29T09:00:00+10:00",\n      "deliver": "origin",\n      "repeat": { "times": null, "completed": 0 }\n    }\n  ]\n}\n```\n\n**Timezone note:** Hermes does NOT store a per-job timezone in `jobs.json`. The system timezone (from `hermes_time.now()`) is used at execution time. Timestamps in `next_run_at` and `last_run_at` are timezone-aware ISO strings reflecting your system timezone.\n\n**Safe to share:** job names, schedule kind, state, and enabled flag. **Do NOT share:** deliver values if they contain chat IDs (e.g., `telegram:-1001234567890`), or any token values.',
+            do: {
+              prompt:
+                'Run `cat ~/.hermes/cron/jobs.json | python3 -m json.tool` (or `jq . ~/.hermes/cron/jobs.json`). Share the output with the deliver and origin fields redacted if they contain chat IDs. Confirm the shape matches: top-level `{ "jobs": [...] }`, each job has `schedule.kind`, `enabled`, `next_run_at`, and `deliver`.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 5: Validation ────────────────────────────────────────────
+      {
+        id: 'validation',
+        title: 'Phase 5: Validation',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'run-validator',
+            title: 'Run Module 6 Validator',
+            learn:
+              'Run the M6 validator to confirm your cron setup is healthy.\n\nThe validator runs four checks:\n\n**Deterministic:**\n- `cron-exists` — `~/.hermes/cron/jobs.json` parses and contains at least one user-created job.\n- `cron-schedule-and-tz` — the job has a recognized schedule (kind: "once", "interval", or "cron") and the system has a timezone available. Note: Hermes does not store a per-job timezone field — this check verifies the schedule exists in any supported form.\n- `cron-enabled-and-bound` — the cron is enabled (not paused), has a `next_run_at` timestamp, and has `deliver` set to something other than `"local"` (i.e., it will actually deliver to a channel, not just save locally).\n\n**Manual:**\n- `cron-fires-end-to-end` — Schedule a one-shot cron for two minutes from now, wait, and confirm you receive the message in your chosen channel. This is the load-bearing check — it proves the executor, gateway, and delivery channel all work together.\n\n**The three deterministic checks are chained:** if `cron-exists` fails, the other two immediately fail with `dependent_on: cron-exists`. Fix the root issue (schedule a job) before re-running.\n\n**Common FAIL causes:**\n- `cron-exists` FAIL: no `jobs.json` yet — schedule a cron job first.\n- `cron-enabled-and-bound` FAIL with `deliver_type: local`: the job was scheduled from the CLI, which defaults to `deliver: "local"`. Update or recreate the job with an explicit delivery channel.\n- `cron-enabled-and-bound` FAIL with `has_next_run: false`: the job completed (one-shot) or errored. Check `hermes cron list` for the state.\n\n**Mac mini sleep caveat:** the `cron-fires-end-to-end` manual check requires the gateway to be running when the cron fires. If your Mac sleeps or the gateway is killed between scheduling and firing, the job will be skipped or fire late. This is environment behavior — not a validator or Hermes bug.',
+            do: {
+              prompt:
+                'Please run the verify_module command for module 6 and reply per the SKILL.md contract.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'cron-exists',
+                  label: '`~/.hermes/cron/jobs.json` contains at least one user-created job',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/cron/jobs.json` exists, parses as valid JSON, and contains at least one job in the `jobs` array. Respond ONLY with this JSON: {"checks":[{"id":"cron-exists","pass":true,"detail":"N user-created cron job(s) found"}]} — set pass to false if the file is missing, unparseable, or the jobs array is empty.',
+                  failHint:
+                    'Schedule a cron job in Hermes chat: "Schedule a reminder in 30 minutes: Remind me I set up a cron." Then re-run the validator.',
+                  fixPrompt:
+                    'Ask your Hermes agent: "Schedule a one-shot reminder in 30 minutes: Remind me I set up a cron." Confirm with `hermes cron list`, then re-run the validator.',
+                },
+                {
+                  id: 'cron-schedule-and-tz',
+                  label: 'Job has a recognized schedule (once / interval / cron)',
+                  verifyPrompt:
+                    'Check the first job in `~/.hermes/cron/jobs.json`. Confirm `schedule.kind` is one of "once", "interval", or "cron", and that the corresponding schedule field exists (run_at for once, minutes for interval, expr for cron). Respond ONLY with this JSON: {"checks":[{"id":"cron-schedule-and-tz","pass":true,"detail":"Schedule present (kind: <kind>) and system timezone available"}]} — set pass to false if schedule.kind is missing or unrecognized.',
+                  failHint:
+                    'This should not fail if a job exists. If it does, the job was created with a malformed schedule — remove it (`hermes cron remove <id>`) and recreate with a valid schedule like "30m" or "every 2h".',
+                  fixPrompt:
+                    'Remove the malformed job (`hermes cron list` to find the ID, then `hermes cron remove <id>`), then recreate: "Schedule a reminder in 30 minutes: Remind me I set up a cron."',
+                },
+                {
+                  id: 'cron-enabled-and-bound',
+                  label: 'Cron is enabled, has next-run timestamp, and bound to a delivery channel',
+                  verifyPrompt:
+                    'Check the first user-created job in `~/.hermes/cron/jobs.json`. Confirm: `enabled` is true (or absent), `next_run_at` is a non-null ISO timestamp, and `deliver` is set to something other than "local" (e.g., "origin", "telegram:...", etc.). Respond ONLY with this JSON: {"checks":[{"id":"cron-enabled-and-bound","pass":true,"detail":"Cron enabled, has next-run, deliver=<type>"}]} — set pass to false if any of the three conditions fails.',
+                  failHint:
+                    'If deliver is "local": recreate the job from a Telegram chat (so Hermes captures the origin channel), or explicitly ask "Schedule ... and deliver to Telegram". If next_run_at is null: the job may have completed — run `hermes cron list` to check state. If enabled is false: run `hermes cron resume <id>`.',
+                  fixPrompt:
+                    'From your Telegram chat with Hermes, schedule a new cron job: "Schedule a reminder in 30 minutes: Reminder that I set up crons." This ensures deliver is set to origin (Telegram). Then re-run the validator.',
+                },
+                {
+                  id: 'cron-fires-end-to-end',
+                  label: 'Cron fired and delivered to your channel (manual)',
+                  verifyPrompt:
+                    'Confirm you scheduled a one-shot cron for 2 minutes from now, waited for it to fire, and received the message in your chosen channel (Telegram, Discord, or wherever). Respond ONLY with this JSON: {"checks":[{"id":"cron-fires-end-to-end","pass":true,"detail":"Cron fired and delivered — <brief description of what you received>"}]} — set pass to false if the message did not arrive.',
+                  failHint:
+                    'If the message did not arrive: (1) confirm the gateway was running at fire time (`hermes gateway status`); (2) check `hermes gateway logs` for delivery errors; (3) confirm the deliver field was not "local". On Mac: check that the machine was not asleep at fire time.',
+                  fixPrompt:
+                    'Schedule a new one-shot: "Schedule a reminder in 2 minutes: Test cron delivery." Keep the gateway running, wait 2 minutes, confirm the message arrives in your channel. If not, check `hermes gateway logs`.',
                 },
               ],
             },
