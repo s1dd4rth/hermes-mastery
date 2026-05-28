@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -411,6 +411,144 @@ export const MODULES_DATA: Module[] = [
                     'If the agent complied with a forbidden request, your SOUL hard-limits aren\'t being enforced. Make sure SOUL.md is saved, start a fresh session, and try again. If it still complies, your limit phrasing may need to be more explicit.',
                   fixPrompt:
                     'Start a fresh Hermes session. Ask the agent to do something your Hard Limits explicitly forbid. If it still complies, rewrite the limit in SOUL.md to be more explicit, save, restart, and re-test.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'm4',
+    title: 'M4: Connect a Channel — Telegram',
+    shortTitle: 'M4 — Telegram',
+    description:
+      'Wire Hermes to Telegram: create a bot via BotFather, run gateway setup, confirm the bot is live, and complete the round-trip proof.',
+    icon: Send,
+    phases: [
+      // ── Phase 1: Create a Telegram bot via BotFather ───────────────────
+      {
+        id: 'botfather',
+        title: 'Phase 1: Create a Bot via BotFather',
+        icon: Send,
+        steps: [
+          {
+            id: 'create-bot',
+            title: 'Create Your Hermes Bot',
+            learn:
+              'Before configuring Hermes, you need a Telegram bot. Telegram bots are created and managed through **BotFather** — the official Telegram bot for managing bots.\n\n**Steps:**\n\n1. Open Telegram and search for [@BotFather](https://t.me/BotFather), or go to [t.me/BotFather](https://t.me/BotFather).\n2. Send `/newbot` to start the creation flow.\n3. When prompted, give your bot a **display name** (e.g., "My Hermes Agent").\n4. When prompted, give your bot a **username** — must end in `bot` (e.g., `myhermes_bot`).\n5. BotFather replies with your bot\'s **token** — a string like `1234567890:ABCDef...`.\n\n**Store this token securely.** You\'ll paste it into the Hermes setup wizard in the next phase. Do **not** paste it into any chat window, doc, or notes app — treat it like a password.\n\n**Important:** Your bot token is a credential. The validator will only confirm that the token *exists* in your config — it will never ask to see the value, and you should never share it with anyone.',
+            do: {
+              prompt:
+                'Open Telegram and go to [@BotFather](https://t.me/BotFather). Send `/newbot`, follow the prompts to create a bot with a name and username ending in `bot`. When BotFather gives you the token, copy it to a secure location (password manager or a local note you\'ll delete after setup). Report back: what username did you choose for your bot? Do not paste the token here.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 2: Run hermes gateway setup ─────────────────────────────
+      {
+        id: 'gateway-setup',
+        title: 'Phase 2: Run `hermes gateway setup`',
+        icon: Server,
+        steps: [
+          {
+            id: 'run-gateway-setup',
+            title: 'Configure the Gateway',
+            learn:
+              '`hermes gateway setup` is the interactive wizard that configures which channels (Telegram, Discord, WhatsApp) the Hermes gateway connects to.\n\n**Run:**\n\n```\nhermes gateway setup\n```\n\nThe wizard will ask:\n1. Which channel to configure (select **Telegram**)\n2. Your **bot token** — paste it from the secure location you stored it in the previous step\n3. Your **Telegram user ID** — this is the numeric ID of your Telegram account (not your @username). Get it by messaging [@userinfobot](https://t.me/userinfobot) on Telegram; it replies with your ID.\n\nThe wizard writes your token to `~/.hermes/.env`. It does **not** go into `config.yaml`.\n\n**After setup, start the gateway:**\n\n```\nhermes gateway start\n```\n\nOr run it in the foreground (better for first-time troubleshooting):\n\n```\nhermes gateway run\n```',
+            do: {
+              prompt:
+                'Run `hermes gateway setup` in your terminal and follow the prompts to configure Telegram. When asked for the bot token, paste it from your secure location — do not share the token in this chat. After completing setup, run `hermes gateway start` (or `hermes gateway run` in a separate terminal for foreground mode). Report: did the setup wizard complete without errors? Is the gateway now running?',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 3: Verify with hermes gateway status ─────────────────────
+      {
+        id: 'gateway-status',
+        title: 'Phase 3: Verify with `hermes gateway status`',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'check-gateway-status',
+            title: 'Confirm the Bot is Running',
+            learn:
+              '`hermes gateway status` shows whether the gateway is running and which channels are connected.\n\n**Run:**\n\n```\nhermes gateway status\n```\n\nA healthy Telegram connection shows the gateway running with a Telegram channel listed as live or connected.\n\nIf the gateway is not running:\n```\nhermes gateway start\n```\n\nIf the gateway runs but Telegram shows an error, check the logs:\n```\nhermes gateway logs\n```\n\nCommon issues:\n- **Invalid token** — re-run `hermes gateway setup` with the correct token from BotFather\n- **Bot not started** — send `/start` to your bot on Telegram first\n- **User ID mismatch** — confirm your numeric Telegram user ID via [@userinfobot](https://t.me/userinfobot)',
+            do: {
+              prompt:
+                'Run `hermes gateway status` and share the output. Do not include any credential values — just the status lines showing whether the gateway and Telegram channel are running.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 4: Test the round trip ───────────────────────────────────
+      {
+        id: 'round-trip',
+        title: 'Phase 4: Test the Round Trip',
+        icon: MessageSquare,
+        steps: [
+          {
+            id: 'message-your-bot',
+            title: 'Message Your Bot and Confirm a Reply',
+            learn:
+              'The final proof is a live round-trip: you send a message to your Hermes bot from your phone or Telegram desktop, and your Hermes agent replies.\n\n**How to test:**\n\n1. Open Telegram and find the bot you created (search by the `@username` you set in BotFather).\n2. Send it a message — something simple like "Hello" or "What\'s your name?"\n3. Your Hermes agent (using the voice and soul you configured in M3) should reply.\n\n**If there\'s no reply:**\n- Confirm the gateway is running: `hermes gateway status`\n- Check the logs: `hermes gateway logs`\n- Make sure you sent `/start` to the bot first (Telegram requires this for new bots)\n- Confirm the Telegram user ID you entered during setup matches your actual ID\n\n**This round-trip is the load-bearing check for M4.** The deterministic validator checks only confirm your config is set and the gateway claims to be bound — this live message proves the whole pipe works.',
+            do: {
+              prompt:
+                'Open Telegram (on your phone or desktop), find your Hermes bot by its @username, and send it a message. Wait for a reply from your Hermes agent. Report: what did you send, and what did the agent reply? If there was no reply, share the output of `hermes gateway logs` (without any credential values) so we can diagnose.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 5: Validation ────────────────────────────────────────────
+      {
+        id: 'validation',
+        title: 'Phase 5: Validation',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'run-validator',
+            title: 'Run Module 4 Validator',
+            learn:
+              'Run the M4 validator to confirm the Telegram channel is configured and live.\n\nThe validator runs three checks:\n- `telegram-configured` — **deterministic.** `TELEGRAM_BOT_TOKEN` is present and non-placeholder in `~/.hermes/.env`. Presence-only — the value is never logged or displayed.\n- `gateway-bot-bound` — **deterministic.** `hermes gateway status` reports the gateway is running and the Telegram channel is live.\n- `telegram-responds` — **manual.** You sent a message to your bot and confirmed a reply. The two checks above only prove config + gateway wiring; this proves the full pipe works.\n\n**Security note:** the validator never asks to see your bot token, and you should never paste it here or in any chat. If `telegram-configured` fails, run `hermes gateway setup` — the wizard writes the token to `~/.hermes/.env` securely.',
+            do: {
+              prompt:
+                'Please run the verify_module command for module 4 and reply per the SKILL.md contract.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'telegram-configured',
+                  label: '`TELEGRAM_BOT_TOKEN` present in `~/.hermes/.env` (presence-only)',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/.env` contains a line starting with `TELEGRAM_BOT_TOKEN=` or `HERMES_TELEGRAM_BOT_TOKEN=` with a non-empty, non-placeholder value. Do NOT display the token value — only confirm its presence. Respond ONLY with this JSON: {"checks":[{"id":"telegram-configured","pass":true,"detail":"TELEGRAM_BOT_TOKEN is set in ~/.hermes/.env (value not displayed)"}]} — set pass to false if the line is missing or the value looks like a placeholder.',
+                  failHint:
+                    'Run `hermes gateway setup` and select Telegram when prompted. Paste your BotFather token into the wizard — it will write it to `~/.hermes/.env`. Do not paste the token into this chat.',
+                  fixPrompt:
+                    'Run `hermes gateway setup`, choose Telegram, and provide your bot token from BotFather when prompted. The wizard writes the token to `~/.hermes/.env`. Then re-run the validator.',
+                },
+                {
+                  id: 'gateway-bot-bound',
+                  label: 'Telegram channel is live in `hermes gateway status`',
+                  verifyPrompt:
+                    'Run `hermes gateway status` and check whether the output shows the gateway is running and a Telegram channel is listed as live or connected. Respond ONLY with this JSON: {"checks":[{"id":"gateway-bot-bound","pass":true,"detail":"Gateway running, Telegram channel live"}]} — set pass to false if the gateway is not running or Telegram is not listed as connected.',
+                  failHint:
+                    'Run `hermes gateway start` to start the gateway, then re-run the validator. If the gateway runs but Telegram is not connected, re-run `hermes gateway setup` and check `hermes gateway logs` for errors.',
+                  fixPrompt:
+                    'Run `hermes gateway start` (or `hermes gateway run` in a separate terminal). Wait a few seconds, then re-run the validator. If still failing, check `hermes gateway logs` for errors.',
+                },
+                {
+                  id: 'telegram-responds',
+                  label: 'Bot replied to a message from your phone (manual)',
+                  verifyPrompt:
+                    'Confirm you sent a message to your Hermes bot on Telegram and received a reply from the agent. Respond ONLY with this JSON: {"checks":[{"id":"telegram-responds","pass":true,"detail":"Bot replied to message — <brief description of exchange>"}]} — set pass to false if the bot did not reply.',
+                  failHint:
+                    'Make sure the gateway is running (`hermes gateway status`), check `hermes gateway logs` for errors, confirm you sent `/start` to the bot, and verify your Telegram user ID matches the one entered in `hermes gateway setup`.',
+                  fixPrompt:
+                    'Check `hermes gateway status` and `hermes gateway logs`. Common fixes: run `hermes gateway start`, send `/start` to the bot first, or re-run `hermes gateway setup` with the correct Telegram user ID.',
                 },
               ],
             },
