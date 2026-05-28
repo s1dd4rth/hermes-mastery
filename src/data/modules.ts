@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock, Search, Mail, Users } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock, Search, Mail, Users, Award } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -1354,6 +1354,174 @@ export const MODULES_DATA: Module[] = [
                     'Ask your root Hermes and your writer profile for a 500-word draft on the same topic. Are the outputs noticeably different in voice, rhythm, or style? Respond ONLY with this JSON: {"checks":[{"id":"profile-delegation","pass":true,"detail":"Writer draft is stylistically distinct from root Hermes output: <brief description of difference>"}]} — set pass to false if the outputs are nearly identical.',
                   failHint: 'If outputs are identical, the writer SOUL.md needs more specific style guidance. Add concrete rules about sentence structure, rhythm, vocabulary register.',
                   fixPrompt: 'Edit `~/.hermes/profiles/writer/SOUL.md` with more distinctive writing style rules, start a fresh writer profile session, and compare drafts again.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── M10: Completion + Self-Improving Loop ─────────────────────────────────
+  {
+    id: 'm10',
+    title: 'M10: Completion + Self-Improving Loop',
+    shortTitle: 'M10 — Completion',
+    description:
+      'Verify the self-improving loop is alive, run the full M1-M9 self-audit, and receive your deterministic HMS- completion code.',
+    icon: Award,
+    phases: [
+      // ── Phase 1: Watch the Loop ───────────────────────────────────────────
+      {
+        id: 'watch-the-loop',
+        title: 'Phase 1: Watch the Loop',
+        icon: Award,
+        steps: [
+          {
+            id: 'open-dashboard',
+            title: 'Open the Hermes Dashboard',
+            learn:
+              'Before generating your completion code, open the Hermes dashboard and observe the self-improving loop in action.\n\nThe "self-improving loop" is Hermes\'s ability to learn about you over time: the **Curator** distills insights from your sessions, **Honcho** stores a user model, and **session search** lets you retrieve facts the agent has learned.\n\nOpen the dashboard:\n```bash\nhermes dashboard\n```\n\nThen navigate to **http://localhost:1919** in your browser.\n\nYou should see:\n- **Sessions** — your conversation history\n- **Curator** activity (if Curator has run)\n- **Memory** entries (if Honcho is active)\n\n**If the dashboard doesn\'t start:** check that no other process is using port 1919. You can also inspect Curator activity directly:\n```bash\nls ~/.hermes/logs/curator/\n```',
+            do: {
+              prompt:
+                'Run `hermes dashboard` and navigate to http://localhost:1919. Report what you see: how many sessions are listed? Is there a Curator or Memory section? (If the dashboard doesn\'t open, run `ls ~/.hermes/logs/curator/` instead and report what you see.)',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 2: Verify the Loop is Alive ────────────────────────────────
+      {
+        id: 'verify-loop-alive',
+        title: 'Phase 2: Verify the Loop is Alive (Not Just Named)',
+        icon: Shield,
+        steps: [
+          {
+            id: 'loop-evidence',
+            title: 'Find Concrete Loop Evidence',
+            learn:
+              'The self-improving loop is only real if you can point at *evidence* — not just trust that it runs. The M10 validator checks this concretely:\n\n**1. Curator run timestamp** — Curator is Hermes\'s background process that distills facts from your sessions. Evidence of a run:\n```bash\nls ~/.hermes/logs/curator/\n# Expected: directories like 20260501-154302/\n```\n\n**2. Session search** — Search your conversation history to find a fact the agent logged about you. In Hermes v0.12.0 there is no `hermes search` CLI command — use the dashboard search bar instead (http://localhost:1919).\n\n**3. Honcho user-model entry** — If Honcho integration is active, Hermes stores a user model. Check:\n```bash\nhermes memory list\n```\n\n**Honesty note:** if you can\'t find evidence of the loop, that\'s important information — either the loop hasn\'t had enough usage to produce observable output, or it\'s not active on your setup. The M10 `loop-honesty-check` manual asks you to report this gap if you find it.',
+            do: {
+              prompt:
+                'Run `ls ~/.hermes/logs/curator/` and report the output. Also run `hermes memory list` and report what you see. Can you find at least one concrete piece of loop evidence (a Curator timestamp, a memory entry, or a session search result)?',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 3: Run the Self-Audit ───────────────────────────────────────
+      {
+        id: 'run-self-audit',
+        title: 'Phase 3: Run the Self-Audit (M1-M9)',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'run-validator-m10',
+            title: 'Run the M10 Validator',
+            learn:
+              'The M10 validator orchestrates M1-M9 in sequence, tallies pass/fail/manual counts for each module, and computes your deterministic completion code.\n\nRun:\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10\n```\n\nOr via the Hermes skill:\n```\nverify module 10\n```\n\nThis will take about 30–60 seconds — it runs all 9 prior module checks as subprocesses.\n\n**Expected output structure:**\n- `claw-reviewed-setup` → PASS (all 9 modules ran without crash)\n- `completion-report` → PASS (per-module tally in evidence)\n- `completion-code` → PASS (HMS-... 12-char code in evidence)\n- `session-search-returns-results` → null (manual — no CLI in v0.12.0)\n- `curator-has-activity` → PASS or FAIL (depends on Curator having run)\n- `assessment-opened` → null (manual)\n- `loop-honesty-check` → null (manual)',
+            do: {
+              prompt:
+                'Run the M10 validator: `node ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10`. Paste the full JSON output here.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'claw-reviewed-setup',
+                  label: 'All M1-M9 validators executed without error',
+                  verifyPrompt:
+                    'Parse the pasted validator JSON. Find the check with id "claw-reviewed-setup". Respond ONLY with this JSON: {"checks":[{"id":"claw-reviewed-setup","pass":<value>,"detail":"<detail>"}]}',
+                  failHint:
+                    'One or more module runners crashed. Check the evidence.failed_modules list and run those modules individually to see the error.',
+                  fixPrompt:
+                    'Run `node ~/.hermes/skills/hermes-mastery-validator/bin/verify.js <N>` for each failing module to diagnose. Then re-run M10.',
+                },
+                {
+                  id: 'completion-report',
+                  label: 'Per-module M1-M9 tally computed',
+                  verifyPrompt:
+                    'Parse the pasted validator JSON. Find the check with id "completion-report". Respond ONLY with this JSON: {"checks":[{"id":"completion-report","pass":<value>,"detail":"<detail>"}]}',
+                  failHint:
+                    'This check always passes if claw-reviewed-setup passed. If it\'s failing, re-run the validator.',
+                },
+                {
+                  id: 'completion-code',
+                  label: 'HMS- completion code generated',
+                  verifyPrompt:
+                    'Parse the pasted validator JSON. Find the check with id "completion-code". Extract the code from evidence.code. Respond ONLY with this JSON: {"checks":[{"id":"completion-code","pass":<value>,"detail":"Code is <code>"}]}',
+                  failHint:
+                    'The completion code is computed from the tally — it should always be present if completion-report passed.',
+                },
+                {
+                  id: 'curator-has-activity',
+                  label: 'Curator has at least one activity log',
+                  verifyPrompt:
+                    'Parse the pasted validator JSON. Find the check with id "curator-has-activity". Respond ONLY with this JSON: {"checks":[{"id":"curator-has-activity","pass":<value>,"detail":"<detail>"}]}',
+                  failHint:
+                    'Curator has not yet run. Use Hermes for a few conversations and wait for Curator to process them. The log directory is `~/.hermes/logs/curator/`.',
+                  fixPrompt:
+                    'Run `hermes chat` for a few sessions, then wait for the Curator to process them (it may take a few minutes). Check `ls ~/.hermes/logs/curator/` for new timestamp directories.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+
+      // ── Phase 4: Get Your Completion Code ────────────────────────────────
+      {
+        id: 'completion-code',
+        title: 'Phase 4: Get Your Completion Code',
+        icon: Award,
+        steps: [
+          {
+            id: 'completion-code-step',
+            title: 'Your HMS- Completion Code',
+            learn:
+              'Your completion code is displayed above if you pasted the validator output in Phase 3.\n\nThe code is in the format `HMS-XXXXXXXXXXXX` — 12 characters after the prefix, using RFC 4648 base32 encoding (uppercase letters + digits 2-7). It is a deterministic hash of your per-module pass/fail tally:\n\n- **Same setup state → same code on every run.** Two learners with identical M1-M9 check states get the same code.\n- **Code changes if your setup changes.** If you fix a failing check, re-run the M10 validator and you\'ll get a new code reflecting the updated state.\n- **The code is not secret.** It encodes only counts of checks passed/failed/manual — not credentials or personal data.\n\n**To regenerate your code after fixing checks:**\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10\n```\n\nCopy the `HMS-...` code from the `completion-code` evidence block.',
+            do: {
+              prompt:
+                'Copy your HMS- completion code from the validator output above (or re-run M10 if needed). It should look like: `HMS-ABCD1234EFGH`. Paste it here to confirm you have it.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 5: Submit the Assessment ───────────────────────────────────
+      {
+        id: 'submit-assessment',
+        title: 'Phase 5: Submit the Assessment',
+        icon: Send,
+        steps: [
+          {
+            id: 'submit-form',
+            title: 'Submit the Course Assessment',
+            learn:
+              'Submit your completion code to the course assessment form.\n\nThe Google Form asks you to:\n1. Confirm you completed M1-M10\n2. Enter your HMS- completion code\n3. Share any feedback on the course\n\n**Assessment form URL:** *(The course owner will add this link to the M10 panel — if you don\'t see a link here, check the course README or contact the course owner.)*\n\n**What your code proves:**\n- You ran the validator on your own machine\n- Your Hermes is configured to the degree your check tally reflects\n- The code is deterministic — the same honest setup always yields the same code\n\n**Loop-honesty reminder:** if you could not find concrete evidence of the self-improving loop in Phase 2, please include that in your form feedback. That\'s valuable signal for improving the curriculum.',
+            do: {
+              prompt:
+                'Open the course assessment Google Form (linked above or in the course README). Enter your HMS- completion code and submit the form. Confirm here once you\'ve submitted.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'assessment-opened',
+                  label: 'Course assessment form submitted with HMS- code (manual)',
+                  verifyPrompt:
+                    'Did you open and submit the course assessment Google Form with your HMS- completion code? Respond ONLY with this JSON: {"checks":[{"id":"assessment-opened","pass":true,"detail":"Submitted completion code <your-code> via Google Form"}]}',
+                  failHint:
+                    'Open the assessment form link above and submit your HMS- completion code. If the link is missing, contact the course owner.',
+                },
+                {
+                  id: 'loop-honesty-check',
+                  label: 'Self-improving loop evidence check (manual)',
+                  verifyPrompt:
+                    'Open the Hermes dashboard or run `ls ~/.hermes/logs/curator/` and `hermes memory list`. Can you point at concrete evidence of the self-improving loop: a Curator run timestamp, a session search result, or a Honcho user-model entry? Respond ONLY with this JSON: {"checks":[{"id":"loop-honesty-check","pass":true,"detail":"Evidence found: <describe what you found>"}]} — set pass to false if you cannot find any evidence.',
+                  failHint:
+                    'If you genuinely cannot find evidence of the loop, that\'s a course bug. Please report it via the assessment form feedback field or the course GitHub issues. The loop is real — but if it\'s not visible, the curriculum needs better observability.',
+                  fixPrompt:
+                    'Report the gap via the assessment form feedback field. This is valuable curriculum feedback.',
                 },
               ],
             },
