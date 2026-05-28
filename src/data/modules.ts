@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock, Search, Mail } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock, Search, Mail, Users } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -1166,6 +1166,194 @@ export const MODULES_DATA: Module[] = [
                     'If no approval prompt appeared: check that SOUL.md has the Outbound Email Protocols rule and that you started a fresh session. If the email was sent despite cancellation: the rule is not being honored — report as a §10 finding.',
                   fixPrompt:
                     'Ensure `~/.hermes/SOUL.md` has the Outbound Email Protocols section, then start a fresh session with `hermes /new` or equivalent. If the approval gate still does not appear after a fresh session, the SOUL.md rule may not be applied at tool-call time — investigate and report.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── M9: Multi-Profile / Specialist Agents ────────────────────────────────
+  {
+    id: 'm9',
+    title: 'M9: Multi-Profile / Specialist Agents',
+    shortTitle: 'M9 — Profiles',
+    description:
+      'Create a specialist writer profile that runs as an isolated Hermes agent with its own identity, SOUL.md, and skills — so you can switch between a general assistant and a focused long-form writing partner.',
+    icon: Users,
+    phases: [
+      // ── Phase 1: What's a Profile ─────────────────────────────────────────
+      {
+        id: 'what-is-a-profile',
+        title: "Phase 1: What's a Profile",
+        icon: Users,
+        steps: [
+          {
+            id: 'profile-concept',
+            title: 'Profiles: Isolated Agent Identities',
+            learn:
+              'A Hermes **profile** is a full agent clone with its own isolated identity: its own `SOUL.md`, `config.yaml`, `.env`, skills, memories, and gateway. You can run multiple profiles on the same machine — each behaves as a separate specialist.\n\nCommon use cases:\n- **Writer** — focused long-form writing voice, different style rules\n- **Coder** — stripped-down SOUL.md, code-first personality, different model\n- **Research** — web-search heavy, citation-aware tone\n\nEach profile lives at `~/.hermes/profiles/<name>/`. The default profile lives at `~/.hermes/` (no subdirectory).\n\n**CLI surface in v0.12.0:**\n```bash\nhermes profile list              # list all profiles\nhermes profile create <name>     # create a new blank profile\nhermes profile create <name> --clone   # clone active profile (config + SOUL)\nhermes profile show <name>       # inspect a profile\nhermes profile use <name>        # set sticky default\n```\n\nAfter creating a profile with `--clone`, Hermes installs an alias wrapper: a binary at `~/.local/bin/<name>` that you can invoke directly (`writer chat`, `writer gateway start`, etc.).\n\n**Acknowledged gap — cross-profile delegation:** in v0.12.0 there is no CLI surface for root Hermes invoking a specialist profile and receiving back a structured draft (cross-profile RPC). Profiles are isolated — you switch between them manually. If Hermes adds cross-agent delegation in a future version, this module will grow a `cross-profile-comms` check. For now: profiles are powerful specialist identities, not sub-agents that a root agent can orchestrate.',
+            do: {
+              prompt:
+                'Run `hermes profile list` and report: how many profiles do you have, and what are their names? (A fresh install has one: `default`.)',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 2: Create a Writer Profile ─────────────────────────────────
+      {
+        id: 'create-writer-profile',
+        title: 'Phase 2: Create a Writer Profile',
+        icon: Users,
+        steps: [
+          {
+            id: 'create-profile',
+            title: 'Create the Writer Profile',
+            learn:
+              'Create a writer profile by cloning your default profile. The `--clone` flag copies `config.yaml`, `.env`, and `SOUL.md` from the active profile, giving you a working starting point:\n\n```bash\nhermes profile create writer --clone\n```\n\nExpected output:\n```\nProfile \'writer\' created at ~/.hermes/profiles/writer\nCloned config, .env, SOUL.md, and skills from default.\nWrapper created: ~/.local/bin/writer\n```\n\nAfter creation, confirm the directory exists:\n\n```bash\nls ~/.hermes/profiles/writer/\n```\n\nYou should see: `config.yaml`, `SOUL.md`, `.env`, `skills/`, `memories/`, and several other directories.\n\n**The validator checks for `~/.hermes/profiles/writer/SOUL.md` being present and non-empty.** If the directory exists but SOUL.md is missing, re-run `hermes profile create writer --clone`.',
+            do: {
+              prompt:
+                'Run `hermes profile create writer --clone` and confirm the profile was created. Then run `ls ~/.hermes/profiles/writer/` and report the files/directories listed.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'writer-profile-exists',
+                  label: '`~/.hermes/profiles/writer/` directory exists',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/profiles/writer/` exists as a directory. Respond ONLY with this JSON: {"checks":[{"id":"writer-profile-exists","pass":true,"detail":"~/.hermes/profiles/writer/ exists"}]} — set pass to false if the directory is absent.',
+                  failHint:
+                    'Run `hermes profile create writer --clone`. If that fails, check `hermes profile --help` for the correct syntax.',
+                  fixPrompt:
+                    'Run `hermes profile create writer --clone`, then confirm the directory `~/.hermes/profiles/writer/` exists.',
+                },
+                {
+                  id: 'writer-soul-exists',
+                  label: '`~/.hermes/profiles/writer/SOUL.md` is present and non-empty',
+                  verifyPrompt:
+                    'Check whether `~/.hermes/profiles/writer/SOUL.md` exists and is non-empty. Respond ONLY with this JSON: {"checks":[{"id":"writer-soul-exists","pass":true,"detail":"writer SOUL.md present, N bytes"}]} — set pass to false if the file is absent or empty.',
+                  failHint:
+                    'If the profile directory exists but SOUL.md is missing, re-run `hermes profile create writer --clone` (the `--clone` flag copies SOUL.md from your default profile).',
+                  fixPrompt:
+                    'Re-run `hermes profile create writer --clone`. If the profile already exists, try `hermes profile delete writer` first, then re-create.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+
+      // ── Phase 3: Customize the Writer Profile ────────────────────────────
+      {
+        id: 'customize-writer',
+        title: 'Phase 3: Customize the Writer Profile',
+        icon: Users,
+        steps: [
+          {
+            id: 'edit-writer-soul',
+            title: 'Give the Writer Profile a Distinct Voice',
+            learn:
+              'The freshly cloned `SOUL.md` is byte-identical to your root SOUL.md — the validator will flag this as a FAIL. You need to edit it to give the writer profile a genuinely different long-form writing voice.\n\n**Edit:**\n```bash\nnano ~/.hermes/profiles/writer/SOUL.md\n# or: code ~/.hermes/profiles/writer/SOUL.md\n```\n\n**What to add/change:**\n- A "Writing Voice" or "Long-Form Style" section with concrete rules: paragraph length targets, preferred transitions, tone for essays vs. how-to guides\n- Guidance on structure: when to use headers, when to write flowing prose\n- Sentence rhythm preferences: short punchy sentences vs. longer subordinate clauses?\n- Vocabulary register: formal, accessible, technical?\n\n**What NOT to do:**\n- Do not just prepend "As a writer, ..." to the existing SOUL.md — one-line changes are not enough\n- Do not copy-paste the root SOUL.md with a single word changed\n\n**The validator checks:**\n1. `writer-soul-distinct-files` — SHA-256 hash comparison. If writer SOUL.md has the same hash as root SOUL.md, it FAILs. This proves *isolation* (the file has been edited), not quality.\n2. `writer-soul-distinct-content` — manual check. You confirm the content is meaningfully different, not just technically distinct.\n\nYou can optionally also change the model for the writer profile by editing `~/.hermes/profiles/writer/config.yaml` — for example, switching to Claude Opus for higher-quality long-form output.',
+            do: {
+              prompt:
+                'Edit `~/.hermes/profiles/writer/SOUL.md` to give the writer profile a distinct long-form writing voice. Add at minimum a "Writing Voice" section with specific style guidance. After editing, confirm the file is saved and different from `~/.hermes/SOUL.md`. Report: what key writing style rules did you add?',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'writer-soul-distinct-files',
+                  label: 'Writer SOUL.md has a different SHA-256 hash than root SOUL.md (edited, not a clone)',
+                  verifyPrompt:
+                    'Compute the SHA-256 hash of `~/.hermes/profiles/writer/SOUL.md` and the SHA-256 hash of `~/.hermes/SOUL.md`. Are they different? Respond ONLY with this JSON: {"checks":[{"id":"writer-soul-distinct-files","pass":true,"detail":"writer SOUL.md hash differs from root SOUL.md hash"}]} — set pass to false if the hashes are identical.',
+                  failHint:
+                    'The writer SOUL.md is still byte-identical to root SOUL.md. Edit `~/.hermes/profiles/writer/SOUL.md` and add meaningful long-form writing guidance — not just a one-line change.',
+                  fixPrompt:
+                    'Open `~/.hermes/profiles/writer/SOUL.md` in a text editor and add a substantive "Writing Voice" or "Long-Form Style" section. Save the file. Then re-run the validator.',
+                },
+              ],
+            },
+          },
+        ],
+      },
+
+      // ── Phase 4: Use the Writer Profile ──────────────────────────────────
+      {
+        id: 'use-writer-profile',
+        title: 'Phase 4: Use the Writer Profile',
+        icon: Users,
+        steps: [
+          {
+            id: 'open-writer',
+            title: 'Chat with Your Writer Profile',
+            learn:
+              'The writer profile has its own alias wrapper installed at `~/.local/bin/writer`. Invoke it directly:\n\n```bash\nwriter chat\n```\n\nThis starts a Hermes session using the writer profile\'s identity — its own SOUL.md, config, and skills.\n\nAlternatively, set it as the sticky default:\n```bash\nhermes profile use writer\nhermes chat\n```\n\nAnd switch back when done:\n```bash\nhermes profile use default\n```\n\n**What to test:**\nAsk the writer profile for a 500-word essay or long-form post on any topic. Compare it to what your root Hermes agent would produce. If the two outputs feel identical in voice and structure, your SOUL.md edit wasn\'t substantive enough — add more specific guidance.\n\n**Gateway note:** if you run both profiles simultaneously, each needs its own gateway port. Edit `~/.hermes/profiles/writer/config.yaml` to change the `dashboard.port` (e.g., from 1919 to 1920) before starting the writer gateway:\n\n```bash\nwriter gateway start\n```',
+            do: {
+              prompt:
+                'Start the writer profile: run `writer chat` (or `hermes profile use writer` then `hermes chat`). Ask it: "Write a 500-word essay on the value of deliberate practice." Report back the first 2-3 sentences of the response.',
+            },
+          },
+        ],
+      },
+
+      // ── Phase 5: Validation ───────────────────────────────────────────────
+      {
+        id: 'validation',
+        title: 'Phase 5: Validation',
+        icon: Shield,
+        steps: [
+          {
+            id: 'run-validator',
+            title: 'Run the M9 Validator',
+            learn:
+              'Run the M9 validator to confirm your writer profile is set up correctly:\n\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 9\n```\n\nOr via the Hermes skill:\n\n```\nverify module 9\n```\n\n**Expected green state:**\n- `writer-profile-exists` → PASS\n- `writer-soul-exists` → PASS\n- `writer-soul-distinct-files` → PASS (hashes differ)\n- `writer-soul-distinct-content` → null (manual — confirm below)\n- `profile-delegation` → null (manual — confirm below)\n\n**If `writer-soul-distinct-files` is still FAIL:** your SOUL.md edit was not saved, or the file is still byte-identical to root. Re-edit and save.\n\n**Manual checks:**\n1. **writer-soul-distinct-content** — Read both SOUL.md files side-by-side. Confirm the writer\'s version has specific long-form guidance not present in root.\n2. **profile-delegation** — Compare two 500-word drafts from root vs. writer profile on the same topic. Confirm the writer draft has a noticeably different voice.',
+            do: {
+              prompt:
+                'Run the M9 validator: `node ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 9`. Paste the full JSON output here.',
+            },
+            verify: {
+              checks: [
+                {
+                  id: 'writer-profile-exists',
+                  label: '`~/.hermes/profiles/writer/` exists',
+                  verifyPrompt:
+                    'Parse the pasted validator JSON. Find the check with id "writer-profile-exists". Respond ONLY with this JSON: {"checks":[{"id":"writer-profile-exists","pass":<value>,"detail":"<detail>"}]}',
+                  failHint: 'Run `hermes profile create writer --clone`.',
+                  fixPrompt: 'Run `hermes profile create writer --clone` then re-run the validator.',
+                },
+                {
+                  id: 'writer-soul-exists',
+                  label: 'Writer SOUL.md is present and non-empty',
+                  verifyPrompt:
+                    'Parse the pasted validator JSON. Find the check with id "writer-soul-exists". Respond ONLY with this JSON: {"checks":[{"id":"writer-soul-exists","pass":<value>,"detail":"<detail>"}]}',
+                  failHint: 'Re-run `hermes profile create writer --clone` to ensure SOUL.md is copied.',
+                  fixPrompt: 'Re-run `hermes profile create writer --clone`. If the profile already exists, delete and recreate it.',
+                },
+                {
+                  id: 'writer-soul-distinct-files',
+                  label: 'Writer SOUL.md has a different hash than root SOUL.md',
+                  verifyPrompt:
+                    'Parse the pasted validator JSON. Find the check with id "writer-soul-distinct-files". Respond ONLY with this JSON: {"checks":[{"id":"writer-soul-distinct-files","pass":<value>,"detail":"<detail>"}]}',
+                  failHint: 'Edit `~/.hermes/profiles/writer/SOUL.md` and add a substantive writing voice section.',
+                  fixPrompt: 'Open `~/.hermes/profiles/writer/SOUL.md`, add a real "Writing Voice" section, save, then re-run the validator.',
+                },
+                {
+                  id: 'writer-soul-distinct-content',
+                  label: 'Writer SOUL.md has materially different long-form guidance (manual)',
+                  verifyPrompt:
+                    'Read `~/.hermes/profiles/writer/SOUL.md` and `~/.hermes/SOUL.md`. Is the writer SOUL.md materially different — specific long-form writing guidance not present in root? Respond ONLY with this JSON: {"checks":[{"id":"writer-soul-distinct-content","pass":true,"detail":"Writer SOUL.md has specific long-form guidance: <brief description>"}]} — set pass to false if the files are nearly identical in content.',
+                  failHint: 'Add more specific long-form writing guidance: paragraph rhythm, sentence structure preferences, tone rules. One-line changes are not enough.',
+                  fixPrompt: 'Edit `~/.hermes/profiles/writer/SOUL.md` with more substantive long-form style rules.',
+                },
+                {
+                  id: 'profile-delegation',
+                  label: 'Writer profile produces a noticeably distinct draft voice (manual)',
+                  verifyPrompt:
+                    'Ask your root Hermes and your writer profile for a 500-word draft on the same topic. Are the outputs noticeably different in voice, rhythm, or style? Respond ONLY with this JSON: {"checks":[{"id":"profile-delegation","pass":true,"detail":"Writer draft is stylistically distinct from root Hermes output: <brief description of difference>"}]} — set pass to false if the outputs are nearly identical.',
+                  failHint: 'If outputs are identical, the writer SOUL.md needs more specific style guidance. Add concrete rules about sentence structure, rhythm, vocabulary register.',
+                  fixPrompt: 'Edit `~/.hermes/profiles/writer/SOUL.md` with more distinctive writing style rules, start a fresh writer profile session, and compare drafts again.',
                 },
               ],
             },
