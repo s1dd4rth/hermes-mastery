@@ -21,7 +21,7 @@ export const MODULES_DATA: Module[] = [
             id: 'install-hermes',
             title: 'Install Hermes',
             learn:
-              'Hermes is a local-first AI orchestrator that runs on your machine. Install it with the canonical one-liner:\n\n```\ncurl -fsSL https://gethermes.ai/install.sh | bash\n```\n\nOnce installed, verify with:\n\n```\nhermes --version\n```\n\nYou should see a version string like `hermes v0.12.0`. If the command is not found, open a new shell so the `PATH` update from the installer takes effect, then try again.\n\n**Apple Silicon note:** the installer places the binary at `/opt/homebrew/bin/hermes` on M1/M2/M3 Macs. On Intel Macs and Linux it goes to `/usr/local/bin/hermes`. Either location is fine as long as it is on your `PATH`.',
+              'Hermes is a local-first AI orchestrator that runs on your machine. Install it with the canonical one-liner:\n\n```\ncurl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash\n```\n\nOnce installed, verify with:\n\n```\nhermes --version\n```\n\nYou should see a version string like `hermes v0.12.0`. If the command is not found, open a new shell so the `PATH` update from the installer takes effect, then try again.\n\n**Apple Silicon note:** the installer places the binary at `/opt/homebrew/bin/hermes` on M1/M2/M3 Macs. On Intel Macs and Linux it goes to `/usr/local/bin/hermes`. Either location is fine as long as it is on your `PATH`.',
             do: {
               prompt:
                 'Run `hermes --version` and report the output. Just the version string, one line.',
@@ -88,10 +88,10 @@ export const MODULES_DATA: Module[] = [
             id: 'install-validator-skill',
             title: 'Install the Validator Skill',
             learn:
-              'The course uses a companion Hermes skill called `hermes-mastery-validator` to verify your setup at the end of each module. Instead of ticking checkboxes by hand, the skill inspects your actual Hermes state — config values, files, the gateway — and returns a structured pass/fail JSON report this app reads.\n\nIt is read-only. It never modifies your setup, never displays secrets.\n\n**Install:**\n\n```\nhermes skills install s1dd4rth/hermes-mastery-validator\n```\n\nThis fetches the skill from the Hermes skill registry. Once installed, start a fresh Hermes session and verify:\n\n```\nhermes skills list\n```\n\n`hermes-mastery-validator` should appear in the output.\n\n**If install fails (registry not yet live):** use the local path method:\n\n```\nmkdir -p ~/.hermes/skills\ngit clone https://github.com/s1dd4rth/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\n```\n\nStart a fresh Hermes session to pick up the new skill.',
+              'The course uses a companion Hermes skill called `hermes-mastery-validator` to verify your setup at the end of each module. Instead of ticking checkboxes by hand, the skill inspects your actual Hermes state — config values, files, the gateway — and returns a structured pass/fail JSON report this app reads.\n\nIt is read-only. It never modifies your setup, never displays secrets.\n\n**Install (v0.1.0-alpha):** Hub install (`hermes skills install …`) is not available yet in this alpha, so clone the repo and symlink it into your skills directory:\n\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```\n\nThe `npm install` step is required, not optional — the validator depends on `js-yaml`, and `verify.js` throws `Cannot find module \'js-yaml\'` without it.\n\nStart a fresh Hermes session so the new skill is picked up, then confirm it is registered:\n\n```\nhermes skills\n```\n\n`hermes-mastery-validator` should appear in the listing.',
             do: {
               prompt:
-                'Install the hermes-mastery-validator skill. First try:\n```\nhermes skills install s1dd4rth/hermes-mastery-validator\n```\nIf the registry is unreachable, fall back to:\n```\nmkdir -p ~/.hermes/skills && git clone https://github.com/s1dd4rth/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\n```\nThen run `hermes skills list` and confirm `hermes-mastery-validator` appears. Report the install method used and whether the skill shows up in the list.',
+                'Install the hermes-mastery-validator skill via clone + symlink (Hub install is not available in v0.1.0-alpha):\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```\nThe `npm install` is required (the validator needs `js-yaml`). Then start a fresh Hermes session, run `hermes skills`, and confirm `hermes-mastery-validator` appears. Report whether the clone, symlink, and `npm install` all succeeded and whether the skill shows up in the listing.',
             },
             verify: {
               checks: [
@@ -103,7 +103,7 @@ export const MODULES_DATA: Module[] = [
                   failHint:
                     'The file is missing. Confirm the git clone completed and the target path is exactly `~/.hermes/skills/hermes-mastery-validator/SKILL.md`.',
                   fixPrompt:
-                    'Run: `ls ~/.hermes/skills/hermes-mastery-validator/SKILL.md` — if missing, re-run: `git clone https://github.com/s1dd4rth/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator`',
+                    'Run: `ls ~/.hermes/skills/hermes-mastery-validator/SKILL.md` — if missing, re-install:\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```',
                 },
               ],
             },
