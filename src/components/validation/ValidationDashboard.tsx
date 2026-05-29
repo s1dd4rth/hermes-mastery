@@ -124,7 +124,7 @@ export const ValidationDashboard = ({
                 className={
                   isComplete
                     ? 'w-full py-4 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-emerald-600/20'
-                    : 'w-full py-4 bg-hermes-dark text-white rounded-xl font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-hermes-dark/10'
+                    : 'w-full py-4 bg-hermes-dark text-hermes-bg rounded-xl font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-hermes-dark/10'
                 }
               >
                 {isComplete

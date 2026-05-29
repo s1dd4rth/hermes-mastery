@@ -154,7 +154,7 @@ export const StepEngine = ({
           {(completedSteps[currentIndex] || isStepComplete(step.id)) && currentIndex < steps.length - 1 && (
             <button
               onClick={() => onNavigateStep(currentIndex + 1)}
-              className="w-full py-4 bg-hermes-dark text-white rounded-xl font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-hermes-dark/10"
+              className="w-full py-4 bg-hermes-dark text-hermes-bg rounded-xl font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-hermes-dark/10"
             >
               Next Step: {steps[currentIndex + 1]?.title}
             </button>

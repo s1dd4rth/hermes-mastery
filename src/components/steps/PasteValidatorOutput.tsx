@@ -146,7 +146,7 @@ export const PasteValidatorOutput = ({ module, moduleNumber, onApply }: PasteVal
           <ol className="list-decimal pl-5 text-sm text-hermes-dark/70 space-y-1.5 leading-relaxed">
             <li>
               In your Hermes chat, run:{' '}
-              <code className="bg-hermes-dark text-emerald-200 px-2 py-0.5 rounded font-mono text-xs">
+              <code className="bg-hermes-bg text-emerald-300 px-2 py-0.5 rounded font-mono text-xs border border-hermes-border">
                 Use hermes-mastery-validator to verify module {moduleNumber}
               </code>
             </li>
@@ -175,7 +175,7 @@ export const PasteValidatorOutput = ({ module, moduleNumber, onApply }: PasteVal
                 <button
                   onClick={handleRunLive}
                   disabled={feedback.kind === 'live_loading'}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-hermes-dark text-white rounded-xl text-sm font-bold hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 transition-all shadow-md shadow-hermes-dark/20"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-hermes-dark text-hermes-bg rounded-xl text-sm font-bold hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 transition-all shadow-md shadow-hermes-dark/20"
                   title="Call the validator skill on your gateway directly, no copy/paste"
                 >
                   {feedback.kind === 'live_loading' ? (
