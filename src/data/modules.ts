@@ -21,7 +21,7 @@ export const MODULES_DATA: Module[] = [
             id: 'install-hermes',
             title: 'Install Hermes',
             learn:
-              'Hermes is a local-first AI orchestrator that runs on your machine. Install it with the canonical one-liner:\n\n```\ncurl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash\n```\n\nOnce installed, verify with:\n\n```\nhermes --version\n```\n\nYou should see a version string like `hermes v0.12.0`. If the command is not found, open a new shell so the `PATH` update from the installer takes effect, then try again.\n\n**Apple Silicon note:** the installer places the binary at `/opt/homebrew/bin/hermes` on M1/M2/M3 Macs. On Intel Macs and Linux it goes to `/usr/local/bin/hermes`. Either location is fine as long as it is on your `PATH`.',
+              'Hermes is a local-first AI orchestrator that runs on your machine. Install it with the canonical one-liner:\n\n```\ncurl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash\n```\n\nOnce installed, verify with:\n\n```\nhermes --version\n```\n\nYou should see a version string like `Hermes Agent v0.15.x`. If the command is not found, open a new shell so the `PATH` update from the installer takes effect, then try again.\n\n**Install location:** on a normal (non-root) macOS or Linux account, Hermes installs under `~/.hermes/hermes-agent` and adds its command to your `PATH`. That `PATH` change only applies to new shells — opening a fresh terminal is what clears a `command not found` immediately after install.',
             do: {
               prompt:
                 'Run `hermes --version` and report the output. Just the version string, one line.',
