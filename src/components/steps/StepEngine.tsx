@@ -14,6 +14,7 @@ interface StepEngineProps {
   phaseId: string;
   userInputs: Record<string, string>;
   getVerifyResults: (stepId: string) => Record<string, VerifyResult> | undefined;
+  getModuleVerifyResults: (moduleId: string) => Record<string, VerifyResult> | undefined;
   isStepComplete: (stepId: string) => boolean;
   onExecute: (prompt: string, stepTitle: string) => void;
   onToggleCheck: (stepId: string, checkId: string) => void;
@@ -34,6 +35,7 @@ export const StepEngine = ({
   currentIndex,
   userInputs,
   getVerifyResults,
+  getModuleVerifyResults,
   isStepComplete,
   onExecute,
   onToggleCheck,
@@ -98,9 +100,11 @@ export const StepEngine = ({
             />
           )}
 
-          {/* M10 completion code (Step 7): surfaces the validator-generated code prominently. */}
+          {/* M10 completion code: surfaces the validator-generated code prominently.
+              Uses module-wide results so the banner appears on all M10 phases,
+              not just the phase where the validator was pasted. */}
           {module.id === 'm10' && (
-            <CompletionCodeBanner results={getVerifyResults(step.id)} />
+            <CompletionCodeBanner results={getModuleVerifyResults(module.id)} />
           )}
 
           {/* Paste validator output (per design doc, above StepVerify, feature-flagged per module) */}

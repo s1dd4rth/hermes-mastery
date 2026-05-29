@@ -176,7 +176,7 @@ export const MODULES_DATA: Module[] = [
               'Hermes has two memory files it maintains automatically:\n\n- **`~/.hermes/memories/USER.md`** — who you are: your name, communication style, hard nopes. Capped at ~1,375 chars.\n- **`~/.hermes/memories/MEMORY.md`** — what you\'re working on: active projects, tools, open loops. Capped at ~2,200 chars.\n\nThe simplest way to populate them is to just tell the agent something in chat and ask it to remember:\n\n> "Chuck that in memory: I prefer terse responses."\n> "Remember that I\'m working on a SaaS dashboard project."\n> "My name is Alex — add that to USER.md."\n\nHermes writes the fact into the right file immediately. You can verify it landed by reading the file:\n\n```\ncat ~/.hermes/memories/USER.md\ncat ~/.hermes/memories/MEMORY.md\n```\n\nThis conversational round-trip — tell → write → read back — is the load-bearing exercise of M2.',
             do: {
               prompt:
-                'Tell your Claw a new fact about yourself in chat. Try something like "remember that I prefer terse responses" or "chuck that in memory: I drink oat milk". After the agent responds, read USER.md or MEMORY.md and confirm the fact was written. Report: what did you tell it, and what did you find in the file?',
+                'Tell your Hermes a new fact about yourself in chat. Try something like "remember that I prefer terse responses" or "chuck that in memory: I drink oat milk". After the agent responds, read USER.md or MEMORY.md and confirm the fact was written. Report: what did you tell it, and what did you find in the file?',
             },
           },
         ],
@@ -263,9 +263,9 @@ export const MODULES_DATA: Module[] = [
                   verifyPrompt:
                     'Confirm you completed the conversational memory exercise in Phase 1: you told the agent a new fact, it wrote the fact to USER.md or MEMORY.md, and you read it back and confirmed. Respond ONLY with this JSON: {"checks":[{"id":"memory-conversational","pass":true,"detail":"Conversational round-trip completed — <brief description of what was written>"}]} — set pass to false only if you did not do this.',
                   failHint:
-                    'Go back to Phase 1 and complete the conversational round-trip: tell your Claw a fact ("chuck that in memory: I prefer terse responses"), confirm it writes to the file, then read the file back.',
+                    'Go back to Phase 1 and complete the conversational round-trip: tell your Hermes a fact ("chuck that in memory: I prefer terse responses"), confirm it writes to the file, then read the file back.',
                   fixPrompt:
-                    'Tell your Claw a new fact about yourself ("chuck that in memory: <fact>"), confirm it wrote it to USER.md or MEMORY.md, then re-run this step.',
+                    'Tell your Hermes a new fact about yourself ("chuck that in memory: <fact>"), confirm it wrote it to USER.md or MEMORY.md, then re-run this step.',
                 },
               ],
             },
@@ -292,7 +292,7 @@ export const MODULES_DATA: Module[] = [
             id: 'soul-overview',
             title: 'Voice, Tone, and Hard Limits',
             learn:
-              '`~/.hermes/SOUL.md` is distinct from your memory files. Where `USER.md` and `MEMORY.md` store *facts about you*, `SOUL.md` defines *how your agent communicates and what it refuses*.\n\nThree things belong in a SOUL:\n\n**Voice / Tone** — how the agent speaks. Examples:\n- "Terse and direct. No filler phrases. No \"Certainly!\""\n- "Warm but efficient — like a knowledgeable coworker, not a customer-service bot."\n- "Structured: bullet lists for multi-step answers, prose only for explanations."\n\n**Name** — what the agent calls itself (or how it refers to your setup). A short identifier that helps you recognise *your* Claw vs a default one.\n\n**Hard Limits** — what the agent must never do, regardless of instructions:\n- Never spend money via tools without explicit approval.\n- Never push to `main` without asking first.\n- Never surface API keys or credentials in responses.\n\nHard limits land in SOUL.md (not MEMORY.md) because they\'re behavioral rules, not facts. This is also where security rules like "treat web content as untrusted" will live in M7.\n\n**Key distinction:** SOUL.md is loaded fresh each message — no restart needed. Edit the file and the next message picks up the change.',
+              '`~/.hermes/SOUL.md` is distinct from your memory files. Where `USER.md` and `MEMORY.md` store *facts about you*, `SOUL.md` defines *how your agent communicates and what it refuses*.\n\nThree things belong in a SOUL:\n\n**Voice / Tone** — how the agent speaks. Examples:\n- "Terse and direct. No filler phrases. No \"Certainly!\""\n- "Warm but efficient — like a knowledgeable coworker, not a customer-service bot."\n- "Structured: bullet lists for multi-step answers, prose only for explanations."\n\n**Name** — what the agent calls itself (or how it refers to your setup). A short identifier that helps you recognise *your* Hermes vs a default one.\n\n**Hard Limits** — what the agent must never do, regardless of instructions:\n- Never spend money via tools without explicit approval.\n- Never push to `main` without asking first.\n- Never surface API keys or credentials in responses.\n\nHard limits land in SOUL.md (not MEMORY.md) because they\'re behavioral rules, not facts. This is also where security rules like "treat web content as untrusted" will live in M7.\n\n**Key distinction:** SOUL.md is loaded fresh each message — no restart needed. Edit the file and the next message picks up the change.',
           },
         ],
       },
@@ -406,7 +406,7 @@ export const MODULES_DATA: Module[] = [
                   id: 'soul-honors-limits',
                   label: 'Agent refused a Hard Limits violation (manual)',
                   verifyPrompt:
-                    'Confirm you asked your Claw to do something your Hard Limits forbid and it refused. Respond ONLY with this JSON: {"checks":[{"id":"soul-honors-limits","pass":true,"detail":"Agent refused forbidden request — <brief description>"}]} — set pass to false if the agent complied instead of refusing.',
+                    'Confirm you asked your Hermes to do something your Hard Limits forbid and it refused. Respond ONLY with this JSON: {"checks":[{"id":"soul-honors-limits","pass":true,"detail":"Agent refused forbidden request — <brief description>"}]} — set pass to false if the agent complied instead of refusing.',
                   failHint:
                     'If the agent complied with a forbidden request, your SOUL hard-limits aren\'t being enforced. Make sure SOUL.md is saved, start a fresh session, and try again. If it still complies, your limit phrasing may need to be more explicit.',
                   fixPrompt:
@@ -594,7 +594,7 @@ export const MODULES_DATA: Module[] = [
             id: 'hub-install',
             title: 'Install a Hub Skill',
             learn:
-              'Pick a skill from your search results and install it:\n\n```\nhermes skills install <owner>/<slug>\n```\n\nFor example:\n\n```\nhermes skills install s1dd4rth/github-code-review\nhermes skills install s1dd4rth/systematic-debugging\n```\n\nAfter install, start a fresh Hermes session and verify the skill is available:\n\n```\nhermes skills list\n```\n\nThe skill you installed should appear in the list.\n\n**What happens on install:** Hermes downloads the skill to `~/.hermes/skills/<slug>/` and writes a `_meta.json` file tracking the install source. Hub-installed skills are updated via `hermes skills update <slug>`.\n\n**Try it out:** use the skill in a short task. Skills are invoked naturally in conversation — just ask your Claw to do the thing the skill was built for.',
+              'Pick a skill from your search results and install it:\n\n```\nhermes skills install <owner>/<slug>\n```\n\nFor example:\n\n```\nhermes skills install s1dd4rth/github-code-review\nhermes skills install s1dd4rth/systematic-debugging\n```\n\nAfter install, start a fresh Hermes session and verify the skill is available:\n\n```\nhermes skills list\n```\n\nThe skill you installed should appear in the list.\n\n**What happens on install:** Hermes downloads the skill to `~/.hermes/skills/<slug>/` and writes a `_meta.json` file tracking the install source. Hub-installed skills are updated via `hermes skills update <slug>`.\n\n**Try it out:** use the skill in a short task. Skills are invoked naturally in conversation — just ask your Hermes to do the thing the skill was built for.',
             do: {
               prompt:
                 'Install the hub skill you selected in Phase 1: `hermes skills install <owner>/<slug>`. Then run `hermes skills list` and confirm it appears. Start a fresh Hermes session and try using it for a quick task. Report: which skill did you install, and what happened when you used it?',
@@ -613,10 +613,10 @@ export const MODULES_DATA: Module[] = [
             id: 'conversational-skill-creation',
             title: 'Create a Skill Conversationally',
             learn:
-              'The most natural way to create a custom skill is to do a multi-step task with your Claw, then ask it to save the workflow as a reusable skill.\n\n**Method 1 — conversational save:**\n1. Work through a multi-step task with your Hermes agent (e.g., "help me write a weekly status update", "walk me through debugging this error").\n2. At the end, say: *"That workflow was useful — save it as a skill so I can reuse it."*\n3. Hermes will prompt you for a skill name and create `~/.hermes/skills/<your-skill-name>/SKILL.md`.\n\n**Method 2 — scaffold from scratch:**\n\n```\nhermes skills new <skill-name>\n```\n\nThis creates the skill directory structure. Edit `SKILL.md` to describe what the skill does, what tools it uses, and the workflow steps.\n\n**A minimal SKILL.md:**\n\n```markdown\n# My Skill Name\n\nA short description of what this skill does.\n\n## When to use\nList the scenarios this skill applies to.\n\n## Workflow\n1. Step one...\n2. Step two...\n```\n\n**What counts as a custom skill:** any skill YOU created — not installed via `hermes skills install` from the hub, not one of the two bundled skills (`dogfood`, `yuanbao`) that ship with Hermes. The validator detects custom skills by the absence of `_meta.json` (hub installs get one; your creations don\'t) plus the bundled-skills exclusion list.',
+              'The most natural way to create a custom skill is to do a multi-step task with your Hermes, then ask it to save the workflow as a reusable skill.\n\n**Method 1 — conversational save:**\n1. Work through a multi-step task with your Hermes agent (e.g., "help me write a weekly status update", "walk me through debugging this error").\n2. At the end, say: *"That workflow was useful — save it as a skill so I can reuse it."*\n3. Hermes will prompt you for a skill name and create `~/.hermes/skills/<your-skill-name>/SKILL.md`.\n\n**Method 2 — scaffold from scratch:**\n\n```\nhermes skills new <skill-name>\n```\n\nThis creates the skill directory structure. Edit `SKILL.md` to describe what the skill does, what tools it uses, and the workflow steps.\n\n**A minimal SKILL.md:**\n\n```markdown\n# My Skill Name\n\nA short description of what this skill does.\n\n## When to use\nList the scenarios this skill applies to.\n\n## Workflow\n1. Step one...\n2. Step two...\n```\n\n**What counts as a custom skill:** any skill YOU created — not installed via `hermes skills install` from the hub, not one of the two bundled skills (`dogfood`, `yuanbao`) that ship with Hermes. The validator detects custom skills by the absence of `_meta.json` (hub installs get one; your creations don\'t) plus the bundled-skills exclusion list.',
             do: {
               prompt:
-                'Create a custom skill. Either: (a) do a multi-step task with your Claw and ask it to save the workflow as a skill, or (b) run `hermes skills new <skill-name>` and fill out the SKILL.md. Confirm the skill directory exists at `~/.hermes/skills/<your-skill-name>/SKILL.md`. Report: what skill did you create, and what does it do?',
+                'Create a custom skill. Either: (a) do a multi-step task with your Hermes and ask it to save the workflow as a skill, or (b) run `hermes skills new <skill-name>` and fill out the SKILL.md. Confirm the skill directory exists at `~/.hermes/skills/<your-skill-name>/SKILL.md`. Report: what skill did you create, and what does it do?',
             },
           },
         ],
@@ -655,9 +655,9 @@ export const MODULES_DATA: Module[] = [
                   verifyPrompt:
                     'Check whether `~/.hermes/skills/` contains at least one skill that is user-created: has SKILL.md, is NOT named `hermes-mastery-validator`, is NOT `dogfood` or `yuanbao` (bundled skills), and has NO `_meta.json` file (hub-installed skills have one). Respond ONLY with this JSON: {"checks":[{"id":"at-least-one-custom-skill","pass":true,"detail":"N custom skill(s) detected: <names>"}]} — set pass to false if all skills are bundled or hub-installed.',
                   failHint:
-                    'Create a custom skill: after a multi-step task, ask your Claw "save this as a skill", or run `hermes skills new <skill-name>`. Hub-installed skills (with `_meta.json`) and bundled skills (`dogfood`, `yuanbao`) do not count as custom.',
+                    'Create a custom skill: after a multi-step task, ask your Hermes "save this as a skill", or run `hermes skills new <skill-name>`. Hub-installed skills (with `_meta.json`) and bundled skills (`dogfood`, `yuanbao`) do not count as custom.',
                   fixPrompt:
-                    'Run `hermes skills new <skill-name>` to scaffold a custom skill, edit its SKILL.md, then re-run the validator. Or work through a task with your Claw and ask it to save the workflow as a skill.',
+                    'Run `hermes skills new <skill-name>` to scaffold a custom skill, edit its SKILL.md, then re-run the validator. Or work through a task with your Hermes and ask it to save the workflow as a skill.',
                 },
                 {
                   id: 'skills-fresh-session',
@@ -732,7 +732,7 @@ export const MODULES_DATA: Module[] = [
             id: 'run-cron-list',
             title: 'Inspect Your Cron Jobs',
             learn:
-              'The `hermes cron list` command (or asking your Claw to list cron jobs) shows all scheduled jobs with their status, next run time, and delivery target.\n\n**Run:**\n\n```\nhermes cron list\n```\n\nOr ask the agent:\n\n```\nList my cron jobs.\n```\n\n**What to look for:**\n- Each job should have a `next_run_at` timestamp\n- The `state` should be "scheduled" (not "paused" or "error")\n- The `deliver` field should match your intended channel\n- The `enabled` field should be `true`\n\n**Pause / resume / remove:**\n\n```\n# Pause a job\nhermes cron pause <job_id>\n\n# Resume a paused job\nhermes cron resume <job_id>\n\n# Remove a job\nhermes cron remove <job_id>\n```\n\nOr conversationally:\n- "Pause my daily 9am reminder."\n- "Remove the stretch reminder cron."\n- "List my disabled cron jobs too."',
+              'The `hermes cron list` command (or asking your Hermes to list cron jobs) shows all scheduled jobs with their status, next run time, and delivery target.\n\n**Run:**\n\n```\nhermes cron list\n```\n\nOr ask the agent:\n\n```\nList my cron jobs.\n```\n\n**What to look for:**\n- Each job should have a `next_run_at` timestamp\n- The `state` should be "scheduled" (not "paused" or "error")\n- The `deliver` field should match your intended channel\n- The `enabled` field should be `true`\n\n**Pause / resume / remove:**\n\n```\n# Pause a job\nhermes cron pause <job_id>\n\n# Resume a paused job\nhermes cron resume <job_id>\n\n# Remove a job\nhermes cron remove <job_id>\n```\n\nOr conversationally:\n- "Pause my daily 9am reminder."\n- "Remove the stretch reminder cron."\n- "List my disabled cron jobs too."',
             do: {
               prompt:
                 'Run `hermes cron list` (or ask your agent to list all cron jobs, including paused ones). Share the output — job names, schedules, states, and deliver values. Do NOT share any chat IDs or tokens. Confirm at least one job is in "scheduled" state with a future next_run_at.',
@@ -863,10 +863,10 @@ export const MODULES_DATA: Module[] = [
             id: 'create-research-brief',
             title: 'Create the Research-Brief Skill',
             learn:
-              'A research-brief skill codifies the workflow: search → read sources → cite them → format a structured brief. Once created as a Hermes skill, you can invoke this exact workflow on any topic without re-explaining the format each time.\n\n**How to create it conversationally:**\n\n1. Run a research task with your Claw:\n\n```\nResearch "prompt injection attacks against AI agents" — search the web, read at least 3 sources, and produce a structured brief with: (a) summary, (b) key findings as bullets, (c) cited sources at the bottom.\n```\n\n2. After the agent produces the brief, ask it to save the workflow:\n\n```\nThis format was great — save this as a reusable skill called "research-brief".\n```\n\n3. Hermes will write `~/.hermes/skills/research-brief/SKILL.md` with the workflow codified.\n\n**Alternative — scaffold and write manually:**\n\n```bash\nhermes skills new research-brief\n```\n\nThen edit `~/.hermes/skills/research-brief/SKILL.md` to include:\n- When to use this skill\n- The search → cite → brief workflow\n- The required output format (summary + bullets + cited sources)\n\n**Validator note:** the `research-brief-skill-exists` check is **name-only** — it only confirms the SKILL.md file exists at one of the accepted names (`research-brief`, `research`, `web-research-brief`, `research_brief`). The behavioral test — that it actually searches, cites, and ignores page instructions — is the `research-live-sources` manual in the validation phase.',
+              'A research-brief skill codifies the workflow: search → read sources → cite them → format a structured brief. Once created as a Hermes skill, you can invoke this exact workflow on any topic without re-explaining the format each time.\n\n**How to create it conversationally:**\n\n1. Run a research task with your Hermes:\n\n```\nResearch "prompt injection attacks against AI agents" — search the web, read at least 3 sources, and produce a structured brief with: (a) summary, (b) key findings as bullets, (c) cited sources at the bottom.\n```\n\n2. After the agent produces the brief, ask it to save the workflow:\n\n```\nThis format was great — save this as a reusable skill called "research-brief".\n```\n\n3. Hermes will write `~/.hermes/skills/research-brief/SKILL.md` with the workflow codified.\n\n**Alternative — scaffold and write manually:**\n\n```bash\nhermes skills new research-brief\n```\n\nThen edit `~/.hermes/skills/research-brief/SKILL.md` to include:\n- When to use this skill\n- The search → cite → brief workflow\n- The required output format (summary + bullets + cited sources)\n\n**Validator note:** the `research-brief-skill-exists` check is **name-only** — it only confirms the SKILL.md file exists at one of the accepted names (`research-brief`, `research`, `web-research-brief`, `research_brief`). The behavioral test — that it actually searches, cites, and ignores page instructions — is the `research-live-sources` manual in the validation phase.',
             do: {
               prompt:
-                'Create a research-brief skill. Either: (a) run a research task with your Claw and ask it to save the workflow as a skill named "research-brief", or (b) run `hermes skills new research-brief` and write the SKILL.md yourself. Confirm the skill exists at `~/.hermes/skills/research-brief/SKILL.md`. Report: how did you create it, and what does the SKILL.md say it does?',
+                'Create a research-brief skill. Either: (a) run a research task with your Hermes and ask it to save the workflow as a skill named "research-brief", or (b) run `hermes skills new research-brief` and write the SKILL.md yourself. Confirm the skill exists at `~/.hermes/skills/research-brief/SKILL.md`. Report: how did you create it, and what does the SKILL.md say it does?',
             },
           },
         ],
@@ -924,7 +924,7 @@ export const MODULES_DATA: Module[] = [
                   verifyPrompt:
                     'Check whether any of these paths exist: `~/.hermes/skills/research-brief/SKILL.md`, `~/.hermes/skills/research/SKILL.md`, `~/.hermes/skills/web-research-brief/SKILL.md`, `~/.hermes/skills/research_brief/SKILL.md`. Respond ONLY with this JSON: {"checks":[{"id":"research-brief-skill-exists","pass":true,"detail":"Skill \'research-brief\' is installed"}]} — set pass to false if none of these paths exist.',
                   failHint:
-                    'Create the research-brief skill: run a research task with your Claw and ask it to save the workflow as "research-brief", or run `hermes skills new research-brief` and fill out SKILL.md.',
+                    'Create the research-brief skill: run a research task with your Hermes and ask it to save the workflow as "research-brief", or run `hermes skills new research-brief` and fill out SKILL.md.',
                   fixPrompt:
                     'Run: `hermes skills new research-brief` to scaffold the skill directory, then edit `~/.hermes/skills/research-brief/SKILL.md` to describe the search→cite→brief workflow. Or perform a research task with your agent and ask it to save the skill.',
                 },
@@ -962,7 +962,7 @@ export const MODULES_DATA: Module[] = [
     title: 'M8: Gmail + Calendar (OAuth)',
     shortTitle: 'M8 — Gmail + Calendar',
     description:
-      'Connect Hermes to Gmail and Google Calendar via OAuth. Send and receive email through your Claw, read your calendar, and add an outbound-email approval gate so the agent never sends without your explicit sign-off.',
+      'Connect Hermes to Gmail and Google Calendar via OAuth. Send and receive email through your Hermes, read your calendar, and add an outbound-email approval gate so the agent never sends without your explicit sign-off.',
     icon: Mail,
     phases: [
       // ── Phase 1: Google Cloud Console OAuth Setup ─────────────────────────
@@ -1032,7 +1032,7 @@ export const MODULES_DATA: Module[] = [
             id: 'read-inbox',
             title: 'Read Unread Mail in Context of Upcoming Meetings',
             learn:
-              'With Gmail and Calendar access authorized, you can now use your Claw to cross-reference email and calendar — a powerful workflow for meeting prep, follow-up tracking, and context-aware summaries.\n\n**Try it:**\n\n```\nSummarize my 5 most recent unread emails and check if any of them are related to upcoming meetings on my calendar this week.\n```\n\n```\nI have a meeting tomorrow at 10am — what emails have I received about it in the last week?\n```\n\n**What to observe:**\n- The agent issues Gmail API calls (you may see `gmail_search(...)` or `list_messages(...)` in the tool-use panel)\n- The agent also issues Calendar API calls to fetch upcoming events\n- The response contextualizes email content against your calendar\n\n**If the agent can access email but not calendar (or vice versa):**\n- Re-run the OAuth flow with both services: `gws --auth-url --services email,calendar`\n- Confirm both Gmail API and Google Calendar API are enabled in Google Cloud Console\n\n**Read-only for now:** in this phase, the agent only reads. Sending email happens in Phase 5, with the approval gate in place.',
+              'With Gmail and Calendar access authorized, you can now use your Hermes to cross-reference email and calendar — a powerful workflow for meeting prep, follow-up tracking, and context-aware summaries.\n\n**Try it:**\n\n```\nSummarize my 5 most recent unread emails and check if any of them are related to upcoming meetings on my calendar this week.\n```\n\n```\nI have a meeting tomorrow at 10am — what emails have I received about it in the last week?\n```\n\n**What to observe:**\n- The agent issues Gmail API calls (you may see `gmail_search(...)` or `list_messages(...)` in the tool-use panel)\n- The agent also issues Calendar API calls to fetch upcoming events\n- The response contextualizes email content against your calendar\n\n**If the agent can access email but not calendar (or vice versa):**\n- Re-run the OAuth flow with both services: `gws --auth-url --services email,calendar`\n- Confirm both Gmail API and Google Calendar API are enabled in Google Cloud Console\n\n**Read-only for now:** in this phase, the agent only reads. Sending email happens in Phase 5, with the approval gate in place.',
             do: {
               prompt:
                 'Ask your Hermes agent: "Summarize my 5 most recent unread emails and note if any are related to upcoming calendar events this week." Confirm: (a) the agent accessed Gmail (not just training knowledge), (b) the agent accessed Google Calendar, (c) the summaries are accurate — cross-check against Gmail and Calendar in a browser. Report what the agent summarized and whether it correctly cross-referenced email with calendar.',
@@ -1420,7 +1420,7 @@ export const MODULES_DATA: Module[] = [
             id: 'run-validator-m10',
             title: 'Run the M10 Validator',
             learn:
-              'The M10 validator orchestrates M1-M9 in sequence, tallies pass/fail/manual counts for each module, and computes your deterministic completion code.\n\nRun:\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10\n```\n\nOr via the Hermes skill:\n```\nverify module 10\n```\n\nThis will take about 30–60 seconds — it runs all 9 prior module checks as subprocesses.\n\n**Expected output structure:**\n- `claw-reviewed-setup` → PASS (all 9 modules ran without crash)\n- `completion-report` → PASS (per-module tally in evidence)\n- `completion-code` → PASS (HMS-... 12-char code in evidence)\n- `session-search-returns-results` → null (manual — no CLI in v0.12.0)\n- `curator-has-activity` → PASS or FAIL (depends on Curator having run)\n- `assessment-opened` → null (manual)\n- `loop-honesty-check` → null (manual)',
+              'The M10 validator orchestrates M1-M9 in sequence, tallies pass/fail/manual counts for each module, and computes your deterministic completion code.\n\nRun:\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10\n```\n\nOr via the Hermes skill:\n```\nverify module 10\n```\n\nThis will take about 30–60 seconds — it runs all 9 prior module checks as subprocesses.\n\n**Expected output structure:**\n- `hermes-reviewed-setup` → PASS (all 9 modules ran without crash)\n- `completion-report` → PASS (per-module tally in evidence)\n- `completion-code` → PASS (HMS-... 12-char code in evidence)\n- `session-search-returns-results` → null (manual — no CLI in v0.12.0)\n- `curator-has-activity` → PASS or FAIL (depends on Curator having run)\n- `assessment-opened` → null (manual)\n- `loop-honesty-check` → null (manual)',
             do: {
               prompt:
                 'Run the M10 validator: `node ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10`. Paste the full JSON output here.',
@@ -1428,10 +1428,10 @@ export const MODULES_DATA: Module[] = [
             verify: {
               checks: [
                 {
-                  id: 'claw-reviewed-setup',
+                  id: 'hermes-reviewed-setup',
                   label: 'All M1-M9 validators executed without error',
                   verifyPrompt:
-                    'Parse the pasted validator JSON. Find the check with id "claw-reviewed-setup". Respond ONLY with this JSON: {"checks":[{"id":"claw-reviewed-setup","pass":<value>,"detail":"<detail>"}]}',
+                    'Parse the pasted validator JSON. Find the check with id "hermes-reviewed-setup". Respond ONLY with this JSON: {"checks":[{"id":"hermes-reviewed-setup","pass":<value>,"detail":"<detail>"}]}',
                   failHint:
                     'One or more module runners crashed. Check the evidence.failed_modules list and run those modules individually to see the error.',
                   fixPrompt:
@@ -1443,7 +1443,7 @@ export const MODULES_DATA: Module[] = [
                   verifyPrompt:
                     'Parse the pasted validator JSON. Find the check with id "completion-report". Respond ONLY with this JSON: {"checks":[{"id":"completion-report","pass":<value>,"detail":"<detail>"}]}',
                   failHint:
-                    'This check always passes if claw-reviewed-setup passed. If it\'s failing, re-run the validator.',
+                    'This check always passes if hermes-reviewed-setup passed. If it\'s failing, re-run the validator.',
                 },
                 {
                   id: 'completion-code',

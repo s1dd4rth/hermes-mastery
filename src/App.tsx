@@ -11,7 +11,7 @@ import { ValidationDashboard } from './components/validation/ValidationDashboard
 export default function App() {
   // ── Progress & Nav ──────────────────────────────────────────────────
   const {
-    nav, userInputs, isLoaded: progressLoaded,
+    progress, nav, userInputs, isLoaded: progressLoaded,
     getStepState, isStepComplete, setVerifyResults, skipStep,
     markStepComplete, setNav, saveUserInput, getModuleChecks,
   } = useStepProgress();
@@ -76,7 +76,23 @@ export default function App() {
   })();
 
   const handleExecute = (_prompt: string, _stepTitle: string) => {
-    // No-op: user copies the prompt and pastes it in Claw manually
+    // No-op: user copies the prompt and pastes it in Hermes manually
+  };
+
+  // Returns all verifyResults across every step of a module, merged into one record.
+  // Used so CompletionCodeBanner can surface the M10 completion code on any phase/step.
+  const getModuleVerifyResults = (moduleId: string): Record<string, import('./data/types').VerifyResult> | undefined => {
+    const moduleProgress = progress[moduleId];
+    if (!moduleProgress) return undefined;
+    const merged: Record<string, import('./data/types').VerifyResult> = {};
+    for (const phaseId of Object.keys(moduleProgress)) {
+      const phase = moduleProgress[phaseId]!;
+      for (const stepId of Object.keys(phase)) {
+        const step = phase[stepId]!;
+        if (step.verifyResults) Object.assign(merged, step.verifyResults);
+      }
+    }
+    return Object.keys(merged).length > 0 ? merged : undefined;
   };
 
   // Toggle a single check's pass state (manual verification)
@@ -246,6 +262,7 @@ export default function App() {
             getVerifyResults={stepId =>
               getStepState(nav.moduleId, nav.phaseId, stepId)?.verifyResults
             }
+            getModuleVerifyResults={getModuleVerifyResults}
             isStepComplete={stepId =>
               isStepComplete(nav.moduleId, nav.phaseId, stepId)
             }

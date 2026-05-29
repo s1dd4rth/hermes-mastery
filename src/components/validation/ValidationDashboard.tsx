@@ -108,7 +108,7 @@ export const ValidationDashboard = ({
               </div>
             ) : (
               <p className="text-[11px] text-hermes-dark/40 italic font-medium mt-8 text-center bg-hermes-bg3 py-2 rounded-lg">
-                Click each check to toggle it pass/fail once you've verified it manually in Claw.
+                Click each check to toggle it pass/fail once you've verified it manually in Hermes.
               </p>
             );
           }
@@ -116,7 +116,7 @@ export const ValidationDashboard = ({
             <div className="mt-8 space-y-3">
               {!isComplete && (
                 <p className="text-[11px] text-hermes-dark/40 italic font-medium text-center bg-hermes-bg3 py-2 rounded-lg">
-                  Click each check to toggle it pass/fail once you've verified it manually in Claw — or skip ahead and come back later.
+                  Click each check to toggle it pass/fail once you've verified it manually in Hermes — or skip ahead and come back later.
                 </p>
               )}
               <button

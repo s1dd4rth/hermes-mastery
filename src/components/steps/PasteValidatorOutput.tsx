@@ -150,7 +150,7 @@ export const PasteValidatorOutput = ({ module, moduleNumber, onApply }: PasteVal
                 Use hermes-mastery-validator to verify module {moduleNumber}
               </code>
             </li>
-            <li>Copy the JSON output your Claw returns</li>
+            <li>Copy the JSON output your Hermes returns</li>
             <li>Paste it below and click Apply Results</li>
           </ol>
 
@@ -376,7 +376,7 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
           <div className="flex items-start gap-2">
             <Download size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
             <div className="text-xs text-amber-900 font-medium leading-relaxed">
-              <strong>Validator skill is outdated</strong> (got schema v{f.payloadVersion}, this app expects v{RENDERER_SCHEMA_VERSION}). In your Claw, run:{' '}
+              <strong>Validator skill is outdated</strong> (got schema v{f.payloadVersion}, this app expects v{RENDERER_SCHEMA_VERSION}). In your Hermes session, run:{' '}
               <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono">
                 hermes skills upgrade hermes-mastery-validator
               </code>

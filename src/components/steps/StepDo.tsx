@@ -88,13 +88,13 @@ export const StepDo = ({
               ) : (
                 <>
                   <Copy size={16} strokeWidth={2.5} />
-                  Copy &amp; Paste to Claw
+                  Copy &amp; Paste to Hermes
                 </>
               )}
             </button>
             {copied && (
               <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full animate-in fade-in slide-in-from-left-2">
-                Now switch to your Claw's chat tab and paste it there.
+                Now switch to your Hermes chat tab and paste it there.
               </span>
             )}
           </div>

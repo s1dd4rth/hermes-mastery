@@ -54,7 +54,7 @@ export const StepVerify = ({
       </div>
 
       <p className="text-[11px] text-hermes-dark/40 italic font-medium px-1">
-        Click each check to toggle it pass/fail once you've verified it manually in Claw.
+        Click each check to toggle it pass/fail once you've verified it manually in Hermes.
       </p>
     </div>
   );
