@@ -34,6 +34,7 @@ interface StepEngineProps {
 export const StepEngine = ({
   steps,
   currentIndex,
+  phaseId,
   userInputs,
   getVerifyResults,
   getModuleVerifyResults,
@@ -114,8 +115,11 @@ export const StepEngine = ({
             <CompletionCodeBanner results={getModuleVerifyResults(module.id)} />
           )}
 
-          {/* Paste validator output (per design doc, above StepVerify, feature-flagged per module) */}
-          {step.verify && pasteValidatorEnabled && (
+          {/* Paste validator output. Only on the validation phase: the validator
+              emits a whole-module envelope and must not be prompted before it's
+              installed (M1 installs it in Phase 2, so it's available by Phase 3 =
+              validation). Earlier-phase checks use the manual toggle. */}
+          {step.verify && pasteValidatorEnabled && phaseId === 'validation' && (
             <PasteValidatorOutput
               module={module}
               moduleNumber={moduleNumber}
