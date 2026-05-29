@@ -108,8 +108,9 @@ export const StepEngine = ({
 
           {/* M10 completion code: surfaces the validator-generated code prominently.
               Uses module-wide results so the banner appears on all M10 phases,
-              not just the phase where the validator was pasted. */}
-          {module.id === 'm10' && (
+              not just the phase where the validator was pasted.
+              Hidden on the Celebrate phase since CelebrationCard already shows the code. */}
+          {module.id === 'm10' && step.id !== 'share-completion' && (
             <CompletionCodeBanner results={getModuleVerifyResults(module.id)} />
           )}
 
