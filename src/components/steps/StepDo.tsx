@@ -63,13 +63,13 @@ export const StepDo = ({
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
             placeholder={requiresInput.placeholder}
-            className="w-full px-4 py-3 bg-white border border-hermes-border rounded-lg text-sm font-medium text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent transition-all"
+            className="w-full px-4 py-3 bg-hermes-bg border border-hermes-border rounded-lg text-sm font-medium text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent transition-all"
           />
         </div>
       )}
 
       {/* Prompt display + action */}
-      <div className="rounded-2xl border border-hermes-border bg-white shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-hermes-border bg-hermes-bg2 shadow-sm overflow-hidden">
         <div className="px-6 py-5 text-sm text-hermes-dark/80 font-mono leading-relaxed select-all bg-hermes-bg/30">
           {prompt}
         </div>
@@ -93,7 +93,7 @@ export const StepDo = ({
               )}
             </button>
             {copied && (
-              <span className="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full animate-in fade-in slide-in-from-left-2">
+              <span className="text-xs text-emerald-300 font-bold bg-emerald-950/40 border border-emerald-700/40 px-3 py-1 rounded-full animate-in fade-in slide-in-from-left-2">
                 Now switch to your Hermes chat tab and paste it there.
               </span>
             )}

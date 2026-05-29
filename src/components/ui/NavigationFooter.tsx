@@ -25,18 +25,18 @@ export const NavigationFooter = ({
 }: NavigationFooterProps) => {
     if (isLastSectionOfCourse) {
         return (
-            <div className="mt-10 pt-8 border-t border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-8 text-center">
-                    <Trophy size={40} className="text-emerald-500 mx-auto mb-3" />
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2">
+            <div className="mt-10 pt-8 border-t border-hermes-border animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-gradient-to-br from-emerald-950/40 to-hermes-bg3 border border-emerald-700/40 rounded-2xl p-8 text-center">
+                    <Trophy size={40} className="text-emerald-400 mx-auto mb-3" />
+                    <h3 className="text-2xl font-bold text-hermes-dark mb-2">
                         Course Complete! 🎉
                     </h3>
-                    <p className="text-slate-600 max-w-sm mx-auto mb-6">
+                    <p className="text-hermes-cream/70 max-w-sm mx-auto mb-6">
                         You've built a private, self-hosted AI agent from scratch. Submit the
                         assessment form to claim your completion record.
                     </p>
                     {!isFullyComplete && (
-                        <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 max-w-sm mx-auto mb-6">
+                        <p className="text-sm text-hermes-accent bg-hermes-bg3 border border-hermes-accent/20 rounded-lg px-4 py-3 max-w-sm mx-auto mb-6">
                             You have incomplete checklist items in earlier modules. You can still submit your assessment.
                         </p>
                     )}
@@ -44,7 +44,7 @@ export const NavigationFooter = ({
                         href="https://docs.google.com/forms/d/e/1FAIpQLSeoR5wfheIkD0hCaf3eYmJ6s8aNMbylfJ00hi6djlkpIuF1FA/viewform"
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-emerald-500 text-white rounded-xl font-semibold text-base shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all"
+                        className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-emerald-600 text-white rounded-xl font-semibold text-base shadow-lg shadow-emerald-900/40 hover:bg-emerald-500 active:scale-95 transition-all"
                     >
                         Submit Assessment
                         <ArrowRight size={18} />
@@ -55,10 +55,10 @@ export const NavigationFooter = ({
     }
 
     return (
-        <div className="mt-10 pt-8 border-t border-slate-200 flex items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="mt-10 pt-8 border-t border-hermes-border flex items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Breadcrumb hint */}
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-                <CheckCircle2 size={16} className="text-slate-300" />
+            <div className="flex items-center gap-2 text-sm text-hermes-cream/40">
+                <CheckCircle2 size={16} className="text-hermes-border" />
                 <span>When you're ready</span>
             </div>
 

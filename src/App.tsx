@@ -159,7 +159,7 @@ export default function App() {
   // ── Loading gate ────────────────────────────────────────────────────
   if (!progressLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-slate-500">
+      <div className="min-h-screen flex items-center justify-center text-hermes-cream/60 bg-hermes-bg">
         Loading mastery curriculum...
       </div>
     );
@@ -193,7 +193,7 @@ export default function App() {
           {/* Module Hero (Mirroring Unpacked) */}
           <header className="mb-24 flex flex-col items-center text-center relative">
             {/* Dynamic Background Glow */}
-            <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(124,58,237,0.04)_0%,transparent_70%)] pointer-events-none -z-10" />
+            <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(255,189,56,0.06)_0%,transparent_70%)] pointer-events-none -z-10" />
 
             <div className="flex flex-wrap items-center justify-center gap-3 mb-10 animate-in fade-in slide-in-from-top-4 duration-500">
               <span className="font-mono text-[0.58rem] font-bold uppercase tracking-[1.5px] text-hermes-accent bg-hermes-accent/5 px-3 py-1.5 rounded-full border border-hermes-accent/15">
@@ -229,7 +229,7 @@ export default function App() {
               <div className="w-[1px] h-8 bg-hermes-border" />
               <div className="flex items-center gap-4 text-left">
                 <div className="w-10 h-10 rounded-xl bg-hermes-bg3 flex items-center justify-center border border-hermes-border">
-                  <div className="w-3 h-3 rounded-full bg-hermes-accent animate-pulse shadow-[0_0_12px_rgba(124,58,237,0.3)]" />
+                  <div className="w-3 h-3 rounded-full bg-hermes-accent animate-pulse shadow-[0_0_12px_rgba(255,189,56,0.35)]" />
                 </div>
                 <div>
                   <div className="text-[0.55rem] font-bold text-hermes-dark/30 uppercase tracking-[2px] font-mono leading-none mb-1">Platform</div>

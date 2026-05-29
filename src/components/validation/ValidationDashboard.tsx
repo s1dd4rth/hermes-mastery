@@ -40,7 +40,7 @@ export const ValidationDashboard = ({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-hermes-border">
+      <div className="bg-hermes-bg2 rounded-3xl p-8 shadow-sm border border-hermes-border">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -103,7 +103,7 @@ export const ValidationDashboard = ({
           const isComplete = total > 0 && passed === total;
           if (!nextPhaseLabel) {
             return isComplete ? (
-              <div className="w-full mt-8 py-4 bg-emerald-50 text-emerald-800 rounded-xl font-bold text-sm text-center border border-emerald-200">
+              <div className="w-full mt-8 py-4 bg-emerald-950/40 text-emerald-300 rounded-xl font-bold text-sm text-center border border-emerald-700/40">
                 🎉 Course complete — you've reached the end of the curriculum.
               </div>
             ) : (

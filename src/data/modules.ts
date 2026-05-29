@@ -1,4 +1,4 @@
-import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock, Search, Mail, Users, Award } from 'lucide-react';
+import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock, Search, Mail, Users, Award, Sparkles } from 'lucide-react';
 import type { Module } from './types';
 
 // M1-only skeleton — further modules added as the course builds out.
@@ -1469,62 +1469,17 @@ export const MODULES_DATA: Module[] = [
         ],
       },
 
-      // ── Phase 4: Get Your Completion Code ────────────────────────────────
+      // ── Phase 4: Celebrate + Share ───────────────────────────────────────
       {
-        id: 'completion-code',
-        title: 'Phase 4: Get Your Completion Code',
-        icon: Award,
+        id: 'celebrate-and-share',
+        title: 'Phase 4: Celebrate',
+        icon: Sparkles,
         steps: [
           {
-            id: 'completion-code-step',
-            title: 'Your HMS- Completion Code',
+            id: 'share-completion',
+            title: 'Celebrate Your Completion',
             learn:
-              'Your completion code is displayed above if you pasted the validator output in Phase 3.\n\nThe code is in the format `HMS-XXXXXXXXXXXX` — 12 characters after the prefix, using RFC 4648 base32 encoding (uppercase letters + digits 2-7). It is a deterministic hash of your per-module pass/fail tally:\n\n- **Same setup state → same code on every run.** Two learners with identical M1-M9 check states get the same code.\n- **Code changes if your setup changes.** If you fix a failing check, re-run the M10 validator and you\'ll get a new code reflecting the updated state.\n- **The code is not secret.** It encodes only counts of checks passed/failed/manual — not credentials or personal data.\n\n**To regenerate your code after fixing checks:**\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10\n```\n\nCopy the `HMS-...` code from the `completion-code` evidence block.',
-            do: {
-              prompt:
-                'Copy your HMS- completion code from the validator output above (or re-run M10 if needed). It should look like: `HMS-ABCD1234EFGH`. Paste it here to confirm you have it.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 5: Submit the Assessment ───────────────────────────────────
-      {
-        id: 'submit-assessment',
-        title: 'Phase 5: Submit the Assessment',
-        icon: Send,
-        steps: [
-          {
-            id: 'submit-form',
-            title: 'Submit the Course Assessment',
-            learn:
-              'Submit your completion code to the course assessment form.\n\nThe Google Form asks you to:\n1. Confirm you completed M1-M10\n2. Enter your HMS- completion code\n3. Share any feedback on the course\n\n**Assessment form URL:** *(The course owner will add this link to the M10 panel — if you don\'t see a link here, check the course README or contact the course owner.)*\n\n**What your code proves:**\n- You ran the validator on your own machine\n- Your Hermes is configured to the degree your check tally reflects\n- The code is deterministic — the same honest setup always yields the same code\n\n**Loop-honesty reminder:** if you could not find concrete evidence of the self-improving loop in Phase 2, please include that in your form feedback. That\'s valuable signal for improving the curriculum.',
-            do: {
-              prompt:
-                'Open the course assessment Google Form (linked above or in the course README). Enter your HMS- completion code and submit the form. Confirm here once you\'ve submitted.',
-            },
-            verify: {
-              checks: [
-                {
-                  id: 'assessment-opened',
-                  label: 'Course assessment form submitted with HMS- code (manual)',
-                  verifyPrompt:
-                    'Did you open and submit the course assessment Google Form with your HMS- completion code? Respond ONLY with this JSON: {"checks":[{"id":"assessment-opened","pass":true,"detail":"Submitted completion code <your-code> via Google Form"}]}',
-                  failHint:
-                    'Open the assessment form link above and submit your HMS- completion code. If the link is missing, contact the course owner.',
-                },
-                {
-                  id: 'loop-honesty-check',
-                  label: 'Self-improving loop evidence check (manual)',
-                  verifyPrompt:
-                    'Open the Hermes dashboard or run `ls ~/.hermes/logs/curator/` and `hermes memory list`. Can you point at concrete evidence of the self-improving loop: a Curator run timestamp, a session search result, or a Honcho user-model entry? Respond ONLY with this JSON: {"checks":[{"id":"loop-honesty-check","pass":true,"detail":"Evidence found: <describe what you found>"}]} — set pass to false if you cannot find any evidence.',
-                  failHint:
-                    'If you genuinely cannot find evidence of the loop, that\'s a course bug. Please report it via the assessment form feedback field or the course GitHub issues. The loop is real — but if it\'s not visible, the curriculum needs better observability.',
-                  fixPrompt:
-                    'Report the gap via the assessment form feedback field. This is valuable curriculum feedback.',
-                },
-              ],
-            },
+              'You\'ve completed Hermes Mastery! Your HMS- completion code was generated in Phase 3 — it\'s a deterministic hash of your M1-M9 pass/fail tally, unique to your setup state.\n\nBelow you\'ll find your personalized completion card. Download it, copy it, or share it on X to show the world you\'ve built a self-improving Hermes agent from scratch.\n\n**What the HMS- code proves:**\n- You ran the validator on your own machine\n- Your Hermes is configured to the degree your check tally reflects\n- The code is deterministic — the same honest setup always yields the same code\n\nIf you haven\'t generated your code yet, head back to Phase 3 and paste the M10 validator output.',
           },
         ],
       },

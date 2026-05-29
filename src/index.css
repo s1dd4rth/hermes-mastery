@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-hermes-accent: #7C3AED;
-  --color-hermes-dark: #1a1815;
-  --color-hermes-bg: #faf9f6;
-  --color-hermes-bg2: #fff;
-  --color-hermes-bg3: #f3f1ed;
-  --color-hermes-border: #e2dfd8;
+  --color-hermes-accent: #ffbd38;
+  --color-hermes-dark: #ffffff;
+  --color-hermes-bg: #170d02;
+  --color-hermes-bg2: #1f1306;
+  --color-hermes-bg3: #28190a;
+  --color-hermes-border: #3a2410;
+  --color-hermes-cream: #ffe6cb;
   --font-sans: 'Geologica', 'Outfit', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-mono: "Courier Prime", ui-monospace, "Cascadia Code", monospace;
 }
 
 @layer components {
@@ -20,34 +21,41 @@
 }
 
 @layer base {
+  html {
+    color-scheme: dark;
+  }
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: var(--color-hermes-bg);
-    /* Soft top-right violet highlight */
-    background-image: radial-gradient(circle at top right, rgba(124, 58, 237, 0.05), transparent 40%);
+    background-color: #170d02;
+    /* Soft top-right amber glow */
+    background-image: radial-gradient(circle at top right, rgba(255, 189, 56, 0.04), transparent 40%);
     background-attachment: fixed;
     color: var(--color-hermes-dark);
     font-family: var(--font-sans);
   }
 }
 
-/* Light mode technical grid background */
+.hermes-glow {
+  box-shadow: 0 0 40px rgba(255, 189, 56, 0.35);
+}
+
+/* Dark mode technical grid background */
 .bg-grid-slate-200 {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgba(226,232,240,0.5)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgba(58,36,16,0.6)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
     background-size: 32px 32px;
 }
 
 /* ── Markdown prose renderer ───────────────────────────────────────────────── */
 /* Scoped to .md-prose so styles never bleed into the rest of the UI.          */
 .md-prose {
-  color: #3f3c39;
+  color: var(--color-hermes-cream);
   line-height: 1.8;
   font-size: 0.9rem;
 }
 .md-prose h1 { font-size: 1.25rem; font-weight: 800; color: var(--color-hermes-dark); margin: 1.5rem 0 0.75rem; }
 .md-prose h2 { font-size: 1rem;    font-weight: 700; color: var(--color-hermes-dark); margin: 1.25rem 0 0.5rem; border-bottom: 1px solid var(--color-hermes-border); padding-bottom: 0.25rem; }
-.md-prose h3 { font-size: 0.9rem;  font-weight: 700; color: #4a453e; margin: 1rem 0 0.375rem; }
+.md-prose h3 { font-size: 0.9rem;  font-weight: 700; color: var(--color-hermes-cream); margin: 1rem 0 0.375rem; }
 .md-prose p  { margin: 0.625rem 0; }
 .md-prose a  { color: var(--color-hermes-accent); text-decoration: none; }
 .md-prose a:hover { text-decoration: underline; }
@@ -85,16 +93,16 @@
 
 .md-prose blockquote {
   border-left: 3px solid var(--color-hermes-accent);
-  background: #faf9ff;
+  background: rgba(255, 189, 56, 0.06);
   margin: 0.75rem 0;
   padding: 0.5rem 1rem;
   border-radius: 0 0.5rem 0.5rem 0;
-  color: #4c1d95;
+  color: var(--color-hermes-cream);
 }
 .md-prose table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 0.875rem 0; }
 .md-prose th { background: var(--color-hermes-bg3); color: var(--color-hermes-dark); font-weight: 700; text-align: left; padding: 0.5rem 0.75rem; border: 1px solid var(--color-hermes-border); }
-.md-prose td { padding: 0.45rem 0.75rem; border: 1px solid var(--color-hermes-border); color: #3f3c39; }
-.md-prose tr:nth-child(even) td { background: #faf9f6; }
+.md-prose td { padding: 0.45rem 0.75rem; border: 1px solid var(--color-hermes-border); color: var(--color-hermes-cream); }
+.md-prose tr:nth-child(even) td { background: var(--color-hermes-bg3); }
 
 /* ── Two-column app layout ───────────────────────────────────────────── */
 .app-layout {

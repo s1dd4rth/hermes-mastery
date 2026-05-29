@@ -14,7 +14,7 @@ export const CopyButton = ({ text, label }: { text: string; label?: string }) =>
     return (
         <button
           onClick={handleCopy}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors shadow-sm"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-hermes-cream bg-hermes-bg3 hover:bg-hermes-border rounded-md transition-colors shadow-sm border border-hermes-border"
           aria-label="Copy to clipboard"
         >
           {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}

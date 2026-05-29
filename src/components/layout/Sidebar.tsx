@@ -40,7 +40,7 @@ export const Sidebar = ({
   }, [moduleDropdownOpen, setModuleDropdownOpen]);
 
   return (
-    <div className="w-72 flex flex-col bg-white border-r border-hermes-border h-full relative z-40">
+    <div className="w-72 flex flex-col bg-hermes-bg2 border-r border-hermes-border h-full relative z-40">
       {/* Logo Section */}
       <div className="p-8 pb-6">
         <div className="flex flex-col gap-1">
@@ -76,7 +76,7 @@ export const Sidebar = ({
         </button>
 
         {moduleDropdownOpen && (
-          <div className="absolute top-full left-4 right-4 mt-2 bg-white border border-hermes-border rounded-xl shadow-xl z-50 max-h-[60vh] overflow-y-auto py-1.5 animate-in fade-in slide-in-from-top-1">
+          <div className="absolute top-full left-4 right-4 mt-2 bg-hermes-bg2 border border-hermes-border rounded-xl shadow-xl z-50 max-h-[60vh] overflow-y-auto py-1.5 animate-in fade-in slide-in-from-top-1">
             {(() => {
               const course = MODULES_DATA.filter(m => !m.bonus);
               const bonus = MODULES_DATA.filter(m => m.bonus);
@@ -173,18 +173,18 @@ export const Sidebar = ({
       </nav>
 
       {/* Course progress */}
-      <div className="p-4 border-t border-slate-200">
-        <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
+      <div className="p-4 border-t border-hermes-border">
+        <div className="bg-emerald-950/40 border border-emerald-700/40 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <GraduationCap size={16} className="text-emerald-600 flex-shrink-0" />
-              <div className="text-sm font-semibold text-emerald-900">Progress</div>
+              <GraduationCap size={16} className="text-emerald-400 flex-shrink-0" />
+              <div className="text-sm font-semibold text-emerald-300">Progress</div>
             </div>
-            <div className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+            <div className="text-xs font-bold text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-700/40">
               {completedModulesCount}/{totalCourseModules}
             </div>
           </div>
-          <div className="w-full h-2.5 bg-emerald-200 rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-emerald-950/60 rounded-full overflow-hidden border border-emerald-800/40">
             <div
               className="h-full bg-emerald-500 transition-all duration-500 rounded-full"
               style={{ width: `${Math.round((completedModulesCount / totalCourseModules) * 100)}%` }}

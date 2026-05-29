@@ -118,7 +118,7 @@ export const PasteValidatorOutput = ({ module, moduleNumber, onApply }: PasteVal
   };
 
   return (
-    <div className="rounded-2xl border border-hermes-border bg-white shadow-sm overflow-hidden mb-4">
+    <div className="rounded-2xl border border-hermes-border bg-hermes-bg2 shadow-sm overflow-hidden mb-4">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-3 px-6 py-4 hover:bg-hermes-bg3/50 transition-colors text-left"
@@ -158,7 +158,7 @@ export const PasteValidatorOutput = ({ module, moduleNumber, onApply }: PasteVal
             value={text}
             onChange={e => setText(e.target.value)}
             placeholder='{"tool": "hermes-mastery.verify_module", "schema_version": 1, ...}'
-            className="w-full h-40 px-4 py-3 bg-white border border-hermes-border rounded-lg text-xs font-mono text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent transition-all resize-y"
+            className="w-full h-40 px-4 py-3 bg-hermes-bg border border-hermes-border rounded-lg text-xs font-mono text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent transition-all resize-y"
           />
 
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -231,18 +231,18 @@ function LiveApiAdvanced({ open, setOpen, settings, isConfigured, update, clear 
         {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         <Globe size={14} /> Live verification (advanced)
         {isConfigured && (
-          <span className="ml-2 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 normal-case tracking-normal">
+          <span className="ml-2 text-[10px] font-bold text-emerald-300 bg-emerald-950/40 border border-emerald-700/40 rounded-full px-2 py-0.5 normal-case tracking-normal">
             configured
           </span>
         )}
       </button>
 
       {open && (
-        <div className="mt-3 space-y-3 bg-amber-50/40 border border-amber-200 rounded-xl p-4">
+        <div className="mt-3 space-y-3 bg-hermes-bg3 border border-hermes-accent/20 rounded-xl p-4">
           <div className="flex items-start gap-2">
-            <ShieldAlert size={16} className="text-amber-700 mt-0.5 flex-shrink-0" />
-            <div className="text-[11px] text-amber-900 leading-relaxed">
-              <strong>Security note:</strong> Live verification stores your gateway URL and a bearer token in this browser's localStorage. If your Hermes supports scoped tokens, use one limited to <code className="bg-amber-100 px-1 rounded">hermes-mastery-validator.*</code>. If only all-powerful tokens are available, anything that runs JavaScript on this domain can read it. Paste-back is the safer default.
+            <ShieldAlert size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
+            <div className="text-[11px] text-hermes-cream leading-relaxed">
+              <strong>Security note:</strong> Live verification stores your gateway URL and a bearer token in this browser's localStorage. If your Hermes supports scoped tokens, use one limited to <code className="bg-hermes-bg px-1 rounded">hermes-mastery-validator.*</code>. If only all-powerful tokens are available, anything that runs JavaScript on this domain can read it. Paste-back is the safer default.
             </div>
           </div>
 
@@ -255,7 +255,7 @@ function LiveApiAdvanced({ open, setOpen, settings, isConfigured, update, clear 
               value={settings.gatewayUrl}
               onChange={e => update({ gatewayUrl: e.target.value })}
               placeholder="https://your-vps.example.com"
-              className="w-full px-3 py-2 bg-white border border-hermes-border rounded-lg text-xs font-mono text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent"
+              className="w-full px-3 py-2 bg-hermes-bg border border-hermes-border rounded-lg text-xs font-mono text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent"
             />
           </div>
 
@@ -268,7 +268,7 @@ function LiveApiAdvanced({ open, setOpen, settings, isConfigured, update, clear 
               value={settings.token}
               onChange={e => update({ token: e.target.value })}
               placeholder="paste your token (never logged, stays in this browser)"
-              className="w-full px-3 py-2 bg-white border border-hermes-border rounded-lg text-xs font-mono text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent"
+              className="w-full px-3 py-2 bg-hermes-bg border border-hermes-border rounded-lg text-xs font-mono text-hermes-dark placeholder:text-hermes-dark/20 focus:outline-none focus:ring-2 focus:ring-hermes-accent/10 focus:border-hermes-accent"
               autoComplete="off"
             />
           </div>
@@ -307,13 +307,13 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       return (
         <div className="space-y-2">
           {integ?.status === 'DRIFT_MODIFIED' && (
-            <div className="bg-red-50 border-2 border-red-400 rounded-lg p-3">
+            <div className="bg-red-950/40 border-2 border-red-600/60 rounded-lg p-3">
               <div className="flex items-start gap-2">
-                <ShieldAlert size={18} className="text-red-600 mt-0.5 flex-shrink-0" />
-                <div className="text-xs text-red-900 font-medium leading-relaxed">
+                <ShieldAlert size={18} className="text-red-400 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-red-300 font-medium leading-relaxed">
                   <strong className="uppercase tracking-wide">validator drift detected — these results may not match the published validator.</strong>
                   {integ.modified_files && integ.modified_files.length > 0 && (
-                    <> Changed: <code className="bg-red-100 px-1 rounded">{integ.modified_files.join(', ')}</code>.</>
+                    <> Changed: <code className="bg-red-950/60 px-1 rounded">{integ.modified_files.join(', ')}</code>.</>
                   )}
                   {' '}The results below were applied but should be treated as suspect until the validator is restored.
                 </div>
@@ -321,19 +321,19 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
             </div>
           )}
           {integ?.status === 'UNKNOWN' && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <div className="bg-hermes-bg3 border border-hermes-accent/30 rounded-lg p-3">
               <div className="flex items-start gap-2">
-                <ShieldAlert size={16} className="text-amber-700 mt-0.5 flex-shrink-0" />
-                <div className="text-xs text-amber-900 font-medium leading-relaxed">
-                  Install the validator skill via <code className="bg-amber-100 px-1 rounded">hermes skills install s1dd4rth/hermes-mastery-validator</code> to enable drift-evidence.
+                <ShieldAlert size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-hermes-cream font-medium leading-relaxed">
+                  Install the validator skill via <code className="bg-hermes-bg px-1 rounded">hermes skills install s1dd4rth/hermes-mastery-validator</code> to enable drift-evidence.
                 </div>
               </div>
             </div>
           )}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+          <div className="bg-emerald-950/40 border border-emerald-700/40 rounded-lg p-3">
             <div className="flex items-start gap-2">
-              <CheckCircle2 size={16} className="text-emerald-600 mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-emerald-900 font-medium leading-relaxed">
+              <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-emerald-300 font-medium leading-relaxed">
                 Applied {f.appliedCount} {f.appliedCount === 1 ? 'check' : 'checks'} ({passedCount} passed
                 {f.failedCount > 0 ? `, ${f.failedCount} failed` : ''}).
                 {f.manualCount > 0 && (
@@ -350,10 +350,10 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
     }
     case 'parse_error':
       return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="bg-red-950/40 border border-red-700/40 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-red-900 font-medium leading-relaxed">
+            <AlertCircle size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-red-300 font-medium leading-relaxed">
               <strong>Could not parse JSON:</strong> {f.message}. Make sure you copied the entire output (no surrounding chat text).
             </div>
           </div>
@@ -361,10 +361,10 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       );
     case 'schema_too_new':
       return (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div className="bg-hermes-bg3 border border-hermes-accent/30 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <RefreshCw size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-amber-900 font-medium leading-relaxed">
+            <RefreshCw size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-hermes-cream font-medium leading-relaxed">
               <strong>Web app is older than your validator skill</strong> (got schema v{f.payloadVersion}, this app understands v{RENDERER_SCHEMA_VERSION}). Hard-refresh this page (Cmd+Shift+R / Ctrl+Shift+R) to pick up the latest course UI.
             </div>
           </div>
@@ -372,12 +372,12 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       );
     case 'schema_too_old':
       return (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div className="bg-hermes-bg3 border border-hermes-accent/30 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <Download size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-amber-900 font-medium leading-relaxed">
+            <Download size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-hermes-cream font-medium leading-relaxed">
               <strong>Validator skill is outdated</strong> (got schema v{f.payloadVersion}, this app expects v{RENDERER_SCHEMA_VERSION}). In your Hermes session, run:{' '}
-              <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono">
+              <code className="bg-hermes-bg px-1.5 py-0.5 rounded font-mono">
                 hermes skills upgrade hermes-mastery-validator
               </code>
             </div>
@@ -386,10 +386,10 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       );
     case 'wrong_module':
       return (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div className="bg-hermes-bg3 border border-hermes-accent/30 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-amber-900 font-medium leading-relaxed">
+            <AlertCircle size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-hermes-cream font-medium leading-relaxed">
               <strong>Wrong module:</strong> this output is for module {f.got}, but you're on module {f.expected}. Re-run the validator for module {f.expected}.
             </div>
           </div>
@@ -397,10 +397,10 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       );
     case 'shape_invalid':
       return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="bg-red-950/40 border border-red-700/40 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-red-900 font-medium leading-relaxed">
+            <AlertCircle size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-red-300 font-medium leading-relaxed">
               <strong>Output shape is invalid:</strong> {f.message}.
             </div>
           </div>
@@ -408,12 +408,12 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       );
     case 'install_required':
       return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="bg-red-950/40 border border-red-700/40 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <Download size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-red-900 font-medium leading-relaxed">
+            <Download size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-red-300 font-medium leading-relaxed">
               <strong>The hermes-mastery-validator skill is not installed.</strong> Install it via:
-              <CodeBlock className="bg-hermes-dark text-emerald-200 px-3 py-2 rounded mt-2 font-mono text-[11px] overflow-x-auto">
+              <CodeBlock className="bg-hermes-bg text-emerald-300 px-3 py-2 rounded mt-2 font-mono text-[11px] overflow-x-auto">
 {`hermes skills install s1dd4rth/hermes-mastery-validator`}
               </CodeBlock>
               <span className="block mt-2">Then start a fresh Hermes session and re-run verify. Full instructions: M1 → "Install the Validator Skill".</span>
@@ -434,21 +434,21 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       );
     case 'live_cors_or_network':
       return (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div className="bg-hermes-bg3 border border-hermes-accent/30 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <ShieldAlert size={16} className="text-amber-700 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-amber-900 font-medium leading-relaxed">
-              <strong>Could not reach your gateway.</strong> Most likely CORS is blocking this origin, or the URL is wrong / unreachable from your browser. Use paste-back instead, or fix the gateway's CORS allowlist. <span className="text-amber-700/70">Detail: {f.message}</span>
+            <ShieldAlert size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-hermes-cream font-medium leading-relaxed">
+              <strong>Could not reach your gateway.</strong> Most likely CORS is blocking this origin, or the URL is wrong / unreachable from your browser. Use paste-back instead, or fix the gateway's CORS allowlist. <span className="text-hermes-cream/60">Detail: {f.message}</span>
             </div>
           </div>
         </div>
       );
     case 'live_unauthorized':
       return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="bg-red-950/40 border border-red-700/40 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <ShieldAlert size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-red-900 font-medium leading-relaxed">
+            <ShieldAlert size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-red-300 font-medium leading-relaxed">
               <strong>Gateway rejected the token (HTTP {f.status}).</strong> Token may be wrong, expired, or scoped to disallow this tool. Update the token in Live verification (advanced) or fall back to paste-back.
             </div>
           </div>
@@ -456,11 +456,11 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
       );
     case 'live_http_error':
       return (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="bg-red-950/40 border border-red-700/40 rounded-lg p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-red-900 font-medium leading-relaxed">
-              <strong>Gateway returned HTTP {f.status}.</strong> {f.body && <span className="block mt-1 text-red-800/70 font-mono text-[11px] break-all">{f.body.slice(0, 200)}</span>}
+            <AlertCircle size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-red-300 font-medium leading-relaxed">
+              <strong>Gateway returned HTTP {f.status}.</strong> {f.body && <span className="block mt-1 text-red-400/70 font-mono text-[11px] break-all">{f.body.slice(0, 200)}</span>}
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { StepVerify } from './StepVerify';
 import { StepProgress } from './StepProgress';
 import { PasteValidatorOutput } from './PasteValidatorOutput';
 import { CompletionCodeBanner } from './CompletionCodeBanner';
+import { CelebrationCard } from '../celebration/CelebrationCard';
 
 interface StepEngineProps {
   steps: Step[];
@@ -89,6 +90,11 @@ export const StepEngine = ({
             <StepLearn content={step.learn} />
           </div>
 
+          {/* Celebration card — M10 share-completion step */}
+          {module.id === 'm10' && step.id === 'share-completion' && (
+            <CelebrationCard moduleResults={getModuleVerifyResults(module.id)} />
+          )}
+
           {/* Do */}
           {step.do && (
             <StepDo
@@ -165,7 +171,7 @@ export const StepEngine = ({
           {(completedSteps[currentIndex] || isStepComplete(step.id))
             && currentIndex === steps.length - 1
             && !nextPhaseLabel && (
-            <div className="w-full py-4 bg-emerald-50 text-emerald-800 rounded-xl font-bold text-sm text-center border border-emerald-200">
+            <div className="w-full py-4 bg-emerald-950/40 text-emerald-300 rounded-xl font-bold text-sm text-center border border-emerald-700/40">
               🎉 Course complete — you've reached the end of the curriculum.
             </div>
           )}
