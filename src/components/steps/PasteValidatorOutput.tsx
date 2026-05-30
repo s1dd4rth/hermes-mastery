@@ -325,7 +325,7 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
               <div className="flex items-start gap-2">
                 <ShieldAlert size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
                 <div className="text-xs text-hermes-cream font-medium leading-relaxed">
-                  Install the validator skill via <code className="bg-hermes-bg px-1 rounded">hermes skills install s1dd4rth/hermes-mastery-validator</code> to enable drift-evidence.
+                  Install the validator skill (clone + symlink — see M1 → "Install the Validator Skill") to enable drift-evidence.
                 </div>
               </div>
             </div>
@@ -376,9 +376,9 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
           <div className="flex items-start gap-2">
             <Download size={16} className="text-hermes-accent mt-0.5 flex-shrink-0" />
             <div className="text-xs text-hermes-cream font-medium leading-relaxed">
-              <strong>Validator skill is outdated</strong> (got schema v{f.payloadVersion}, this app expects v{RENDERER_SCHEMA_VERSION}). In your Hermes session, run:{' '}
+              <strong>Validator skill is outdated</strong> (got schema v{f.payloadVersion}, this app expects v{RENDERER_SCHEMA_VERSION}). It's a symlinked clone, so update it with:{' '}
               <code className="bg-hermes-bg px-1.5 py-0.5 rounded font-mono">
-                hermes skills upgrade hermes-mastery-validator
+                cd ~/hermes-mastery-validator &amp;&amp; git pull &amp;&amp; npm install
               </code>
             </div>
           </div>
@@ -412,9 +412,11 @@ function renderFeedback(f: Exclude<FeedbackState, { kind: 'idle' }>) {
           <div className="flex items-start gap-2">
             <Download size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
             <div className="text-xs text-red-300 font-medium leading-relaxed">
-              <strong>The hermes-mastery-validator skill is not installed.</strong> Install it via:
+              <strong>The hermes-mastery-validator skill is not installed.</strong> Hub install is unsupported — clone + symlink it:
               <CodeBlock className="bg-hermes-bg text-emerald-300 px-3 py-2 rounded mt-2 font-mono text-[11px] overflow-x-auto">
-{`hermes skills install s1dd4rth/hermes-mastery-validator`}
+{`cd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git
+ln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator
+cd ~/hermes-mastery-validator && npm install`}
               </CodeBlock>
               <span className="block mt-2">Then start a fresh Hermes session and re-run verify. Full instructions: M1 → "Install the Validator Skill".</span>
             </div>

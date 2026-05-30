@@ -45,20 +45,20 @@ export const MODULES_DATA: Module[] = [
             id: 'setup-wizard',
             title: 'Run the Setup Wizard',
             learn:
-              'After install, run the Hermes onboarding wizard:\n\n```\nhermes onboard\n```\n\nThe wizard walks you through:\n1. Choosing a model provider (Anthropic, OpenAI, or Google)\n2. Pasting your API key\n3. Naming your agent\n4. Setting a gateway port (default: 1919)\n\nWork through each prompt. When the wizard completes, the Hermes dashboard opens at `http://localhost:1919` in your browser.',
+              'After install, run the Hermes setup wizard:\n\n```\nhermes setup\n```\n\nThe wizard walks you through:\n1. Choosing a model provider and model (Anthropic, OpenAI, Google, or Nous Portal)\n2. Storing your API key in `~/.hermes/.env`\n3. Terminal, tools, and agent options\n\nWork through each prompt. To re-run just one section later: `hermes setup model` (also `tts`, `terminal`, `tools`, `agent`, `gateway`). For one-shot Nous Portal OAuth: `hermes setup --portal`.\n\nHermes is **terminal-first** — there is no web dashboard you have to open. Start a session anytime with `hermes` (classic CLI) or `hermes --tui` (recommended). An optional config/keys web UI is available via `hermes dashboard` if you want one, but it is not required for this course.',
             do: {
               prompt:
-                'Run `hermes onboard` and follow the prompts. When done, open `http://localhost:1919` in your browser and confirm the dashboard loads. Report back: which model provider did you choose, and does the dashboard respond?',
+                'Run `hermes setup` and follow the prompts (pick a provider/model and paste your API key). When done, start a session with `hermes` (or `hermes --tui`) and confirm the agent replies to a simple "hello". Report which model provider you chose and whether the agent responded.',
             },
           },
           {
             id: 'choose-model',
             title: 'Choose Your Model',
             learn:
-              'Hermes supports three model providers. Your choice affects cost, personality, and latency:\n\n- **Anthropic (Claude):** Best for long-form writing and careful reasoning. Claude Sonnet 4 is the recommended starting model. Requires billing at [console.anthropic.com](https://console.anthropic.com).\n- **OpenAI (GPT):** Fastest and widely compatible. GPT-4o is a solid default. Requires billing at [platform.openai.com](https://platform.openai.com).\n- **Google (Gemini):** Most cost-efficient; free tier available at [aistudio.google.com](https://aistudio.google.com).\n\nThe `model.provider` key in `~/.hermes/config.yaml` stores your choice. You can switch providers anytime by editing this file and restarting the gateway.\n\n**Check your current config:**\n```\ncat ~/.hermes/config.yaml | grep -A2 model\n```',
+              'Hermes supports several model providers. Your choice affects cost, personality, and latency:\n\n- **Anthropic (Claude):** Best for long-form writing and careful reasoning. Requires billing at [console.anthropic.com](https://console.anthropic.com).\n- **OpenAI (GPT):** Fast and widely compatible. Requires billing at [platform.openai.com](https://platform.openai.com).\n- **Google (Gemini):** Most cost-efficient; free tier at [aistudio.google.com](https://aistudio.google.com).\n- **Nous Portal:** OAuth login, no key juggling — `hermes setup --portal`.\n\nYour choice is stored under the nested `model` key in `~/.hermes/config.yaml` (`model.provider` plus `model.default`). Secrets (API keys) live separately in `~/.hermes/.env`.\n\n**View your current config:**\n```\nhermes config show\n```\n\n**Change provider/model** — re-run the model section of the wizard, or set it directly:\n```\nhermes setup model\nhermes config set model anthropic/claude-opus-4.6\n```',
             do: {
               prompt:
-                'Show me the `model` section of `~/.hermes/config.yaml`. Run: `cat ~/.hermes/config.yaml | grep -A5 "^model"`. Reply with just the yaml block.',
+                'Run `hermes config show` and report the `Model` line (it shows the provider and default model). If no provider is set, run `hermes setup model` to pick one, then re-run `hermes config show`.',
             },
             verify: {
               checks: [
@@ -68,9 +68,9 @@ export const MODULES_DATA: Module[] = [
                   verifyPrompt:
                     'Read the `model.provider` value from `~/.hermes/config.yaml`. Respond ONLY with this JSON: {"checks":[{"id":"model-configured","pass":true,"detail":"model.provider: <value>"}]} — set pass to false if the key is missing or empty.',
                   failHint:
-                    'If `model.provider` is missing, run `hermes onboard` again and pick a provider, or manually add it to `~/.hermes/config.yaml`.',
+                    'If `model.provider` is missing, run `hermes setup model` to pick a provider, or set it with `hermes config set model <provider>/<model>`.',
                   fixPrompt:
-                    'Open `~/.hermes/config.yaml` and confirm the `model.provider` key is present with a non-empty value (anthropic, openai, or google).',
+                    'Run `hermes setup model` (or `hermes config set model <provider>/<model>`), then confirm with `hermes config show` that a provider is set.',
                 },
               ],
             },
@@ -88,10 +88,10 @@ export const MODULES_DATA: Module[] = [
             id: 'install-validator-skill',
             title: 'Install the Validator Skill',
             learn:
-              'The course uses a companion Hermes skill called `hermes-mastery-validator` to verify your setup at the end of each module. Instead of ticking checkboxes by hand, the skill inspects your actual Hermes state — config values, files, the gateway — and returns a structured pass/fail JSON report this app reads.\n\nIt is read-only. It never modifies your setup, never displays secrets.\n\n**Install (v0.1.0-alpha):** Hub install (`hermes skills install …`) is not available yet in this alpha, so clone the repo and symlink it into your skills directory:\n\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```\n\nThe `npm install` step is required, not optional — the validator depends on `js-yaml`, and `verify.js` throws `Cannot find module \'js-yaml\'` without it.\n\nStart a fresh Hermes session so the new skill is picked up, then confirm it is registered:\n\n```\nhermes skills\n```\n\n`hermes-mastery-validator` should appear in the listing.',
+              'The course uses a companion Hermes skill called `hermes-mastery-validator` to verify your setup at the end of each module. Instead of ticking checkboxes by hand, the skill inspects your actual Hermes state — config values, files, the gateway — and returns a structured pass/fail JSON report this app reads.\n\nIt is read-only. It never modifies your setup, never displays secrets.\n\n**Install (v0.1.0-alpha):** Hub install (`hermes skills install …`) is not available yet in this alpha, so clone the repo and symlink it into your skills directory:\n\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```\n\nThe `npm install` step is required, not optional — the validator depends on `js-yaml`, and `verify.js` throws `Cannot find module \'js-yaml\'` without it.\n\nStart a fresh Hermes session so the new skill is picked up, then confirm it is registered:\n\n```\nhermes skills list\n```\n\n`hermes-mastery-validator` should appear in the listing with source `local`.',
             do: {
               prompt:
-                'Install the hermes-mastery-validator skill via clone + symlink (Hub install is not available in v0.1.0-alpha):\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```\nThe `npm install` is required (the validator needs `js-yaml`). Then start a fresh Hermes session, run `hermes skills`, and confirm `hermes-mastery-validator` appears. Report whether the clone, symlink, and `npm install` all succeeded and whether the skill shows up in the listing.',
+                'Install the hermes-mastery-validator skill via clone + symlink (Hub install is not available in v0.1.0-alpha):\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```\nThe `npm install` is required (the validator needs `js-yaml`). Then start a fresh Hermes session, run `hermes skills list`, and confirm `hermes-mastery-validator` appears (source: local). Report whether the clone, symlink, and `npm install` all succeeded and whether the skill shows up in the listing.',
             },
             verify: {
               checks: [
@@ -109,25 +109,25 @@ export const MODULES_DATA: Module[] = [
             },
           },
           {
-            id: 'verify-gateway',
-            title: 'Verify Gateway',
+            id: 'verify-skill-loads',
+            title: 'Confirm the Skill Loads',
             learn:
-              'Before running the module validator, confirm the Hermes gateway is responding. The gateway serves the dashboard at `http://localhost:1919` and handles all skill invocations.\n\nIf the dashboard does not load, start the gateway:\n\n```\nhermes gateway start\n```\n\nFor a persistent background process (recommended on a machine that stays on):\n\n```\nhermes gateway start --daemon\n```\n\nOnce the gateway is running, the `hermes-mastery-validator` skill can be invoked from within Hermes sessions.',
+              'Hermes is terminal-first: skills run **inside a Hermes session**, not behind a gateway or web server. (`hermes gateway` is for connecting messaging channels like Telegram or Discord — it is not a dashboard, and you do not need it for this course.)\n\nBefore running the module validator, confirm Hermes actually recognizes the skill you just installed. List installed skills:\n\n```\nhermes skills list\n```\n\n`hermes-mastery-validator` should appear with source `local`. If the name looks cut off in the table, widen your terminal or run `hermes skills list --source local`. If it is missing entirely, you may be in a stale session — start a fresh `hermes` session and list again.\n\nYou can also check from inside a chat: run `hermes` (or `hermes --tui`), then type `/skills`.',
             do: {
               prompt:
-                'Confirm the Hermes gateway is running. Open `http://localhost:1919` in a browser and verify the dashboard loads. If it does not, run `hermes gateway start` and try again. Report: does the dashboard respond?',
+                'Run `hermes skills list` and confirm `hermes-mastery-validator` appears (source: local). If it does not show up, start a fresh Hermes session and try again. Report whether the skill is listed.',
             },
             verify: {
               checks: [
                 {
-                  id: 'gateway-running',
-                  label: 'Dashboard reachable at 127.0.0.1:1919',
+                  id: 'skill-registered',
+                  label: '`hermes-mastery-validator` appears in `hermes skills list`',
                   verifyPrompt:
-                    'Check whether the Hermes dashboard at `http://127.0.0.1:1919` is reachable (try a curl or fetch). Respond ONLY with this JSON: {"checks":[{"id":"gateway-running","pass":true,"detail":"Dashboard responded with HTTP 200"}]} — set pass to false if the gateway does not respond.',
+                    'Run `hermes skills list` (the Rich table may truncate long names — a wide terminal or `hermes skills list --source local` avoids that). Respond ONLY with this JSON: {"checks":[{"id":"skill-registered","pass":true,"detail":"hermes-mastery-validator is registered (source: local)"}]} — set pass to false if it does not appear.',
                   failHint:
-                    'Run `hermes gateway start` in a terminal, wait a few seconds, then try again.',
+                    'If the skill is missing, confirm the symlink at `~/.hermes/skills/hermes-mastery-validator` and start a fresh Hermes session so it gets picked up.',
                   fixPrompt:
-                    'Run `hermes gateway start` and wait ~5 seconds, then re-check `http://127.0.0.1:1919`.',
+                    'Run `hermes skills list --source local`. If `hermes-mastery-validator` is absent, re-create the symlink: `ln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator`, then start a fresh Hermes session.',
                 },
               ],
             },
@@ -145,7 +145,7 @@ export const MODULES_DATA: Module[] = [
             id: 'run-validator',
             title: 'Run Module 1 Validator',
             learn:
-              'Now that Hermes is installed, your model is configured, the validator skill is in place, and the gateway is running — run the M1 validator to confirm all four checks pass.\n\nThe validator skill runs four deterministic checks:\n- `hermes-installed` — `hermes --version` succeeds\n- `gateway-running` — dashboard reachable at 127.0.0.1:1919\n- `model-configured` — `model.provider` is set in config\n- `validator-skill-installed` — SKILL.md is present\n\nPaste the JSON output into the panel below. The app updates the check results automatically.',
+              'Now that Hermes is installed, your model is configured, and the validator skill is registered — run the M1 validator to confirm all four checks pass.\n\nThe validator skill runs four deterministic checks:\n- `hermes-installed` — `hermes --version` succeeds\n- `skill-registered` — `hermes-mastery-validator` appears in `hermes skills list`\n- `model-configured` — `model.provider` is set in config\n- `validator-skill-installed` — SKILL.md is present\n\nPaste the JSON output into the panel below. The app updates the check results automatically.',
             do: {
               prompt:
                 'Invoke the hermes-mastery-validator skill for module 1 and reply with the complete JSON output. The tool name is `hermes-mastery-validator` and the operation is `verify_module` with argument `module: 1`. Reply with only the raw JSON object — no prose, no markdown fence.',
