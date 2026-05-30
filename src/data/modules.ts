@@ -162,40 +162,31 @@ export const MODULES_DATA: Module[] = [
         ],
       },
 
-      // ── Phase 2: Direct-edit USER.md ───────────────────────────────────
+      // ── Phase 2: Direct-edit the memory files ──────────────────────────
       {
-        id: 'edit-user-md',
-        title: 'Phase 2: Edit USER.md',
+        id: 'edit-memory-files',
+        title: 'Phase 2: Direct-Edit Your Memory Files',
         icon: BookOpen,
         steps: [
           {
             id: 'direct-edit-user-md',
-            title: 'Direct-Edit USER.md',
+            title: 'Edit USER.md — Who You Are',
             learn:
-              'You can also edit the memory files directly in your text editor. `~/.hermes/memories/USER.md` is a plain-text file — Hermes reads it at session start and uses it as context.\n\nRecommended structure for USER.md:\n\n```\nName: Your Name\nCommunication style: terse / verbose / Socratic / etc.\nHard nopes: never spend >$X via tools without asking first\n```\n\nKeep it under ~1,375 chars (the Hermes documented limit). The validator will warn if you\'re over, but won\'t fail — Hermes\'s limits may shift between versions.\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/USER.md\n# or: code ~/.hermes/memories/USER.md\n```\n\nAdd your name, how you want the agent to communicate, and at least one hard limit ("never book travel without confirmation", "never push to main without asking"). When done, check the size with `wc -c ~/.hermes/memories/USER.md`.',
+              'Besides the conversational round-trip, you can edit the memory files directly in a text editor. Both are plain text that Hermes reads at session start — open with `nano` or `code`, edit, save.\n\n`USER.md` holds your **identity and guardrails**: your name, how you want the agent to communicate, and your hard limits. Recommended shape:\n\n```\nName: Your Name\nCommunication style: terse / verbose / Socratic / etc.\nHard nopes: never spend >$X via tools without asking first\n```\n\n**Open it:**\n\n```\nnano ~/.hermes/memories/USER.md\n# or: code ~/.hermes/memories/USER.md\n```\n\nAdd your name, your preferred communication style, and at least one hard limit ("never book travel without confirmation", "never push to main without asking"). Keep it under ~1,375 chars — `wc -c ~/.hermes/memories/USER.md` to check. The validator warns over the limit but won\'t fail; Hermes\'s caps may shift between versions.',
           },
-        ],
-      },
-
-      // ── Phase 3: Direct-edit MEMORY.md ─────────────────────────────────
-      {
-        id: 'edit-memory-md',
-        title: 'Phase 3: Edit MEMORY.md',
-        icon: BookOpen,
-        steps: [
           {
             id: 'direct-edit-memory-md',
-            title: 'Direct-Edit MEMORY.md',
+            title: 'Edit MEMORY.md — What You\'re Working On',
             learn:
-              '`~/.hermes/memories/MEMORY.md` captures your active context — what you\'re building, what tools you use, what decisions are in flight. Hermes injects this into every session so you don\'t have to re-explain your setup.\n\nRecommended structure for MEMORY.md:\n\n```\n- Working on: <project name> — <one-line description>\n- Stack: <tech>\n- Tools: <tool1>, <tool2>\n- Open loops: <decision or question pending>\n```\n\nOr prose — Hermes is flexible. The validator just checks that at least one project/context entry is present.\n\nKeep it under ~2,200 chars (informational limit, same caveat as USER.md).\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/MEMORY.md\n# or: code ~/.hermes/memories/MEMORY.md\n```\n\nAdd your current active project(s), the tech stack or tools you use, and any open decisions. When done, check the size with `wc -c ~/.hermes/memories/MEMORY.md`.',
+              'Where `USER.md` is who you are, `MEMORY.md` is **what\'s in flight** — active projects, tools, and open decisions. Hermes injects it into every session so you don\'t re-explain your setup each time. Recommended shape:\n\n```\n- Working on: <project name> — <one-line description>\n- Stack: <tech>\n- Tools: <tool1>, <tool2>\n- Open loops: <decision or question pending>\n```\n\nProse works too — the validator just checks that at least one project/context entry is present.\n\n**Open it:**\n\n```\nnano ~/.hermes/memories/MEMORY.md\n# or: code ~/.hermes/memories/MEMORY.md\n```\n\nAdd your current project(s), stack/tools, and any open decisions. Keep it under ~2,200 chars — `wc -c ~/.hermes/memories/MEMORY.md` to check.',
           },
         ],
       },
 
-      // ── Phase 4: Validation ─────────────────────────────────────────────
+      // ── Phase 3: Validation ─────────────────────────────────────────────
       {
         id: 'validation',
-        title: 'Phase 4: Validation',
+        title: 'Phase 3: Validation',
         icon: CheckCircle,
         steps: [
           {
