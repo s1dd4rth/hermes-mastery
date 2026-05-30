@@ -14,6 +14,13 @@ export interface Step {
   learn: string;
   do?: {
     prompt: string;
+    /**
+     * True when this is a terminal task the learner runs themselves (install,
+     * interactive wizard, clone/symlink) — NOT something to delegate to the
+     * Hermes agent. Renders a neutral "Copy command" + "run in your terminal"
+     * instead of "Copy & Paste to Hermes". Defaults to false (agent-delegated).
+     */
+    manual?: boolean;
     requiresInput?: {
       label: string;
       placeholder: string;

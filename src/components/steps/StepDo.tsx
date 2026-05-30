@@ -3,6 +3,7 @@ import { Copy, Check } from 'lucide-react';
 
 interface StepDoProps {
   prompt: string;
+  manual?: boolean;
   requiresInput?: {
     label: string;
     placeholder: string;
@@ -15,6 +16,7 @@ interface StepDoProps {
 
 export const StepDo = ({
   prompt,
+  manual,
   requiresInput,
   userInputs,
   onExecute,
@@ -70,7 +72,7 @@ export const StepDo = ({
 
       {/* Prompt display + action */}
       <div className="rounded-2xl border border-hermes-border bg-hermes-bg2 shadow-sm overflow-hidden">
-        <div className="px-6 py-5 text-sm text-hermes-dark/80 font-mono leading-relaxed select-all bg-hermes-bg/30">
+        <div className="px-6 py-5 text-sm text-hermes-dark/80 font-mono leading-relaxed select-all bg-hermes-bg/30 whitespace-pre-wrap">
           {prompt}
         </div>
         <div className="flex items-center justify-between gap-3 px-6 py-4 bg-hermes-bg3 border-t border-hermes-border">
@@ -88,13 +90,15 @@ export const StepDo = ({
               ) : (
                 <>
                   <Copy size={16} strokeWidth={2.5} />
-                  Copy &amp; Paste to Hermes
+                  {manual ? 'Copy command' : 'Copy & Paste to Hermes'}
                 </>
               )}
             </button>
             {copied && (
               <span className="text-xs text-emerald-300 font-bold bg-emerald-950/40 border border-emerald-700/40 px-3 py-1 rounded-full animate-in fade-in slide-in-from-left-2">
-                Now switch to your Hermes chat tab and paste it there.
+                {manual
+                  ? 'Now run it yourself in your terminal.'
+                  : 'Now switch to your Hermes chat tab and paste it there.'}
               </span>
             )}
           </div>
