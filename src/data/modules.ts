@@ -156,7 +156,7 @@ export const MODULES_DATA: Module[] = [
               'Hermes has two memory files it maintains automatically:\n\n- **`~/.hermes/memories/USER.md`** — who you are: your name, communication style, hard nopes. Capped at ~1,375 chars.\n- **`~/.hermes/memories/MEMORY.md`** — what you\'re working on: active projects, tools, open loops. Capped at ~2,200 chars.\n\n**On a fresh install these files don\'t exist yet** — Hermes creates them the first time it records a memory. So if you `cat ~/.hermes/memories/USER.md` before doing the exercise below and see *"No such file or directory"*, that\'s expected. Do the tell → write → read-back round-trip first, then the file will be there.\n\nThe simplest way to populate them is to just tell the agent something in chat and ask it to remember:\n\n> "Chuck that in memory: I prefer terse responses."\n> "Remember that I\'m working on a SaaS dashboard project."\n> "My name is Alex — add that to USER.md."\n\nHermes writes the fact into the right file immediately. You can verify it landed by reading the file:\n\n```\ncat ~/.hermes/memories/USER.md\ncat ~/.hermes/memories/MEMORY.md\n```\n\nThis conversational round-trip — tell → write → read back — is the load-bearing exercise of M2.',
             do: {
               prompt:
-                'Tell your Hermes a new fact about yourself in chat. Try something like "remember that I prefer terse responses" or "chuck that in memory: I drink oat milk". After the agent responds, read USER.md or MEMORY.md and confirm the fact was written. Report: what did you tell it, and what did you find in the file?',
+                'Chuck that in memory: I prefer terse, direct responses — skip the preamble. Then tell me which memory file you saved it to.',
             },
           },
         ],
@@ -172,11 +172,7 @@ export const MODULES_DATA: Module[] = [
             id: 'direct-edit-user-md',
             title: 'Direct-Edit USER.md',
             learn:
-              'You can also edit the memory files directly in your text editor. `~/.hermes/memories/USER.md` is a plain-text file — Hermes reads it at session start and uses it as context.\n\nRecommended structure for USER.md:\n\n```\nName: Your Name\nCommunication style: terse / verbose / Socratic / etc.\nHard nopes: never spend >$X via tools without asking first\n```\n\nKeep it under ~1,375 chars (the Hermes documented limit). The validator will warn if you\'re over, but won\'t fail — Hermes\'s limits may shift between versions.\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/USER.md\n# or: code ~/.hermes/memories/USER.md\n```\n\nAdd your name, how you want the agent to communicate, and at least one hard limit ("never book travel without confirmation", "never push to main without asking").',
-            do: {
-              prompt:
-                'Open `~/.hermes/memories/USER.md` in your editor. Add or confirm: your name (real or a handle), your preferred communication style (terse/verbose/structured etc.), and at least one hard nope. Save the file. Run `wc -c ~/.hermes/memories/USER.md` and confirm it\'s under 1375 chars. Report what you set for each field.',
-            },
+              'You can also edit the memory files directly in your text editor. `~/.hermes/memories/USER.md` is a plain-text file — Hermes reads it at session start and uses it as context.\n\nRecommended structure for USER.md:\n\n```\nName: Your Name\nCommunication style: terse / verbose / Socratic / etc.\nHard nopes: never spend >$X via tools without asking first\n```\n\nKeep it under ~1,375 chars (the Hermes documented limit). The validator will warn if you\'re over, but won\'t fail — Hermes\'s limits may shift between versions.\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/USER.md\n# or: code ~/.hermes/memories/USER.md\n```\n\nAdd your name, how you want the agent to communicate, and at least one hard limit ("never book travel without confirmation", "never push to main without asking"). When done, check the size:\n\n```\nwc -c ~/.hermes/memories/USER.md\n```\n\nKeep it under ~1,375 chars.',
           },
         ],
       },
@@ -191,11 +187,7 @@ export const MODULES_DATA: Module[] = [
             id: 'direct-edit-memory-md',
             title: 'Direct-Edit MEMORY.md',
             learn:
-              '`~/.hermes/memories/MEMORY.md` captures your active context — what you\'re building, what tools you use, what decisions are in flight. Hermes injects this into every session so you don\'t have to re-explain your setup.\n\nRecommended structure for MEMORY.md:\n\n```\n- Working on: <project name> — <one-line description>\n- Stack: <tech>\n- Tools: <tool1>, <tool2>\n- Open loops: <decision or question pending>\n```\n\nOr prose — Hermes is flexible. The validator just checks that at least one project/context entry is present.\n\nKeep it under ~2,200 chars (informational limit, same caveat as USER.md).\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/MEMORY.md\n# or: code ~/.hermes/memories/MEMORY.md\n```',
-            do: {
-              prompt:
-                'Open `~/.hermes/memories/MEMORY.md` in your editor. Add your current active project(s), the tech stack or tools you use, and any open decisions. Save. Run `wc -c ~/.hermes/memories/MEMORY.md` and confirm it\'s under 2200 chars. Report what you added.',
-            },
+              '`~/.hermes/memories/MEMORY.md` captures your active context — what you\'re building, what tools you use, what decisions are in flight. Hermes injects this into every session so you don\'t have to re-explain your setup.\n\nRecommended structure for MEMORY.md:\n\n```\n- Working on: <project name> — <one-line description>\n- Stack: <tech>\n- Tools: <tool1>, <tool2>\n- Open loops: <decision or question pending>\n```\n\nOr prose — Hermes is flexible. The validator just checks that at least one project/context entry is present.\n\nKeep it under ~2,200 chars (informational limit, same caveat as USER.md).\n\n**Open the file:**\n\n```\nnano ~/.hermes/memories/MEMORY.md\n# or: code ~/.hermes/memories/MEMORY.md\n```\n\nAdd your current active project(s), the tech stack or tools you use, and any open decisions. When done, check the size:\n\n```\nwc -c ~/.hermes/memories/MEMORY.md\n```\n\nKeep it under ~2,200 chars.',
           },
         ],
       },
