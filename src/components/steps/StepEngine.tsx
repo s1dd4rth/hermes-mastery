@@ -3,7 +3,6 @@ import { StepLearn } from './StepLearn';
 import { StepDo } from './StepDo';
 import { StepVerify } from './StepVerify';
 import { StepProgress } from './StepProgress';
-import { CompletionCodeBanner } from './CompletionCodeBanner';
 import { CelebrationCard } from '../celebration/CelebrationCard';
 import { SelfCheck } from './SelfCheck';
 
@@ -13,7 +12,6 @@ interface StepEngineProps {
   moduleId: string;
   userInputs: Record<string, string>;
   getVerifyResults: (stepId: string) => Record<string, VerifyResult> | undefined;
-  getModuleVerifyResults: (moduleId: string) => Record<string, VerifyResult> | undefined;
   isStepComplete: (stepId: string) => boolean;
   onExecute: (prompt: string, stepTitle: string) => void;
   onToggleCheck: (stepId: string, checkId: string) => void;
@@ -34,7 +32,6 @@ export const StepEngine = ({
   currentIndex,
   userInputs,
   getVerifyResults,
-  getModuleVerifyResults,
   isStepComplete,
   onExecute,
   onToggleCheck,
@@ -90,7 +87,7 @@ export const StepEngine = ({
 
           {/* Celebration card — M10 share-completion step */}
           {module.id === 'm10' && step.id === 'share-completion' && (
-            <CelebrationCard moduleResults={getModuleVerifyResults(module.id)} />
+            <CelebrationCard />
           )}
 
           {/* Do */}
@@ -102,14 +99,6 @@ export const StepEngine = ({
               onExecute={prompt => onExecute(prompt, step.title)}
               onSaveInput={onSaveInput}
             />
-          )}
-
-          {/* M10 completion code: surfaces the validator-generated code prominently.
-              Uses module-wide results so the banner appears on all M10 phases,
-              not just the phase where the validator was pasted.
-              Hidden on the Celebrate phase since CelebrationCard already shows the code. */}
-          {module.id === 'm10' && step.id !== 'share-completion' && (
-            <CompletionCodeBanner results={getModuleVerifyResults(module.id)} />
           )}
 
           {/* Verify */}
