@@ -150,26 +150,6 @@ export const Sidebar = ({
           </div>
         </div>
 
-        {/* Extra Resources */}
-        <div className="pt-4 border-t border-hermes-border space-y-3">
-          <div className="px-2 flex items-center gap-2">
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.15em] text-hermes-dark/40">
-              Resources
-            </h2>
-          </div>
-          <div className="space-y-1">
-            <a
-              href="https://s1dd4rth.github.io/hermes-mastery-validator/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-hermes-dark/60 hover:bg-hermes-bg3/50 hover:text-hermes-dark transition-all duration-200 group"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-hermes-dark/10 group-hover:bg-hermes-dark/20 transition-colors" />
-              <span className="text-sm font-medium tracking-tight">Hermes Mastery</span>
-              <span className="ml-auto text-[10px] text-hermes-dark/30 group-hover:text-hermes-dark/50 transition-colors">↗</span>
-            </a>
-          </div>
-        </div>
       </nav>
 
       {/* Course progress */}

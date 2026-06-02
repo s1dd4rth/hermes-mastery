@@ -28,8 +28,8 @@ export default function App() {
 
   const courseModules = MODULES_DATA.filter(m => !m.bonus);
   const completedModulesCount = courseModules.filter(mod => {
-    const { total, passed } = getModuleChecks(mod.id);
-    return total > 0 && passed === total;
+    const { total, done } = getModuleProgress(mod.id);
+    return total > 0 && done === total;
   }).length;
   const totalCourseModules = courseModules.length;
 
@@ -173,6 +173,7 @@ export default function App() {
 
   // ── Module check data (for dashboard) ───────────────────────────────
   const moduleChecks = getModuleChecks(nav.moduleId);
+  const moduleProgress = getModuleProgress(nav.moduleId);
 
   return (
     <div className="flex h-screen bg-hermes-bg font-body overflow-hidden">
@@ -219,13 +220,13 @@ export default function App() {
 
             <div className="flex items-center gap-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
               <div className="flex flex-col items-center gap-2">
-                <div className="text-2xl font-black text-hermes-accent">{(moduleChecks.passed / moduleChecks.total * 100).toFixed(0)}%</div>
-                <div className="text-[0.55rem] font-bold text-hermes-dark/30 uppercase tracking-[2px] font-mono">Mastery</div>
+                <div className="text-2xl font-black text-hermes-accent">{moduleProgress.total > 0 ? Math.round(moduleProgress.done / moduleProgress.total * 100) : 0}%</div>
+                <div className="text-[0.55rem] font-bold text-hermes-dark/30 uppercase tracking-[2px] font-mono">Complete</div>
               </div>
               <div className="w-[1px] h-8 bg-hermes-border" />
               <div className="flex flex-col items-center gap-2">
-                <div className="text-2xl font-black text-hermes-dark tabular-nums">{moduleChecks.passed}/{moduleChecks.total}</div>
-                <div className="text-[0.55rem] font-bold text-hermes-dark/30 uppercase tracking-[2px] font-mono">Checks</div>
+                <div className="text-2xl font-black text-hermes-dark tabular-nums">{moduleProgress.done}/{moduleProgress.total}</div>
+                <div className="text-[0.55rem] font-bold text-hermes-dark/30 uppercase tracking-[2px] font-mono">Steps</div>
               </div>
               <div className="w-[1px] h-8 bg-hermes-border" />
               <div className="flex items-center gap-4 text-left">
