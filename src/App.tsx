@@ -1,19 +1,16 @@
 import { useState } from 'react';
 import { MODULES_DATA } from './data/modules';
 import { useStepProgress } from './hooks/useStepProgress';
-import { isPasteValidatorEnabled } from './data/featureFlags';
-import type { ApplyPlan } from './data/validator';
 import { Sidebar } from './components/layout/Sidebar';
 import { MobileGate } from './components/layout/MobileGate';
 import { StepEngine } from './components/steps/StepEngine';
-import { ValidationDashboard } from './components/validation/ValidationDashboard';
 
 export default function App() {
   // ── Progress & Nav ──────────────────────────────────────────────────
   const {
     progress, nav, userInputs, isLoaded: progressLoaded,
     getStepState, isStepComplete, setVerifyResults, skipStep,
-    markStepComplete, setNav, saveUserInput, getModuleChecks,
+    markStepComplete, setNav, saveUserInput,
     toggleSelfCheck, getModuleProgress,
   } = useStepProgress();
 
@@ -24,7 +21,6 @@ export default function App() {
   // ── Derived ─────────────────────────────────────────────────────────
   const currentModule = MODULES_DATA.find(m => m.id === nav.moduleId) ?? MODULES_DATA[0]!;
   const currentPhase = currentModule.phases.find(p => p.id === nav.phaseId) ?? currentModule.phases[0]!;
-  const isValidationPhase = currentPhase.id === 'validation';
 
   const courseModules = MODULES_DATA.filter(m => !m.bonus);
   const completedModulesCount = courseModules.filter(mod => {
@@ -119,44 +115,6 @@ export default function App() {
     setVerifyResults(moduleId, phaseId, stepId, updatedResults);
   };
 
-  // Apply a parsed validator output across whichever steps own each check
-  const handleApplyValidatorPlan = (plan: ApplyPlan) => {
-    const groups = new Map<
-      string,
-      { phaseId: string; stepId: string; items: ApplyPlan['applied'] }
-    >();
-    for (const a of plan.applied) {
-      const key = `${a.phaseId}::${a.stepId}`;
-      const existing = groups.get(key);
-      if (existing) {
-        existing.items.push(a);
-      } else {
-        groups.set(key, { phaseId: a.phaseId, stepId: a.stepId, items: [a] });
-      }
-    }
-    for (const { phaseId, stepId, items } of groups.values()) {
-      const existing = getStepState(nav.moduleId, phaseId, stepId)?.verifyResults ?? {};
-      const merged = { ...existing };
-      for (const a of items) {
-        merged[a.checkId] = a.result;
-      }
-      setVerifyResults(nav.moduleId, phaseId, stepId, merged);
-    }
-  };
-
-  // Toggle a check from the ValidationDashboard — find which step owns it
-  const handleToggleDashboardCheck = (checkId: string) => {
-    for (const phase of currentModule.phases) {
-      for (const step of phase.steps) {
-        const found = step.verify?.checks.find(c => c.id === checkId);
-        if (found) {
-          handleToggleCheck(nav.moduleId, phase.id, step.id, checkId);
-          return;
-        }
-      }
-    }
-  };
-
   // ── Loading gate ────────────────────────────────────────────────────
   if (!progressLoaded) {
     return (
@@ -171,8 +129,6 @@ export default function App() {
     return <MobileGate onContinueAnyway={() => setMobileOverride(true)} />;
   }
 
-  // ── Module check data (for dashboard) ───────────────────────────────
-  const moduleChecks = getModuleChecks(nav.moduleId);
   const moduleProgress = getModuleProgress(nav.moduleId);
 
   return (
@@ -244,22 +200,10 @@ export default function App() {
           </header>
 
         {/* Content */}
-        {isValidationPhase ? (
-          <ValidationDashboard
-            moduleTitle={currentModule.title}
-            total={moduleChecks.total}
-            passed={moduleChecks.passed}
-            checks={moduleChecks.checks}
-            onToggleCheck={handleToggleDashboardCheck}
-            onAdvancePhase={handleAdvancePhase}
-            nextPhaseLabel={nextPhaseLabel}
-          />
-        ) : (
-          <StepEngine
+        <StepEngine
             steps={currentPhase.steps}
             currentIndex={nav.stepIndex}
             moduleId={nav.moduleId}
-            phaseId={nav.phaseId}
             userInputs={userInputs}
             getVerifyResults={stepId =>
               getStepState(nav.moduleId, nav.phaseId, stepId)?.verifyResults
@@ -278,8 +222,6 @@ export default function App() {
             onNavigateStep={index => setNav({ stepIndex: index })}
             module={currentModule}
             moduleNumber={MODULES_DATA.findIndex(m => m.id === nav.moduleId) + 1}
-            pasteValidatorEnabled={isPasteValidatorEnabled(nav.moduleId)}
-            onApplyValidator={handleApplyValidatorPlan}
             onAdvancePhase={handleAdvancePhase}
             nextPhaseLabel={nextPhaseLabel}
             getSelfCheckState={stepId =>
@@ -289,7 +231,6 @@ export default function App() {
               toggleSelfCheck(nav.moduleId, nav.phaseId, stepId, checkId, total)
             }
           />
-        )}
         </div>
       </main>
     </div>

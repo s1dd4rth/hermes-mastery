@@ -1,10 +1,8 @@
 import type { Module, Step, VerifyResult } from '../../data/types';
-import type { ApplyPlan } from '../../data/validator';
 import { StepLearn } from './StepLearn';
 import { StepDo } from './StepDo';
 import { StepVerify } from './StepVerify';
 import { StepProgress } from './StepProgress';
-import { PasteValidatorOutput } from './PasteValidatorOutput';
 import { CompletionCodeBanner } from './CompletionCodeBanner';
 import { CelebrationCard } from '../celebration/CelebrationCard';
 import { SelfCheck } from './SelfCheck';
@@ -13,7 +11,6 @@ interface StepEngineProps {
   steps: Step[];
   currentIndex: number;
   moduleId: string;
-  phaseId: string;
   userInputs: Record<string, string>;
   getVerifyResults: (stepId: string) => Record<string, VerifyResult> | undefined;
   getModuleVerifyResults: (moduleId: string) => Record<string, VerifyResult> | undefined;
@@ -26,8 +23,6 @@ interface StepEngineProps {
   onNavigateStep: (index: number) => void;
   module: Module;
   moduleNumber: number;
-  pasteValidatorEnabled: boolean;
-  onApplyValidator: (plan: ApplyPlan) => void;
   onAdvancePhase: () => void;
   nextPhaseLabel: string | null;
   getSelfCheckState: (stepId: string) => Record<string, boolean>;
@@ -37,7 +32,6 @@ interface StepEngineProps {
 export const StepEngine = ({
   steps,
   currentIndex,
-  phaseId,
   userInputs,
   getVerifyResults,
   getModuleVerifyResults,
@@ -50,8 +44,6 @@ export const StepEngine = ({
   onNavigateStep,
   module,
   moduleNumber,
-  pasteValidatorEnabled,
-  onApplyValidator,
   onAdvancePhase,
   nextPhaseLabel,
   getSelfCheckState,
@@ -118,18 +110,6 @@ export const StepEngine = ({
               Hidden on the Celebrate phase since CelebrationCard already shows the code. */}
           {module.id === 'm10' && step.id !== 'share-completion' && (
             <CompletionCodeBanner results={getModuleVerifyResults(module.id)} />
-          )}
-
-          {/* Paste validator output. Only on the validation phase: the validator
-              emits a whole-module envelope and must not be prompted before it's
-              installed (M1 installs it in Phase 2, so it's available by Phase 3 =
-              validation). Earlier-phase checks use the manual toggle. */}
-          {step.verify && pasteValidatorEnabled && phaseId === 'validation' && (
-            <PasteValidatorOutput
-              module={module}
-              moduleNumber={moduleNumber}
-              onApply={onApplyValidator}
-            />
           )}
 
           {/* Verify */}
