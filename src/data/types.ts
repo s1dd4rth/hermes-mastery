@@ -67,6 +67,9 @@ export interface VerifyResult {
 export interface StepState {
   completed: boolean;
   skipped: boolean;
+  /** New: per-self-check done-state. */
+  selfChecks?: Record<string, boolean>;
+  /** @deprecated removed in a later task */
   verifyResults?: Record<string, VerifyResult>;
 }
 

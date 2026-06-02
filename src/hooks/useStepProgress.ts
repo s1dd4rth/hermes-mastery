@@ -141,6 +141,45 @@ export function useStepProgress() {
     [],
   );
 
+  const toggleSelfCheck = useCallback(
+    (moduleId: string, phaseId: string, stepId: string, checkId: string, total: number) => {
+      setProgress(prev => {
+        const next = { ...prev };
+        if (!next[moduleId]) next[moduleId] = {};
+        if (!next[moduleId][phaseId]) next[moduleId][phaseId] = {};
+        const existing = next[moduleId][phaseId][stepId] ?? { completed: false, skipped: false };
+        const checks = { ...(existing.selfChecks ?? {}) };
+        checks[checkId] = !checks[checkId];
+        const doneCount = Object.values(checks).filter(Boolean).length;
+        next[moduleId][phaseId][stepId] = {
+          ...existing,
+          selfChecks: checks,
+          completed: total > 0 && doneCount >= total,
+        };
+        return next;
+      });
+    },
+    [],
+  );
+
+  const getModuleProgress = useCallback(
+    (moduleId: string) => {
+      const mod = MODULES_DATA.find(m => m.id === moduleId);
+      if (!mod) return { total: 0, done: 0 };
+      let total = 0;
+      let done = 0;
+      for (const phase of mod.phases) {
+        for (const step of phase.steps) {
+          total += 1;
+          const state = progress[moduleId]?.[phase.id]?.[step.id];
+          if (state?.completed || state?.skipped) done += 1;
+        }
+      }
+      return { total, done };
+    },
+    [progress],
+  );
+
   const setNav = useCallback((update: Partial<NavState>) => {
     setNavRaw(prev => ({ ...prev, ...update }));
   }, []);
@@ -198,6 +237,8 @@ export function useStepProgress() {
     setVerifyResults,
     skipStep,
     markStepComplete,
+    toggleSelfCheck,
+    getModuleProgress,
     setNav,
     saveUserInput,
     getModuleChecks,
