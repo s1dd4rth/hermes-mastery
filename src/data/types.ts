@@ -8,6 +8,12 @@ export interface CheckItem {
   fixPrompt?: string;
 }
 
+export interface SelfCheckItem {
+  /** What the learner confirms they saw happen, e.g. "My agent texted me the brief." */
+  id: string;
+  label: string;
+}
+
 export interface Step {
   id: string;
   title: string;
@@ -20,6 +26,9 @@ export interface Step {
       storeAs: string;
     };
   };
+  /** New: outcome-first "did you see it happen?" checkpoints. */
+  selfChecks?: SelfCheckItem[];
+  /** @deprecated validator-era checks — removed in a later task. */
   verify?: {
     checks: CheckItem[];
   };
