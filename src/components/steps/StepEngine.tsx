@@ -1,7 +1,6 @@
-import type { Module, Step, VerifyResult } from '../../data/types';
+import type { Module, Step } from '../../data/types';
 import { StepLearn } from './StepLearn';
 import { StepDo } from './StepDo';
-import { StepVerify } from './StepVerify';
 import { StepProgress } from './StepProgress';
 import { CelebrationCard } from '../celebration/CelebrationCard';
 import { SelfCheck } from './SelfCheck';
@@ -11,10 +10,8 @@ interface StepEngineProps {
   currentIndex: number;
   moduleId: string;
   userInputs: Record<string, string>;
-  getVerifyResults: (stepId: string) => Record<string, VerifyResult> | undefined;
   isStepComplete: (stepId: string) => boolean;
   onExecute: (prompt: string, stepTitle: string) => void;
-  onToggleCheck: (stepId: string, checkId: string) => void;
   onSkip: (stepId: string) => void;
   onMarkComplete: (stepId: string) => void;
   onSaveInput: (key: string, value: string) => void;
@@ -31,10 +28,8 @@ export const StepEngine = ({
   steps,
   currentIndex,
   userInputs,
-  getVerifyResults,
   isStepComplete,
   onExecute,
-  onToggleCheck,
   onSkip,
   onMarkComplete,
   onSaveInput,
@@ -101,16 +96,6 @@ export const StepEngine = ({
             />
           )}
 
-          {/* Verify */}
-          {step.verify && (
-            <StepVerify
-              checks={step.verify.checks}
-              results={getVerifyResults(step.id)}
-              onToggleCheck={(checkId) => onToggleCheck(step.id, checkId)}
-              onSkip={() => onSkip(step.id)}
-            />
-          )}
-
           {/* Self-check: outcome "see it happen" checkpoints */}
           {step.selfChecks && step.selfChecks.length > 0 && (
             <SelfCheck
@@ -123,11 +108,10 @@ export const StepEngine = ({
             />
           )}
 
-          {/* Mark as done button for steps without a verify section.
-              Steps with `verify` advance via passing checks (or skipping).
-              Steps without `verify` need a manual completion control —
+          {/* Mark as done button for steps without self-checks.
+              Steps without `selfChecks` need a manual completion control —
               both pure-learn steps AND learn+do steps like Tour Configuration. */}
-          {!step.verify && !step.selfChecks && !completedSteps[currentIndex] && (
+          {!step.selfChecks && !completedSteps[currentIndex] && (
             <button
               onClick={() => onMarkComplete(step.id)}
               className="w-full py-4 bg-hermes-accent text-white rounded-xl font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-hermes-accent/20"

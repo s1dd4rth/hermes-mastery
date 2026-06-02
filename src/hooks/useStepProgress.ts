@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { AppProgress, NavState, StepState, VerifyResult } from '../data/types';
+import type { AppProgress, NavState, StepState } from '../data/types';
 import { MODULES_DATA } from '../data/modules';
 
 const PROGRESS_KEY = 'hermesProgress';
 const NAV_KEY = 'hermesNav';
 const INPUTS_KEY = 'hermesUserInputs';
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function load<T>(key: string, fallback: T): T {
   try {
@@ -87,28 +86,6 @@ export function useStepProgress() {
     [getStepState],
   );
 
-  const setVerifyResults = useCallback(
-    (moduleId: string, phaseId: string, stepId: string, results: Record<string, VerifyResult>) => {
-      setProgress(prev => {
-        const next = { ...prev };
-        if (!next[moduleId]) next[moduleId] = {};
-        if (!next[moduleId][phaseId]) next[moduleId][phaseId] = {};
-        if (!next[moduleId][phaseId][stepId]) {
-          next[moduleId][phaseId][stepId] = { completed: false, skipped: false };
-        }
-
-        const allPass = Object.values(results).every(r => r.pass);
-        next[moduleId][phaseId][stepId] = {
-          ...next[moduleId][phaseId][stepId],
-          verifyResults: results,
-          completed: allPass,
-        };
-        return next;
-      });
-    },
-    [],
-  );
-
   const skipStep = useCallback(
     (moduleId: string, phaseId: string, stepId: string) => {
       setProgress(prev => {
@@ -188,45 +165,6 @@ export function useStepProgress() {
     setUserInputs(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  const isResultStale = useCallback((checkedAt: string): boolean => {
-    return Date.now() - new Date(checkedAt).getTime() > CACHE_TTL_MS;
-  }, []);
-
-  // Get all check results for a module (for ValidationDashboard)
-  const getModuleChecks = useCallback(
-    (moduleId: string) => {
-      const mod = MODULES_DATA.find(m => m.id === moduleId);
-      if (!mod) return { total: 0, passed: 0, checks: [] as Array<{ checkId: string; label: string; pass: boolean | null; detail: string; phaseTitle: string; failHint?: string; fixPrompt?: string }> };
-
-      const checks: Array<{ checkId: string; label: string; pass: boolean | null; detail: string; phaseTitle: string; failHint?: string; fixPrompt?: string }> = [];
-
-      for (const phase of mod.phases) {
-        for (const step of phase.steps) {
-          if (!step.verify) continue;
-          for (const check of step.verify.checks) {
-            const result = progress[moduleId]?.[phase.id]?.[step.id]?.verifyResults?.[check.id];
-            checks.push({
-              checkId: check.id,
-              label: check.label,
-              pass: result ? (isResultStale(result.checkedAt) ? null : result.pass) : null,
-              detail: result?.detail ?? '',
-              phaseTitle: phase.title,
-              failHint: check.failHint,
-              fixPrompt: check.fixPrompt,
-            });
-          }
-        }
-      }
-
-      return {
-        total: checks.length,
-        passed: checks.filter(c => c.pass === true).length,
-        checks,
-      };
-    },
-    [progress, isResultStale],
-  );
-
   return {
     progress,
     nav,
@@ -234,13 +172,11 @@ export function useStepProgress() {
     isLoaded,
     getStepState,
     isStepComplete,
-    setVerifyResults,
     skipStep,
     markStepComplete,
     toggleSelfCheck,
     getModuleProgress,
     setNav,
     saveUserInput,
-    getModuleChecks,
   };
 }

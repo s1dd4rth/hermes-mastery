@@ -8,8 +8,8 @@ import { StepEngine } from './components/steps/StepEngine';
 export default function App() {
   // ── Progress & Nav ──────────────────────────────────────────────────
   const {
-    progress, nav, userInputs, isLoaded: progressLoaded,
-    getStepState, isStepComplete, setVerifyResults, skipStep,
+    nav, userInputs, isLoaded: progressLoaded,
+    getStepState, isStepComplete, skipStep,
     markStepComplete, setNav, saveUserInput,
     toggleSelfCheck, getModuleProgress,
   } = useStepProgress();
@@ -74,29 +74,6 @@ export default function App() {
 
   const handleExecute = (_prompt: string, _stepTitle: string) => {
     // No-op: user copies the prompt and pastes it in Hermes manually
-  };
-
-  // Toggle a single check's pass state (manual verification)
-  const handleToggleCheck = (
-    moduleId: string,
-    phaseId: string,
-    stepId: string,
-    checkId: string,
-  ) => {
-    const currentResults = getStepState(moduleId, phaseId, stepId)?.verifyResults ?? {};
-    const currentPass = currentResults[checkId]?.pass ?? null;
-    const newPass = currentPass !== true; // null → true, false → true, true → false
-
-    const updatedResults = {
-      ...currentResults,
-      [checkId]: {
-        pass: newPass,
-        detail: newPass ? 'Manually marked as passed.' : 'Manually marked as failed.',
-        checkedAt: new Date().toISOString(),
-      },
-    };
-
-    setVerifyResults(moduleId, phaseId, stepId, updatedResults);
   };
 
   // ── Loading gate ────────────────────────────────────────────────────
@@ -189,16 +166,10 @@ export default function App() {
             currentIndex={nav.stepIndex}
             moduleId={nav.moduleId}
             userInputs={userInputs}
-            getVerifyResults={stepId =>
-              getStepState(nav.moduleId, nav.phaseId, stepId)?.verifyResults
-            }
             isStepComplete={stepId =>
               isStepComplete(nav.moduleId, nav.phaseId, stepId)
             }
             onExecute={handleExecute}
-            onToggleCheck={(stepId, checkId) =>
-              handleToggleCheck(nav.moduleId, nav.phaseId, stepId, checkId)
-            }
             onSkip={stepId => skipStep(nav.moduleId, nav.phaseId, stepId)}
             onMarkComplete={stepId => markStepComplete(nav.moduleId, nav.phaseId, stepId)}
             onSaveInput={saveUserInput}

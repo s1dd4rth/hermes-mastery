@@ -1,12 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
 
-export interface CheckItem {
-  id: string;
-  label: string;
-  verifyPrompt: string;
-  failHint?: string;
-  fixPrompt?: string;
-}
 
 export interface SelfCheckItem {
   /** What the learner confirms they saw happen, e.g. "My agent texted me the brief." */
@@ -28,10 +21,6 @@ export interface Step {
   };
   /** New: outcome-first "did you see it happen?" checkpoints. */
   selfChecks?: SelfCheckItem[];
-  /** @deprecated validator-era checks — removed in a later task. */
-  verify?: {
-    checks: CheckItem[];
-  };
 }
 
 export interface Phase {
@@ -50,18 +39,9 @@ export interface Module {
   phases: Phase[];
   /**
    * True if this is a bonus module (not part of the M1–M10 course track).
-   * The Sidebar groups bonuses below a "Bonus" header. Bonus modules are
-   * EXCLUDED from M10's completion code orchestration in the validator.
+   * The Sidebar groups bonuses below a "Bonus" header.
    */
   bonus?: boolean;
-}
-
-export interface VerifyResult {
-  pass: boolean;
-  detail: string;
-  checkedAt: string;
-  /** Optional opaque evidence from the validator (e.g. M10's completion code). Not all checks set this. */
-  evidence?: unknown;
 }
 
 export interface StepState {
@@ -69,8 +49,6 @@ export interface StepState {
   skipped: boolean;
   /** New: per-self-check done-state. */
   selfChecks?: Record<string, boolean>;
-  /** @deprecated removed in a later task */
-  verifyResults?: Record<string, VerifyResult>;
 }
 
 export interface AppProgress {
