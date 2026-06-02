@@ -14,6 +14,7 @@ export default function App() {
     progress, nav, userInputs, isLoaded: progressLoaded,
     getStepState, isStepComplete, setVerifyResults, skipStep,
     markStepComplete, setNav, saveUserInput, getModuleChecks,
+    toggleSelfCheck, getModuleProgress,
   } = useStepProgress();
 
   // ── UI state ────────────────────────────────────────────────────────
@@ -280,6 +281,12 @@ export default function App() {
             onApplyValidator={handleApplyValidatorPlan}
             onAdvancePhase={handleAdvancePhase}
             nextPhaseLabel={nextPhaseLabel}
+            getSelfCheckState={stepId =>
+              getStepState(nav.moduleId, nav.phaseId, stepId)?.selfChecks ?? {}
+            }
+            onToggleSelfCheck={(stepId, checkId, total) =>
+              toggleSelfCheck(nav.moduleId, nav.phaseId, stepId, checkId, total)
+            }
           />
         )}
         </div>

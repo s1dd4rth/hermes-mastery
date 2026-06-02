@@ -7,6 +7,7 @@ import { StepProgress } from './StepProgress';
 import { PasteValidatorOutput } from './PasteValidatorOutput';
 import { CompletionCodeBanner } from './CompletionCodeBanner';
 import { CelebrationCard } from '../celebration/CelebrationCard';
+import { SelfCheck } from './SelfCheck';
 
 interface StepEngineProps {
   steps: Step[];
@@ -29,6 +30,8 @@ interface StepEngineProps {
   onApplyValidator: (plan: ApplyPlan) => void;
   onAdvancePhase: () => void;
   nextPhaseLabel: string | null;
+  getSelfCheckState: (stepId: string) => Record<string, boolean>;
+  onToggleSelfCheck: (stepId: string, checkId: string, total: number) => void;
 }
 
 export const StepEngine = ({
@@ -51,6 +54,8 @@ export const StepEngine = ({
   onApplyValidator,
   onAdvancePhase,
   nextPhaseLabel,
+  getSelfCheckState,
+  onToggleSelfCheck,
 }: StepEngineProps) => {
   const completedSteps = steps.map(s => isStepComplete(s.id));
   const step = steps[currentIndex];
@@ -137,11 +142,23 @@ export const StepEngine = ({
             />
           )}
 
+          {/* Self-check: outcome "see it happen" checkpoints */}
+          {step.selfChecks && step.selfChecks.length > 0 && (
+            <SelfCheck
+              checks={step.selfChecks}
+              done={getSelfCheckState(step.id)}
+              onToggle={(checkId) =>
+                onToggleSelfCheck(step.id, checkId, step.selfChecks!.length)
+              }
+              onSkip={() => onSkip(step.id)}
+            />
+          )}
+
           {/* Mark as done button for steps without a verify section.
               Steps with `verify` advance via passing checks (or skipping).
               Steps without `verify` need a manual completion control —
               both pure-learn steps AND learn+do steps like Tour Configuration. */}
-          {!step.verify && !completedSteps[currentIndex] && (
+          {!step.verify && !step.selfChecks && !completedSteps[currentIndex] && (
             <button
               onClick={() => onMarkComplete(step.id)}
               className="w-full py-4 bg-hermes-accent text-white rounded-xl font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-md shadow-hermes-accent/20"
