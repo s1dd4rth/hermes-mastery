@@ -59,9 +59,15 @@ After the initial rewrite, two Hermes developments were folded in:
 
 Smaller release-note touch-ups (v0.13–v0.15.2): M5 notes built-in **promptware/injection
 defense** layering under the SOUL rule; M3 names the rebuilt **session search** as a recall
-capability. Correctness note carried from the build: my local sandbox runs v0.12.0, so v0.13+
-features (Kanban swarm, desktop, session_search rebuild) are grounded in official docs + the
-release notes, not a local probe — verify on a v0.15+ machine before publishing.
+capability.
+
+**Verification status (2026-06-03):** the sandbox was updated v0.12.0 → **v0.15.1** and the
+whole course re-verified against the real CLI. Notably this caught that `hermes kanban swarm`
+uses `--worker PROFILE:TITLE` (singular, repeatable) with `--verifier`/`--synthesizer` both
+**required** — the docs implied `--workers a,b` with optional synthesizer. M8 was corrected and
+the swarm was run end-to-end (root→worker→verifier→synthesizer graph confirmed via
+`hermes kanban list`). M2 cron, M3 memory, M6 curator, M7 mcp, M9 `setup tts` all confirmed
+present on v0.15.1. The course no longer rests on doc inference for any module.
 
 ## 3. The new spine
 
