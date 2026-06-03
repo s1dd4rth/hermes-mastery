@@ -438,100 +438,71 @@ export const MODULES_DATA: Module[] = [
   },
   {
     id: 'm6',
-    title: 'M6: Crons (Pillar 4)',
-    shortTitle: 'M6 — Crons',
+    title: 'M6: It Improves Itself',
+    shortTitle: 'M6 — Self-Improving',
     description:
-      'Schedule recurring and one-shot cron jobs in Hermes — natural language scheduling, delivery to your Telegram channel, and end-to-end fire proof.',
-    icon: Clock,
+      'By the end of this module you can point at concrete evidence that your agent is getting better over time — accumulating memory, skills it built for itself, and a background Curator that prunes and consolidates them. This is the loop that makes Hermes more than a chatbot.',
+    icon: Sparkles,
     phases: [
-      // ── Phase 1: One-shot cron via natural language ────────────────────
+      // ── Phase 1: See it — the loop is real ──────────────────────────────
       {
-        id: 'oneshot-cron',
-        title: 'Phase 1: Cron via Natural Language',
-        icon: Clock,
+        id: 'point-at-evidence',
+        title: 'Phase 1: Point at the Evidence',
+        icon: Search,
         steps: [
           {
-            id: 'schedule-oneshot',
-            title: 'Schedule a One-Shot Delay',
+            id: 'inspect-the-loop',
+            title: 'Show Me It\'s Getting Better',
             learn:
-              'Hermes understands natural-language schedule expressions. The easiest entry point is a one-shot delay — a job that fires once, some time from now.\n\n**Examples:**\n\n```\nSchedule a reminder in 30 minutes: "Remind me to stretch."\nSchedule a check in 2 hours: "Check the status of my deploy."\n```\n\nHermes translates these into a `cronjob` call with `schedule: "30m"` or `schedule: "2h"`. The job is stored in `~/.hermes/cron/jobs.json` and the scheduler fires it when the timer expires.\n\n**How to verify the job was created:**\n\n```\nhermes cron list\n```\n\nOr inspect the file directly:\n\n```\ncat ~/.hermes/cron/jobs.json\n```\n\n**Schedule syntax supported:**\n- `"30m"`, `"2h"`, `"1d"` — one-shot from now\n- `"every 30m"`, `"every 2h"` — recurring interval\n- `"0 9 * * *"` — cron expression (requires `croniter` in the Hermes Python env)\n- `"2026-06-01T09:00:00"` — one-shot at an ISO timestamp',
+              '**The payoff for this module:** instead of taking "self-improving" on faith, you\'ll *point at* it — files and stats that prove your agent accumulates knowledge and tends its own skills.\n\nThree concrete surfaces:\n- **Memory that compounds** — every fact you\'ve taught it lives in `~/.hermes/memories/` and grows over time. `hermes memory` (or just read the files) shows what it knows about you now vs. day one.\n- **The Curator** — a background task that periodically reviews the skills your agent has created, prunes stale ones, and consolidates overlaps. Check it:\n\n```\nhermes curator status\n```\n\nIt shows run count, last run, interval, and how many agent-created skills it\'s tracking. (`hermes curator run` triggers a review now.)\n- **Skills it made** — workflows your agent saved for itself (like the research-brief skill from M5) appear in `hermes skills list`.\n\nLook at all three and confirm the loop is real, not just named.',
+            selfChecks: [
+              { id: 'saw-curator', label: '`hermes curator status` showed run history and its review interval' },
+              { id: 'saw-memory-growth', label: 'My memory files hold more than they did when I started' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 2: Build it — give the loop something to chew on ──────────
+      {
+        id: 'feed-the-loop',
+        title: 'Phase 2: Feed the Loop',
+        icon: Wrench,
+        steps: [
+          {
+            id: 'create-and-curate',
+            title: 'Make a Skill, Then Let It Be Curated',
+            learn:
+              'The self-improving loop needs material: skills your agent creates as it helps you. You already made one in M5 (research-brief). Make another from a real workflow — then watch the Curator take responsibility for it.\n\nDo a small multi-step task with your agent and ask it to save the workflow as a skill. Then trigger a Curator review and confirm your new skill is now in its care:\n\n```\nhermes curator run\nhermes curator status\n```\n\n`curator status` should now list your agent-created skills under management. Over time, unused ones get flagged stale and (much later) archived — recoverably. This is your agent maintaining its own toolkit instead of accumulating cruft.',
             do: {
               prompt:
-                'Schedule a one-shot reminder in 30 minutes: Remind me I set up a cron.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 2: Recurring cron with delivery channel ─────────────────
-      {
-        id: 'recurring-cron',
-        title: 'Phase 2: Recurring + Delivery',
-        icon: Send,
-        steps: [
-          {
-            id: 'schedule-recurring',
-            title: 'Schedule a Recurring Cron with Telegram Delivery',
-            learn:
-              'One-shot jobs prove the scheduler works. Recurring jobs are where crons become genuinely useful — daily summaries, hourly checks, weekly reminders.\n\n**Schedule a recurring job:**\n\n```\nSchedule a daily message at 9am: "Good morning — summarise my open tasks."\n```\n\nOr with an explicit interval:\n\n```\nEvery 2 hours, send me a message: "Quick check-in — what were the last 3 things I worked on?"\n```\n\n**Delivery to Telegram:**\n\nBy default, Hermes delivers the cron output back to the chat that scheduled it (the "origin"). If you scheduled the job from Telegram, the result arrives in Telegram automatically.\n\nTo explicitly target Telegram:\n\n```\nSchedule a daily 9am check-in, deliver to Telegram.\n```\n\nHermes will capture your current Telegram chat as the delivery target and store it in the job\'s `deliver` field.\n\n**Important:** if you schedule the job from the CLI (not from Telegram), Hermes defaults to `deliver: "local"` (save only, no external delivery). To get Telegram delivery, either schedule from a Telegram message OR ask the agent to set `deliver: "telegram"` explicitly with your chat ID.\n\n**Mac mini sleep caveat:** if your Mac sleeps or the Hermes gateway is killed, the scheduler tick stops. Cron jobs scheduled during sleep may be skipped or fire late on resume. This is environment behavior, not a validator bug. For reliable recurring jobs on a Mac, keep the gateway running as a LaunchAgent and disable sleep for the machine.',
-            do: {
-              prompt:
-                'Schedule a daily message every day at 9am: Good morning — what are my priorities today? Deliver it to Telegram.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 3: Verify with hermes cron list ─────────────────────────
-      {
-        id: 'cron-list',
-        title: 'Phase 3: Verify with CLI',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'run-cron-list',
-            title: 'Inspect Your Cron Jobs',
-            learn:
-              'The `hermes cron list` command (or asking your Hermes to list cron jobs) shows all scheduled jobs with their status, next run time, and delivery target.\n\n**Run:**\n\n```\nhermes cron list\n```\n\nOr ask the agent:\n\n```\nList my cron jobs.\n```\n\n**What to look for:**\n- Each job should have a `next_run_at` timestamp\n- The `state` should be "scheduled" (not "paused" or "error")\n- The `deliver` field should match your intended channel\n- The `enabled` field should be `true`\n\n**Pause / resume / remove:**\n\n```\n# Pause a job\nhermes cron pause <job_id>\n\n# Resume a paused job\nhermes cron resume <job_id>\n\n# Remove a job\nhermes cron remove <job_id>\n```\n\nOr conversationally:\n- "Pause my daily 9am reminder."\n- "Remove the stretch reminder cron."\n- "List my disabled cron jobs too."',
-          },
-        ],
-      },
-
-      // ── Phase 4: Inspect ~/.hermes/cron/jobs.json ─────────────────────
-      {
-        id: 'inspect-jobs-json',
-        title: 'Phase 4: Inspect jobs.json',
-        icon: BookOpen,
-        steps: [
-          {
-            id: 'read-jobs-json',
-            title: 'Read the Persisted Job Shape',
-            learn:
-              '`~/.hermes/cron/jobs.json` is the source of truth for all your cron jobs. Hermes writes it atomically on every create/update/run. Understanding the schema helps you debug and gives you a mental model of what the validator is checking.\n\n**Read it:**\n\n```\ncat ~/.hermes/cron/jobs.json | python3 -m json.tool\n# or: jq . ~/.hermes/cron/jobs.json\n```\n\n**Key fields to note:**\n\n```json\n{\n  "jobs": [\n    {\n      "id": "abc123def456",\n      "name": "Good morning check-in",\n      "schedule": {\n        "kind": "cron",\n        "expr": "0 9 * * *",\n        "display": "0 9 * * *"\n      },\n      "enabled": true,\n      "state": "scheduled",\n      "next_run_at": "2026-05-29T09:00:00+10:00",\n      "deliver": "origin",\n      "repeat": { "times": null, "completed": 0 }\n    }\n  ]\n}\n```\n\n**Timezone note:** Hermes does NOT store a per-job timezone in `jobs.json`. The system timezone (from `hermes_time.now()`) is used at execution time. Timestamps in `next_run_at` and `last_run_at` are timezone-aware ISO strings reflecting your system timezone.\n\n**Safe to share:** job names, schedule kind, state, and enabled flag. **Do NOT share:** deliver values if they contain chat IDs (e.g., `telegram:-1001234567890`), or any token values.',
-          },
-        ],
-      },
-
-      // ── Phase 5: Validation ────────────────────────────────────────────
-      {
-        id: 'validation',
-        title: 'Phase 5: Validation',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'run-validator',
-            title: 'Run Module 6 Validator',
-            learn:
-              'Run the M6 validator to confirm your cron setup is healthy.\n\nThe validator runs four checks:\n\n**Deterministic:**\n- `cron-exists` — `~/.hermes/cron/jobs.json` parses and contains at least one user-created job.\n- `cron-schedule-and-tz` — the job has a recognized schedule (kind: "once", "interval", or "cron") and the system has a timezone available. Note: Hermes does not store a per-job timezone field — this check verifies the schedule exists in any supported form.\n- `cron-enabled-and-bound` — the cron is enabled (not paused), has a `next_run_at` timestamp, and has `deliver` set to something other than `"local"` (i.e., it will actually deliver to a channel, not just save locally).\n\n**Manual:**\n- `cron-fires-end-to-end` — Schedule a one-shot cron for two minutes from now, wait, and confirm you receive the message in your chosen channel. This is the load-bearing check — it proves the executor, gateway, and delivery channel all work together.\n\n**The three deterministic checks are chained:** if `cron-exists` fails, the other two immediately fail with `dependent_on: cron-exists`. Fix the root issue (schedule a job) before re-running.\n\n**Common FAIL causes:**\n- `cron-exists` FAIL: no `jobs.json` yet — schedule a cron job first.\n- `cron-enabled-and-bound` FAIL with `deliver_type: local`: the job was scheduled from the CLI, which defaults to `deliver: "local"`. Update or recreate the job with an explicit delivery channel.\n- `cron-enabled-and-bound` FAIL with `has_next_run: false`: the job completed (one-shot) or errored. Check `hermes cron list` for the state.\n\n**Mac mini sleep caveat:** the `cron-fires-end-to-end` manual check requires the gateway to be running when the cron fires. If your Mac sleeps or the gateway is killed between scheduling and firing, the job will be skipped or fire late. This is environment behavior — not a validator or Hermes bug.',
-            do: {
-              prompt:
-                'Please run the verify_module command for module 6 and reply per the SKILL.md contract.',
+                'Walk me through a useful repeatable workflow (say, turning rough notes into a clean weekly status update), then save it as a skill so I can reuse it. Tell me the skill name when done.',
             },
             selfChecks: [
-              { id: 'cron-exists', label: '`~/.hermes/cron/jobs.json` has at least one job in it' },
-              { id: 'cron-schedule-and-tz', label: 'The job has a recognized schedule (once / interval / cron)' },
-              { id: 'cron-enabled-and-bound', label: 'The cron is enabled, has a next-run timestamp, and is bound to a delivery channel' },
-              { id: 'cron-fires-end-to-end', label: 'A one-shot cron fired and the message arrived in my channel' },
+              { id: 'made-a-skill', label: 'My agent saved a new workflow as a skill' },
+              { id: 'curator-tracks-it', label: '`hermes curator status` now counts my agent-created skill(s)' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 3: Make it yours — keep the good, prune the rest ──────────
+      {
+        id: 'tend-the-loop',
+        title: 'Phase 3: Tend It',
+        icon: Heart,
+        steps: [
+          {
+            id: 'pin-and-prune',
+            title: 'Protect What Matters',
+            learn:
+              'You\'re in charge of the loop, not just a spectator. Two controls worth knowing:\n- **Pin** a skill you rely on so the Curator never auto-archives it: `hermes curator pin <skill>` (and `unpin` to release).\n- **Prune** on your terms — ask your agent to clean up a skill you no longer want, or `hermes curator restore` to bring back one that was archived.\n\nPin the skill you care most about, then confirm with `hermes curator status`. That\'s the whole self-improving loop in your hands: memory that compounds, skills your agent builds, a Curator that keeps them tidy, and you steering what survives.\n\nThat completes the **core track** — your agent is alive on your phone, briefs you, knows you, triages your inbox, researches for you, and improves itself. The remaining modules are the power track: deeper capabilities to push it further.',
+            do: {
+              prompt:
+                'Which of my agent-created skills do I use most? Pin it so the Curator never archives it, and confirm it\'s pinned.',
+            },
+            selfChecks: [
+              { id: 'pinned-a-skill', label: 'I pinned a skill and saw it protected in `hermes curator status`' },
             ],
           },
         ],
