@@ -22,9 +22,9 @@ export const MODULES_DATA: Module[] = [
             id: 'install-hermes',
             title: 'Install Hermes',
             learn:
-              '**The payoff for this module:** an agent that lives on your machine and answers you from your phone. First, get it installed.\n\nHermes is a local-first AI agent that runs on your own machine. Install it with the canonical one-liner:\n\n```\ncurl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash\n```\n\nThen confirm it\'s there:\n\n```\nhermes --version\n```\n\nYou should see something like `Hermes Agent v0.15.x`. If you get `command not found`, open a **fresh terminal** — the installer adds Hermes to your `PATH`, but that only takes effect in new shells. (On a normal macOS/Linux account it installs under `~/.hermes/hermes-agent`.)',
+              '**The payoff for this module:** an agent that lives on your machine and answers you from your phone. First, get it installed.\n\nHermes is a local-first AI agent that runs on your own machine. The easiest way to install it is the **desktop app**:\n\n- **macOS** — download [Hermes-Setup.dmg](https://hermes-assets.nousresearch.com/Hermes-Setup.dmg) and open it\n- **Windows** — download [Hermes-Setup.exe](https://hermes-assets.nousresearch.com/Hermes-Setup.exe) and run it\n- **Linux** — use the terminal install below\n\nThe desktop installer provisions everything for you (Python, Node, Git) and, importantly, **also installs the `hermes` command-line tool and shares the same data directory.** So the app and the terminal are two doors into the *same* agent.\n\n**Prefer the terminal, or on Linux?** Install via CLI instead:\n\n```\ncurl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash\n```\n\n(or `pip install hermes-agent`).\n\n**This course drives Hermes from the terminal** — the commands work identically whether you installed the app or the CLI. So however you installed, open a terminal and confirm the command is there:\n\n```\nhermes --version\n```\n\nIf you get `command not found`, open a **fresh terminal** (the installer adds `hermes` to your `PATH`, which only takes effect in new shells).',
             selfChecks: [
-              { id: 'hermes-installed', label: '`hermes --version` printed a version' },
+              { id: 'hermes-installed', label: 'I installed Hermes (desktop app or CLI) and `hermes --version` works in a terminal' },
             ],
           },
           {
@@ -40,7 +40,7 @@ export const MODULES_DATA: Module[] = [
             id: 'first-chat',
             title: 'Say Hello',
             learn:
-              'Hermes is **terminal-first** — no dashboard to open. Start a session right now:\n\n```\nhermes\n```\n\n(or `hermes --tui` for the nicer terminal UI). Ask it anything — *"What can you do?"* — and confirm it replies. That\'s your agent talking, using the model you just configured.\n\nType `/exit` (or Ctrl-C) to leave the session. The agent keeps running for the next phase, where we put it on your phone.',
+              'Time to meet your agent. Start a session right now:\n\n```\nhermes\n```\n\n(or `hermes --tui` for the nicer terminal UI). Ask it anything — *"What can you do?"* — and confirm it replies. That\'s your agent talking, using the model you just configured.\n\n*(If you installed the desktop app, you can also chat from its dashboard window — same agent. This course uses the terminal so the steps are copy-pasteable.)*\n\nType `/exit` (or Ctrl-C) to leave the session. The agent keeps running for the next phase, where we put it on your phone.',
             do: {
               prompt:
                 'Hello! In one short paragraph, tell me what you can help me with as my Hermes agent.',
@@ -580,78 +580,79 @@ export const MODULES_DATA: Module[] = [
     ],
   },
 
-  // ── M8: A Team of Agents (delegation) ────────────────────────────────────
+  // ── M8: A Team of Agents (Kanban swarm) ──────────────────────────────────
   {
     id: 'm8',
     title: 'M8: A Team of Agents',
-    shortTitle: 'M8 — Delegation',
+    shortTitle: 'M8 — Swarm',
     description:
-      'Power track. By the end of this module your agent breaks a big job into parts, hands each to a focused subagent working in parallel, and reports back a synthesized result — a team, not a soloist.',
+      'Power track. By the end of this module you hand your agent one goal and it spins up a whole team — parallel specialist workers, a verifier, and a synthesizer — on a durable task board that finishes the job while you watch.',
     icon: Users,
     phases: [
-      // ── Phase 1: Understand — why delegate ──────────────────────────────
+      // ── Phase 1: Build it — create the specialists ──────────────────────
       {
-        id: 'why-delegate',
-        title: 'Phase 1: Why a Team',
+        id: 'create-specialists',
+        title: 'Phase 1: Create the Specialists',
         icon: Users,
         steps: [
           {
-            id: 'delegation-concept',
-            title: 'One Agent, Many Hands',
+            id: 'make-profiles',
+            title: 'Give the Team Members Identities',
             learn:
-              '**The payoff for this module:** give your agent a job too big for one pass, and watch it spin up helpers — each with its own focused context — then combine their work into one answer.\n\nHermes has a **delegate** capability: the main agent can spawn **subagents**, each with a fresh context window and a single sub-task, run them (often in parallel), and fold their results back together. Why this matters:\n- **Focus** — each subagent sees only its slice, so it doesn\'t get distracted or run out of context.\n- **Parallelism** — independent parts run at once instead of one long serial chain.\n- **Cleaner main thread** — your main agent\'s context stays uncluttered; it only sees the summaries.\n\nThis is an in-chat capability (a tool the agent uses), not a CLI command — you trigger it by asking for work that benefits from splitting up.',
+              '**The payoff for this module:** give Hermes a single goal and watch it decompose the work, run several specialist agents *in parallel*, then verify and synthesize their output — a real team, not one agent doing everything serially.\n\nHermes\'s multi-agent platform is **Kanban**: a durable, SQLite-backed task board where named **profiles** (specialist clones of your agent) claim tasks and run them in isolated workspaces. A "swarm" wires up a root → parallel workers → verifier → synthesizer graph in one command.\n\nFirst, the team needs members. Each worker/verifier/synthesizer in a swarm maps to a **profile** — create a few specialists, with descriptions so the decomposer knows what each is good at:\n\n```\nhermes profile create researcher --description "Finds and cites sources"\nhermes profile create writer --description "Turns findings into clean prose"\nhermes profile create reviewer --description "QA — checks accuracy and gaps"\n```\n\nConfirm them with `hermes profile list`.',
             selfChecks: [
-              { id: 'understand-delegation', label: 'I understand what subagent delegation is and when it helps' },
+              { id: 'profiles-created', label: '`hermes profile list` shows my specialist profiles' },
             ],
           },
         ],
       },
 
-      // ── Phase 2: See it happen — delegate a real job ────────────────────
+      // ── Phase 2: See it happen — run a swarm ────────────────────────────
       {
-        id: 'delegate-a-job',
-        title: 'Phase 2: Delegate a Real Job',
+        id: 'run-swarm',
+        title: 'Phase 2: Launch the Swarm',
         icon: Sparkles,
         steps: [
           {
-            id: 'run-delegation',
-            title: 'Hand Out the Work',
+            id: 'kanban-swarm',
+            title: 'One Goal, a Whole Team',
             learn:
-              '**This is the payoff.** Give your agent a job with naturally separable parts and explicitly invite it to delegate. A research-style task works well — several independent threads that merge into one brief.\n\nWatch the transcript: you should see the main agent spawn subagents, each working its piece, then a synthesis step where it combines them. Compare the feel to doing it in one serial pass — delegation is how Hermes handles work that\'s too big or too parallel for a single thread.\n\n(If your agent just does it solo, make the parallelism explicit: "spin up a separate subagent for each company so they run at once.")',
+              '**This is the payoff.** Initialize the board, make sure the gateway is running (it dispatches the workers), and launch a swarm from a single goal:\n\n```\nhermes kanban init\nhermes gateway start\nhermes kanban swarm "Write a short brief comparing three note-taking apps" \\\n  --workers researcher,writer --verifier reviewer\n```\n\nThis creates one durable graph: a root "blackboard" card with shared context, your worker cards running **in parallel**, a verifier card gated until the workers finish, and (if you add `--synthesizer`) a final card that merges everything.\n\nWatch it work:\n\n```\nhermes kanban watch     # live activity\nhermes kanban list      # all cards + statuses\nhermes kanban dispatch --max 3   # kick workers now instead of waiting for the tick\n```\n\nWhen the root card reaches `done`, inspect the result: `hermes kanban show <root-id>`. You just watched your agent run a team to completion.',
             do: {
               prompt:
-                'Compare three AI agent frameworks for me — Hermes, plus two others. Delegate one subagent per framework to research it in parallel, then synthesize their findings into a single comparison table with a recommendation.',
+                'Look at my kanban board with `hermes kanban list` and tell me, in plain English, what each worker is doing and how the verifier and synthesizer depend on them.',
             },
             selfChecks: [
-              { id: 'delegated', label: 'My agent spun up subagents for the parts and synthesized their results' },
+              { id: 'swarm-ran', label: 'My swarm decomposed the goal, ran workers in parallel, and the board reached done' },
             ],
           },
         ],
       },
 
-      // ── Phase 3: Make it yours — a delegation skill ─────────────────────
+      // ── Phase 3: Make it yours — goals + workspaces ─────────────────────
       {
-        id: 'delegation-skill',
+        id: 'tune-swarm',
         title: 'Phase 3: Make It Yours',
         icon: Heart,
         steps: [
           {
-            id: 'save-delegation-pattern',
-            title: 'Bottle the Pattern',
+            id: 'goal-and-workspace',
+            title: 'Hold It to a Standard',
             learn:
-              'If a delegated workflow was useful, save it as a skill so your agent reaches for the team automatically next time — no need to spell out "use subagents" every time.\n\nAsk your agent to save the just-run pattern as a reusable skill (it writes a `SKILL.md` describing when to fan out and how to synthesize). Confirm with `hermes skills list`.\n\nThat\'s delegation: your single agent is now a coordinator that can marshal a team whenever a job is big enough to warrant one.',
+              'Two controls make swarms genuinely useful:\n\n- **`--goal`** turns a task into a self-checking loop: after each turn an auxiliary judge compares the output against the card\'s acceptance criteria (its title + body) and keeps the worker going until it passes or runs out of turns. Great for "don\'t stop until it\'s actually done" work:\n\n```\nhermes kanban create "Draft my weekly update" \\\n  --body "Acceptance: 5 bullets, each with a metric, no filler." \\\n  --assignee writer --goal --goal-max-turns 10\n```\n\n- **`--workspace`** controls where a task runs: `scratch` (ephemeral, default), `worktree` (git-backed), or `dir:<path>` (a shared folder) — handy when workers produce files you want to keep.\n\nKick off one goal-driven task of your own, then `hermes kanban watch` it to completion. That\'s the team working to *your* standard.\n\n*(`hermes kanban swarm` needs a recent Hermes — v0.15+. On older builds, the in-chat delegate tool covers simpler "spin up subagents for this" jobs.)*',
             do: {
               prompt:
-                'That parallel-research-and-synthesize approach was great. Save it as a reusable skill (call it "parallel-research") so you use this delegate-and-merge pattern automatically for multi-part research. Tell me where you saved it.',
+                'Create one kanban task with a clear acceptance criteria in the body, assign it to one of my profiles with --goal, and explain what the judge will check after each turn.',
             },
             selfChecks: [
-              { id: 'delegation-skill-saved', label: 'A reusable delegation skill shows up in `hermes skills list`' },
+              { id: 'goal-task-ran', label: 'I ran a --goal task and watched the judge hold it to my acceptance criteria' },
             ],
           },
         ],
       },
     ],
   },
+
   // ── M9: Talk to It (voice) ───────────────────────────────────────────────
   {
     id: 'm9',
