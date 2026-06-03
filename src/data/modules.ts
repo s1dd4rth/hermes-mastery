@@ -1,7 +1,8 @@
 import { Server, Shield, CheckCircle, Brain, BookOpen, MessageSquare, Heart, Send, Wrench, Clock, Search, Mail, Users, Award, Sparkles } from 'lucide-react';
 import type { Module } from './types';
 
-// M1-only skeleton — further modules added as the course builds out.
+// Outcome-first course: 6 core modules (M1-M6) + 4 power-track (M7-M10).
+// Each module follows Hook → Build → See it → Make it yours.
 export const MODULES_DATA: Module[] = [
   {
     id: 'm1',
@@ -297,7 +298,7 @@ export const MODULES_DATA: Module[] = [
             id: 'install-gmail-skill',
             title: 'Install a Google Workspace Skill',
             learn:
-              '**The payoff for this module:** *"Summarize my unread email and flag anything urgent"* — and your agent actually does it, against your real Gmail.\n\nGiving Hermes inbox access has two parts: a **skill** that knows how to call Gmail/Calendar, and **OAuth credentials** that authorize it. Start with the skill.\n\nSearch the hub for a Google Workspace / Gmail skill and install it by its identifier:\n\n```\nhermes skills search "google workspace"\nhermes skills install <identifier-from-the-results>\n```\n\n**If install fails with `Could not fetch ... from any source`** (hub coverage is uneven in this alpha): pick a different result, `hermes skills inspect <identifier>` to preview one, or clone a Google Workspace skill repo and symlink it into `~/.hermes/skills/` (the same clone+symlink method from M1\'s validator era). Then start a fresh session and confirm it loads with `hermes skills list`.',
+              '**The payoff for this module:** *"Summarize my unread email and flag anything urgent"* — and your agent actually does it, against your real Gmail.\n\nGiving Hermes inbox access has two parts: a **skill** that knows how to call Gmail/Calendar, and **OAuth credentials** that authorize it. Start with the skill.\n\nSearch the hub for a Google Workspace / Gmail skill and install it by its identifier:\n\n```\nhermes skills search "google workspace"\nhermes skills install <identifier-from-the-results>\n```\n\n**If install fails with `Could not fetch ... from any source`** (hub coverage is uneven in this alpha): pick a different result, `hermes skills inspect <identifier>` to preview one, or clone a Google Workspace skill repo and symlink it into `~/.hermes/skills/`. Then start a fresh session and confirm it loads with `hermes skills list`.',
             selfChecks: [
               { id: 'gmail-skill-installed', label: 'A Google Workspace / Gmail skill shows up in `hermes skills list`' },
             ],
@@ -651,111 +652,64 @@ export const MODULES_DATA: Module[] = [
       },
     ],
   },
-  // ── M9: Multi-Profile / Specialist Agents ────────────────────────────────
+  // ── M9: Talk to It (voice) ───────────────────────────────────────────────
   {
     id: 'm9',
-    title: 'M9: Multi-Profile / Specialist Agents',
-    shortTitle: 'M9 — Profiles',
+    title: 'M9: Talk to It',
+    shortTitle: 'M9 — Voice',
     description:
-      'Create a specialist writer profile that runs as an isolated Hermes agent with its own identity, SOUL.md, and skills — so you can switch between a general assistant and a focused long-form writing partner.',
-    icon: Users,
+      'Power track. By the end of this module you speak to your agent and it speaks back — hands-free voice in/out, so Hermes works while you cook, drive, or pace.',
+    icon: MessageSquare,
     phases: [
-      // ── Phase 1: What's a Profile ─────────────────────────────────────────
+      // ── Phase 1: Build it — configure voice ─────────────────────────────
       {
-        id: 'what-is-a-profile',
-        title: "Phase 1: What's a Profile",
-        icon: Users,
+        id: 'configure-voice',
+        title: 'Phase 1: Set Up Voice',
+        icon: Wrench,
         steps: [
           {
-            id: 'profile-concept',
-            title: 'Profiles: Isolated Agent Identities',
+            id: 'voice-setup',
+            title: 'Configure TTS / STT',
             learn:
-              'A Hermes **profile** is a full agent clone with its own isolated identity: its own `SOUL.md`, `config.yaml`, `.env`, skills, memories, and gateway. You can run multiple profiles on the same machine — each behaves as a separate specialist.\n\nCommon use cases:\n- **Writer** — focused long-form writing voice, different style rules\n- **Coder** — stripped-down SOUL.md, code-first personality, different model\n- **Research** — web-search heavy, citation-aware tone\n\nEach profile lives at `~/.hermes/profiles/<name>/`. The default profile lives at `~/.hermes/` (no subdirectory).\n\n**CLI surface:**\n```bash\nhermes profile list              # list all profiles\nhermes profile create <name>     # create a new blank profile\nhermes profile create <name> --clone   # clone active profile (config + SOUL)\nhermes profile show <name>       # inspect a profile\nhermes profile use <name>        # set sticky default\n```\n\nAfter creating a profile with `--clone`, Hermes installs an alias wrapper: a binary at `~/.local/bin/<name>` that you can invoke directly (`writer chat`, `writer gateway start`, etc.).\n\n**Acknowledged gap — cross-profile delegation:** there is no CLI surface for root Hermes invoking a *named profile* and receiving back a structured draft (cross-profile RPC). Hermes does have a delegate tool that spawns isolated **subagents** mid-task, but that is not the same as handing work to your writer *profile*. Profiles stay isolated — you switch between them manually. For now: profiles are powerful specialist identities, not sub-agents a root agent orchestrates by name.',
-          },
-        ],
-      },
-
-      // ── Phase 2: Create a Writer Profile ─────────────────────────────────
-      {
-        id: 'create-writer-profile',
-        title: 'Phase 2: Create a Writer Profile',
-        icon: Users,
-        steps: [
-          {
-            id: 'create-profile',
-            title: 'Create the Writer Profile',
-            learn:
-              'Create a writer profile by cloning your default profile. The `--clone` flag copies `config.yaml`, `.env`, and `SOUL.md` from the active profile, giving you a working starting point:\n\n```bash\nhermes profile create writer --clone\n```\n\nExpected output:\n```\nProfile \'writer\' created at ~/.hermes/profiles/writer\nCloned config, .env, SOUL.md, and skills from default.\nWrapper created: ~/.local/bin/writer\n```\n\nAfter creation, confirm the directory exists:\n\n```bash\nls ~/.hermes/profiles/writer/\n```\n\nYou should see: `config.yaml`, `SOUL.md`, `.env`, `skills/`, `memories/`, and several other directories.\n\n**The validator checks for `~/.hermes/profiles/writer/SOUL.md` being present and non-empty.** If the directory exists but SOUL.md is missing, re-run `hermes profile create writer --clone`.',
+              '**The payoff for this module:** a real spoken conversation with your agent — you talk, it listens, it talks back.\n\nVoice has two halves: **STT** (speech-to-text, so it hears you) and **TTS** (text-to-speech, so it answers aloud). Configure them in the setup wizard\'s voice section:\n\n```\nhermes setup tts\n```\n\nFollow the prompts to pick a voice/provider. (Some providers need an API key — e.g. OpenAI for STT/TTS; the wizard tells you what it needs.) Settings land in your `~/.hermes/config.yaml` under the voice/tts keys; check with `hermes config show`.',
             selfChecks: [
-              { id: 'writer-profile-exists', label: '`~/.hermes/profiles/writer/` directory exists' },
-              { id: 'writer-soul-exists', label: '`~/.hermes/profiles/writer/SOUL.md` is present and non-empty' },
+              { id: 'voice-configured', label: 'I configured voice (TTS/STT) via `hermes setup tts`' },
             ],
           },
         ],
       },
 
-      // ── Phase 3: Customize the Writer Profile ────────────────────────────
+      // ── Phase 2: See it happen — have a spoken exchange ─────────────────
       {
-        id: 'customize-writer',
-        title: 'Phase 3: Customize the Writer Profile',
-        icon: Users,
+        id: 'speak-to-it',
+        title: 'Phase 2: Have a Conversation',
+        icon: Sparkles,
         steps: [
           {
-            id: 'edit-writer-soul',
-            title: 'Give the Writer Profile a Distinct Voice',
+            id: 'voice-exchange',
+            title: 'Speak, and Hear It Answer',
             learn:
-              'The freshly cloned `SOUL.md` is byte-identical to your root SOUL.md — the validator will flag this as a FAIL. You need to edit it to give the writer profile a genuinely different long-form writing voice.\n\n**Edit:**\n```bash\nnano ~/.hermes/profiles/writer/SOUL.md\n# or: code ~/.hermes/profiles/writer/SOUL.md\n```\n\n**What to add/change:**\n- A "Writing Voice" or "Long-Form Style" section with concrete rules: paragraph length targets, preferred transitions, tone for essays vs. how-to guides\n- Guidance on structure: when to use headers, when to write flowing prose\n- Sentence rhythm preferences: short punchy sentences vs. longer subordinate clauses?\n- Vocabulary register: formal, accessible, technical?\n\n**What NOT to do:**\n- Do not just prepend "As a writer, ..." to the existing SOUL.md — one-line changes are not enough\n- Do not copy-paste the root SOUL.md with a single word changed\n\n**The validator checks:**\n1. `writer-soul-distinct-files` — SHA-256 hash comparison. If writer SOUL.md has the same hash as root SOUL.md, it FAILs. This proves *isolation* (the file has been edited), not quality.\n2. `writer-soul-distinct-content` — manual check. You confirm the content is meaningfully different, not just technically distinct.\n\nYou can optionally also change the model for the writer profile by editing `~/.hermes/profiles/writer/config.yaml` — for example, switching to Claude Opus for higher-quality long-form output.\n\n**Or let Hermes interview you** — paste the prompt below and the agent will ask about your long-form voice, then write it to the writer profile\'s SOUL.md. Because the content is genuinely yours, the file ends up distinct from root (which the validator requires).',
-            do: {
-              prompt:
-                'Interview me about my long-form writing voice — paragraph length, tone, structure, vocabulary register — asking one question at a time. Then write what you learn as a `## Writing Voice` section to `~/.hermes/profiles/writer/SOUL.md` (the writer profile, NOT the default `~/.hermes/SOUL.md`).',
-            },
+              '**This is the payoff.** Start a session in the terminal UI, where voice lives:\n\n```\nhermes --tui\n```\n\nEnable voice mode in the TUI (look for the voice toggle / command in the interface), then just talk — ask it something out loud and listen to it answer. The same agent you\'ve built all course — your memory, your skills, your inbox access — now reachable by voice.\n\nThis is a different *modality*, not a different agent: everything from M1–M8 still applies. Voice just changes how you reach it.',
             selfChecks: [
-              { id: 'writer-soul-distinct-files', label: 'Writer SOUL.md has a different hash than root SOUL.md (I edited it)' },
+              { id: 'spoke-and-heard', label: 'I spoke to my agent and heard it respond aloud' },
             ],
           },
         ],
       },
 
-      // ── Phase 4: Use the Writer Profile ──────────────────────────────────
+      // ── Phase 3: Make it yours — pick a voice ───────────────────────────
       {
-        id: 'use-writer-profile',
-        title: 'Phase 4: Use the Writer Profile',
-        icon: Users,
+        id: 'tune-voice',
+        title: 'Phase 3: Make It Yours',
+        icon: Heart,
         steps: [
           {
-            id: 'open-writer',
-            title: 'Chat with Your Writer Profile',
+            id: 'pick-voice',
+            title: 'Pick a Voice That Fits',
             learn:
-              'The writer profile has its own alias wrapper installed at `~/.local/bin/writer`. Invoke it directly:\n\n```bash\nwriter chat\n```\n\nThis starts a Hermes session using the writer profile\'s identity — its own SOUL.md, config, and skills.\n\nAlternatively, set it as the sticky default:\n```bash\nhermes profile use writer\nhermes chat\n```\n\nAnd switch back when done:\n```bash\nhermes profile use default\n```\n\n**What to test:**\nAsk the writer profile for a 500-word essay or long-form post on any topic. Compare it to what your root Hermes agent would produce. If the two outputs feel identical in voice and structure, your SOUL.md edit wasn\'t substantive enough — add more specific guidance.\n\n**Running the writer as a service:** the writer profile has its own gateway. Start it with `writer gateway start` (or `hermes gateway start` while the writer profile is active). If you run multiple profile gateways at once and hit a port clash, give each its own port in `~/.hermes/profiles/writer/config.yaml`.',
-            do: {
-              prompt:
-                'Write a 500-word essay on the value of deliberate practice.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 5: Validation ───────────────────────────────────────────────
-      {
-        id: 'validation',
-        title: 'Phase 5: Validation',
-        icon: Shield,
-        steps: [
-          {
-            id: 'run-validator',
-            title: 'Run the M9 Validator',
-            learn:
-              'Run the M9 validator to confirm your writer profile is set up correctly:\n\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 9\n```\n\nOr via the Hermes skill:\n\n```\nverify module 9\n```\n\n**Expected green state:**\n- `writer-profile-exists` → PASS\n- `writer-soul-exists` → PASS\n- `writer-soul-distinct-files` → PASS (hashes differ)\n- `writer-soul-distinct-content` → null (manual — confirm below)\n- `profile-delegation` → null (manual — confirm below)\n\n**If `writer-soul-distinct-files` is still FAIL:** your SOUL.md edit was not saved, or the file is still byte-identical to root. Re-edit and save.\n\n**Manual checks:**\n1. **writer-soul-distinct-content** — Read both SOUL.md files side-by-side. Confirm the writer\'s version has specific long-form guidance not present in root.\n2. **profile-delegation** — Compare two 500-word drafts from root vs. writer profile on the same topic. Confirm the writer draft has a noticeably different voice.',
-            do: {
-              prompt:
-                'Run the M9 validator: `node ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 9`. Paste the full JSON output here.',
-            },
+              'Re-run `hermes setup tts` to try different voices or providers until one feels right — the agent\'s spoken character is part of how it feels to *yours*. Pair this with the SOUL voice/tone you set in M3: terse text + a brisk spoken voice, or warm prose + a friendly one.\n\nThat\'s voice: your agent now meets you hands-free, wherever you are.',
             selfChecks: [
-              { id: 'writer-profile-exists', label: '`~/.hermes/profiles/writer/` exists' },
-              { id: 'writer-soul-exists', label: 'Writer SOUL.md is present and non-empty' },
-              { id: 'writer-soul-distinct-files', label: 'Writer SOUL.md has a different hash than root SOUL.md' },
-              { id: 'writer-soul-distinct-content', label: 'Writer SOUL.md has materially different long-form writing guidance than root' },
-              { id: 'profile-delegation', label: 'The writer profile produced a noticeably distinct draft voice compared to root Hermes' },
+              { id: 'voice-tuned', label: 'I picked a voice that fits how I want my agent to sound' },
             ],
           },
         ],
@@ -763,81 +717,73 @@ export const MODULES_DATA: Module[] = [
     ],
   },
 
-  // ── M10: Completion + Self-Improving Loop ─────────────────────────────────
+  // ── M10: It Writes Its Own Skills ────────────────────────────────────────
   {
     id: 'm10',
-    title: 'M10: Completion + Self-Improving Loop',
-    shortTitle: 'M10 — Completion',
+    title: 'M10: It Writes Its Own Skills',
+    shortTitle: 'M10 — Self-Authoring',
     description:
-      'Verify the self-improving loop is alive, run the full M1-M9 self-audit, and receive your deterministic HMS- completion code.',
+      'The finale. By the end of this module your agent designs, writes, and saves a brand-new skill for itself from a plain-English request — then uses it. An agent that extends its own capabilities is the whole point.',
     icon: Award,
     phases: [
-      // ── Phase 1: Watch the Loop ───────────────────────────────────────────
+      // ── Phase 1: See it happen — agent authors a skill ──────────────────
       {
-        id: 'watch-the-loop',
-        title: 'Phase 1: Watch the Loop',
-        icon: Award,
+        id: 'author-a-skill',
+        title: 'Phase 1: Ask for a New Power',
+        icon: Sparkles,
         steps: [
           {
-            id: 'open-dashboard',
-            title: 'Open the Hermes Dashboard',
+            id: 'agent-writes-skill',
+            title: 'Describe It, and It Builds It',
             learn:
-              'Before generating your completion code, open the Hermes dashboard and observe the self-improving loop in action.\n\nThe "self-improving loop" is Hermes\'s ability to learn about you over time: the **Curator** distills insights from your sessions, **Honcho** stores a user model, and **session search** lets you retrieve facts the agent has learned.\n\nOpen the dashboard:\n```bash\nhermes dashboard\n```\n\nThen navigate to **http://localhost:9119** in your browser (the dashboard runs on port 9119). The dashboard manages your config, API keys, and **sessions** — browse your conversation history there.\n\nThe self-improving loop\'s evidence lives on disk and via the CLI rather than a dedicated dashboard tab, so inspect it directly:\n```bash\nls ~/.hermes/logs/curator/   # Curator run timestamps\nhermes memory list           # what the agent has stored about you\n```\n\n**If the dashboard doesn\'t start:** check that no other process is using port 9119 (`hermes dashboard --status` lists running instances).',
-          },
-        ],
-      },
-
-      // ── Phase 2: Verify the Loop is Alive ────────────────────────────────
-      {
-        id: 'verify-loop-alive',
-        title: 'Phase 2: Verify the Loop is Alive (Not Just Named)',
-        icon: Shield,
-        steps: [
-          {
-            id: 'loop-evidence',
-            title: 'Find Concrete Loop Evidence',
-            learn:
-              'The self-improving loop is only real if you can point at *evidence* — not just trust that it runs. The M10 validator checks this concretely:\n\n**1. Curator run timestamp** — Curator is Hermes\'s background process that distills facts from your sessions. Evidence of a run:\n```bash\nls ~/.hermes/logs/curator/\n# Expected: directories like 20260501-154302/\n```\n\n**2. Session search** — Hermes can search your past conversations (it has a built-in session-search tool). There is no `hermes search` CLI command; instead, ask the agent in chat — e.g. *"Search our past sessions for what I told you about myself in M2."* You can also browse past sessions in the dashboard (`hermes dashboard`).\n\n**3. Honcho user-model entry** — If Honcho integration is active, Hermes stores a user model. Check:\n```bash\nhermes memory list\n```\n\n**Honesty note:** if you can\'t find evidence of the loop, that\'s important information — either the loop hasn\'t had enough usage to produce observable output, or it\'s not active on your setup. The M10 `loop-honesty-check` manual asks you to report this gap if you find it.',
-          },
-        ],
-      },
-
-      // ── Phase 3: Run the Self-Audit ───────────────────────────────────────
-      {
-        id: 'run-self-audit',
-        title: 'Phase 3: Run the Self-Audit (M1-M9)',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'run-validator-m10',
-            title: 'Run the M10 Validator',
-            learn:
-              'The M10 validator orchestrates M1-M9 in sequence, tallies pass/fail/manual counts for each module, and computes your deterministic completion code.\n\nRun:\n```bash\nnode ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10\n```\n\nOr via the Hermes skill:\n```\nverify module 10\n```\n\nThis will take about 30–60 seconds — it runs all 9 prior module checks as subprocesses.\n\n**Expected output structure:**\n- `hermes-reviewed-setup` → PASS (all 9 modules ran without crash)\n- `completion-report` → PASS (per-module tally in evidence)\n- `completion-code` → PASS (HMS-... 12-char code in evidence)\n- `session-search-returns-results` → null (manual — no `hermes search` CLI; ask the agent in chat)\n- `curator-has-activity` → PASS or FAIL (depends on Curator having run)\n- `assessment-opened` → null (manual)\n- `loop-honesty-check` → null (manual)',
+              '**The finale payoff:** you describe a capability in plain English, and your agent writes itself a new skill to do it — no SKILL.md authoring by you.\n\nThroughout this course you\'ve *saved* workflows as skills. Now go further: ask your agent to **design** one from scratch for a need you describe. It decides the steps, the tools to use, and the output format, then writes the `SKILL.md` under `~/.hermes/skills/`.\n\nPick something genuinely useful to you — "summarize a YouTube transcript into action items," "turn a messy idea into a one-page PRD," "triage my GitHub notifications." Describe the *what*; let it figure out the *how*.',
             do: {
               prompt:
-                'Run the M10 validator: `node ~/.hermes/skills/hermes-mastery-validator/bin/verify.js 10`. Paste the full JSON output here.',
+                'Design and save a brand-new skill for me from scratch. The need: take a rough brain-dump of ideas and turn it into a clean, prioritized action list. You decide the steps and output format, write it as a proper SKILL.md, and tell me the skill name when done.',
             },
             selfChecks: [
-              { id: 'hermes-reviewed-setup', label: 'All M1-M9 validators executed without error' },
-              { id: 'completion-report', label: 'Per-module M1-M9 tally was computed' },
-              { id: 'completion-code', label: 'My HMS- completion code was generated' },
-              { id: 'curator-has-activity', label: 'Curator has at least one activity log in `~/.hermes/logs/curator/`' },
+              { id: 'skill-authored', label: 'My agent designed and saved a new skill from my description' },
             ],
           },
         ],
       },
 
-      // ── Phase 4: Celebrate + Share ───────────────────────────────────────
+      // ── Phase 2: See it happen — use the self-made skill ────────────────
       {
-        id: 'celebrate-and-share',
-        title: 'Phase 4: Celebrate',
-        icon: Sparkles,
+        id: 'use-self-made',
+        title: 'Phase 2: Put It to Work',
+        icon: CheckCircle,
+        steps: [
+          {
+            id: 'invoke-new-skill',
+            title: 'Use What It Built',
+            learn:
+              '**Close the loop.** Start a fresh session (so the new skill loads) and use the capability your agent just gave itself — naturally, in conversation. Confirm it follows the workflow it designed.\n\nThis is the full arc of the course in one move: your agent identified a need, built a tool for it, and now uses that tool. It\'s not just running — it\'s *extending itself*.',
+            do: {
+              prompt:
+                'Use the skill you just created: here\'s my brain-dump — [paste a few messy ideas/tasks]. Turn it into a clean, prioritized action list using your new skill.',
+            },
+            selfChecks: [
+              { id: 'used-new-skill', label: 'My agent used the skill it wrote for itself' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 3: Celebrate ──────────────────────────────────────────────
+      {
+        id: 'celebrate',
+        title: 'Phase 3: Celebrate',
+        icon: Award,
         steps: [
           {
             id: 'share-completion',
-            title: 'Celebrate Your Completion',
+            title: 'You Did It',
             learn:
-              'You\'ve completed Hermes Mastery! Your HMS- completion code was generated in Phase 3 — it\'s a deterministic hash of your M1-M9 pass/fail tally, unique to your setup state.\n\nBelow you\'ll find your personalized completion card. Download it, copy it, or share it on X to show the world you\'ve built a self-improving Hermes agent from scratch.\n\n**What the HMS- code proves:**\n- You ran the validator on your own machine\n- Your Hermes is configured to the degree your check tally reflects\n- The code is deterministic — the same honest setup always yields the same code\n\nIf you haven\'t generated your code yet, head back to Phase 3 and paste the M10 validator output.',
+              'That\'s the whole course. Look at what your agent does now:\n\n- **Lives on your phone** (M1) and **briefs you every morning** (M2)\n- **Knows you and remembers** across sessions (M3)\n- **Triages your inbox**, safely (M4)\n- **Researches and reports** with citations (M5)\n- **Improves itself** — memory, skills, a Curator (M6)\n- **Reaches any tool** via MCP (M7), **delegates to a team** of subagents (M8), **talks with you** (M9), and now **writes its own skills** (M10)\n\nYou didn\'t configure a chatbot — you built a persistent agent that runs alongside your life and keeps getting better. Grab your completion card below and share it.',
+            selfChecks: [
+              { id: 'course-complete', label: 'I built a self-improving Hermes agent — start to finish' },
+            ],
           },
         ],
       },
