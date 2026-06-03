@@ -112,79 +112,82 @@ export const MODULES_DATA: Module[] = [
   },
   {
     id: 'm2',
-    title: 'M2: Your Memory',
-    shortTitle: 'M2 — Memory',
+    title: 'M2: It Greets You Every Morning',
+    shortTitle: 'M2 — Morning Brief',
     description:
-      'Learn the conversational-memory pattern: tell Hermes about yourself, confirm it writes to USER.md and MEMORY.md, then direct-edit both files for your identity and active projects.',
-    icon: Brain,
+      'By the end of this module your agent sends you a personal brief on a schedule — a morning message with your priorities, delivered to your phone, without you asking. This is the "heartbeat" that makes Hermes feel alive.',
+    icon: Clock,
     phases: [
-      // ── Phase 1: Practice the "chuck that in memory" pattern ───────────
+      // ── Phase 1: Build it — tell it who you are ─────────────────────────
       {
-        id: 'conversational-memory',
-        title: 'Phase 1: Conversational Memory',
+        id: 'tell-it-about-you',
+        title: 'Phase 1: Tell It About You',
         icon: MessageSquare,
         steps: [
           {
-            id: 'chuck-in-memory',
-            title: 'Practice "Chuck That in Memory"',
+            id: 'seed-memory',
+            title: 'Give It Enough to Personalize',
             learn:
-              'Hermes has two memory files it maintains automatically:\n\n- **`~/.hermes/memories/USER.md`** — who you are: your name, communication style, hard nopes. Capped at ~1,375 chars.\n- **`~/.hermes/memories/MEMORY.md`** — what you\'re working on: active projects, tools, open loops. Capped at ~2,200 chars.\n\n**On a fresh install these files don\'t exist yet** — Hermes creates them the first time it records a memory. So if you `cat ~/.hermes/memories/USER.md` before doing the exercise below and see *"No such file or directory"*, that\'s expected. Do the tell → write → read-back round-trip first, then the file will be there.\n\nThe simplest way to populate them is to just tell the agent something in chat and ask it to remember:\n\n> "Chuck that in memory: I prefer terse responses."\n> "Remember that I\'m working on a SaaS dashboard project."\n> "My name is Alex — add that to USER.md."\n\nHermes writes the fact into the right file immediately. You can verify it landed by reading the file:\n\n```\ncat ~/.hermes/memories/USER.md\ncat ~/.hermes/memories/MEMORY.md\n```\n\nThis conversational round-trip — tell → write → read back — is the load-bearing exercise of M2.',
+              '**The payoff for this module:** a brief that lands on your phone every morning — *"Morning! Here are your 3 priorities today…"* — generated and sent by your agent on a schedule.\n\nFor that brief to feel personal, your agent needs to know a little about you. The simplest way is to just tell it, in chat, and ask it to remember. Hermes stores facts like these in a memory file (`~/.hermes/memories/USER.md`) it reads at the start of every session — including the scheduled ones.\n\nTell it a couple of things now: your name, and what a useful morning brief would contain for you (top priorities? calendar? a motivational nudge? your side-project todos?).\n\n(This is just a taste of memory — M3 goes deep on how your agent remembers you across weeks.)',
             do: {
               prompt:
-                'Chuck that in memory: I prefer terse, direct responses — skip the preamble. Then tell me which memory file you saved it to.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 2: Direct-edit the memory files ──────────────────────────
-      {
-        id: 'edit-memory-files',
-        title: 'Phase 2: Direct-Edit Your Memory Files',
-        icon: BookOpen,
-        steps: [
-          {
-            id: 'direct-edit-user-md',
-            title: 'Edit USER.md — Who You Are',
-            learn:
-              'Besides the conversational round-trip, you can edit the memory files directly in a text editor. Both are plain text that Hermes reads at session start — open with `nano` or `code`, edit, save.\n\n`USER.md` holds your **identity and guardrails**: your name, how you want the agent to communicate, and your hard limits. Recommended shape:\n\n```\nName: Your Name\nCommunication style: terse / verbose / Socratic / etc.\nHard nopes: never spend >$X via tools without asking first\n```\n\n**Open it:**\n\n```\nnano ~/.hermes/memories/USER.md\n# or: code ~/.hermes/memories/USER.md\n```\n\nAdd your name, your preferred communication style, and at least one hard limit ("never book travel without confirmation", "never push to main without asking"). Keep it under ~1,375 chars — `wc -c ~/.hermes/memories/USER.md` to check. The validator warns over the limit but won\'t fail; Hermes\'s caps may shift between versions.\n\n**Or let Hermes interview you** — paste the prompt below and the agent will ask a few questions, then write USER.md for you.',
-            do: {
-              prompt:
-                'Interview me about who I am — ask about my name, how I want you to communicate, and any hard limits you should respect. Ask one question at a time, then save what you learn to my USER.md.',
-            },
-          },
-          {
-            id: 'direct-edit-memory-md',
-            title: 'Edit MEMORY.md — What You\'re Working On',
-            learn:
-              'Where `USER.md` is who you are, `MEMORY.md` is **what\'s in flight** — active projects, tools, and open decisions. Hermes injects it into every session so you don\'t re-explain your setup each time. Recommended shape:\n\n```\n- Working on: <project name> — <one-line description>\n- Stack: <tech>\n- Tools: <tool1>, <tool2>\n- Open loops: <decision or question pending>\n```\n\nProse works too — the validator just checks that at least one project/context entry is present.\n\n**Open it:**\n\n```\nnano ~/.hermes/memories/MEMORY.md\n# or: code ~/.hermes/memories/MEMORY.md\n```\n\nAdd your current project(s), stack/tools, and any open decisions. Keep it under ~2,200 chars — `wc -c ~/.hermes/memories/MEMORY.md` to check.\n\n**Or let Hermes interview you** — paste the prompt below and the agent will ask about your work, then write MEMORY.md for you.',
-            do: {
-              prompt:
-                'Interview me about what I\'m currently working on — active projects, my stack and tools, and any open decisions. Ask one question at a time, then save it to my MEMORY.md.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 3: Validation ─────────────────────────────────────────────
-      {
-        id: 'validation',
-        title: 'Phase 3: Validation',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'run-validator',
-            title: 'Run Module 2 Validator',
-            learn:
-              'Run the M2 validator to confirm the memory files are in place with the right shape.\n\nThe validator runs three checks:\n- `user-md-exists` — USER.md present, non-empty, real identity field (not placeholder). Char limit 1375 informational.\n- `memory-md-exists` — MEMORY.md present, non-empty, at least one project/context entry. Char limit 2200 informational.\n- `memory-conversational` — **manual.** Confirm you completed the conversational round-trip in Phase 1 (tell → write → read back). The file-presence checks above only confirm the surface exists; this is what proves the memory loop works.\n\n**Important:** the deterministic checks are formatting checks only. A learner could hand-write any content and pass. The manual check is the real test.',
-            do: {
-              prompt:
-                'Please run the verify_module command for module 2 and reply per the SKILL.md contract.',
+                'Remember this about me for my morning briefs: my name, and that a good brief for me lists my top 3 priorities for the day in a short, direct tone. Save it to memory, then tell me what you stored.',
             },
             selfChecks: [
-              { id: 'user-md-exists', label: 'USER.md has my real identity in it' },
-              { id: 'memory-md-exists', label: 'MEMORY.md has at least one project or context entry' },
-              { id: 'memory-conversational', label: 'I completed the tell → write → read-back round-trip' },
+              { id: 'memory-seeded', label: 'My agent saved my name + brief preferences to memory' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 2: Build it — schedule the brief ──────────────────────────
+      {
+        id: 'schedule-the-brief',
+        title: 'Phase 2: Schedule the Brief',
+        icon: Clock,
+        steps: [
+          {
+            id: 'create-cron',
+            title: 'Schedule a Daily Brief',
+            learn:
+              'Hermes can run tasks on a schedule — its **cron** system. You don\'t need cron syntax; just ask in plain language. Scheduling from a Telegram message (or telling the agent to deliver to Telegram) makes the result arrive on your phone — the gateway you set up in M1.\n\nTell your agent to schedule a daily brief. Because you want it on your phone, ask it to **deliver to Telegram**.\n\nConfirm it was created:\n\n```\nhermes cron list\n```\n\nYou should see one job with a schedule and a `next_run_at` time. (Under the hood it\'s stored in `~/.hermes/cron/jobs.json`. Manage jobs with `hermes cron pause|resume|remove`, or just ask the agent.)\n\n**Note:** the scheduler only fires while the gateway is running and your machine is awake — keep `hermes gateway start` running for scheduled briefs to actually go out.',
+            do: {
+              prompt:
+                'Schedule a daily message at 8am: write me a short morning brief with my top 3 priorities for today, in my preferred tone. Deliver it to Telegram.',
+            },
+            selfChecks: [
+              { id: 'cron-created', label: '`hermes cron list` shows my daily brief job with a next run time' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 3: See it happen + make it yours ──────────────────────────
+      {
+        id: 'see-the-brief',
+        title: 'Phase 3: See It Happen',
+        icon: Send,
+        steps: [
+          {
+            id: 'fire-it-now',
+            title: 'Fire It Now',
+            learn:
+              '**This is the payoff — and you don\'t have to wait until 8am.** Trigger the job on the next scheduler tick so you can watch it land:\n\n```\nhermes cron run <job-id>\n```\n\n(Get the `<job-id>` from `hermes cron list`. `hermes cron tick` runs all due jobs once and exits — also handy for testing.)\n\nWithin a few seconds your morning brief should arrive **on your phone via Telegram** — written by your agent, personalized from what you told it, sent without you asking. That\'s the heartbeat: your agent doing useful work on its own schedule.\n\nNo message? Check `hermes gateway status` (must be running) and `hermes cron list` (job enabled, delivering to Telegram not `local`).',
+            selfChecks: [
+              { id: 'brief-arrived', label: 'A morning brief arrived on my phone' },
+            ],
+          },
+          {
+            id: 'make-it-yours-m2',
+            title: 'Make It Yours',
+            learn:
+              'Now bend it to your life. Ask your agent to adjust the schedule or the content — the time, what it includes, even a second job for a different moment of the day:\n\n> "Move my morning brief to 7:30am."\n> "Add the weather and my next calendar event to the brief."\n> "Also send me a wind-down message at 9pm asking what I got done today."\n\nScheduled, personalized, proactive messages are the thing that turns a chatbot into an agent that *runs alongside your day*. You\'ll reuse this heartbeat in later modules (inbox digests, research drops).',
+            do: {
+              prompt:
+                'Change my morning brief to also include my next calendar event and today\'s weather. Keep it short. Confirm the updated schedule.',
+            },
+            selfChecks: [
+              { id: 'brief-tweaked', label: 'My agent updated the brief to my liking' },
             ],
           },
         ],
