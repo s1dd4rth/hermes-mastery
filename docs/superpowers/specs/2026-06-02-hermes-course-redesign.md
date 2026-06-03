@@ -40,6 +40,29 @@ Both are **outcome/system-first**; ours is **mechanics/config-first**. That is t
 Outcome-first. Every module is a **felt win**. Config is the means, never the lesson. The proof
 of an outcome is the outcome happening (a text arriving on your phone), not a file-stat passing.
 
+## 2b. Post-implementation updates (2026-06-03)
+
+After the initial rewrite, two Hermes developments were folded in:
+
+- **Desktop app.** Hermes now ships a standalone desktop app (macOS DMG, Windows EXE;
+  `hermes-assets.nousresearch.com/Hermes-Setup.dmg|.exe`). It wraps the installer, **shares
+  the same install + data dir as the CLI, and puts `hermes` on PATH** — so app and terminal
+  are interchangeable doors into one agent. M1 now leads with the desktop download (friendly
+  default) but keeps the course terminal-driven (the steps are copy-pasteable and M2–M10 are
+  CLI-based). `pip install hermes-agent` noted as a third path.
+- **M8 = real multi-agent platform (Kanban), not the delegate tool.** v0.15 ships
+  `hermes kanban swarm`: a durable board where named **profiles** (specialist clones) claim
+  tasks and run in parallel — root/blackboard → workers → verifier → synthesizer — plus
+  `--goal` (self-checking loop against acceptance criteria) and `--workspace`. M8 teaches this
+  (requires `hermes profile create <name>` for each role first), with a fallback note that the
+  in-chat delegate tool covers simpler jobs on older builds.
+
+Smaller release-note touch-ups (v0.13–v0.15.2): M5 notes built-in **promptware/injection
+defense** layering under the SOUL rule; M3 names the rebuilt **session search** as a recall
+capability. Correctness note carried from the build: my local sandbox runs v0.12.0, so v0.13+
+features (Kanban swarm, desktop, session_search rebuild) are grounded in official docs + the
+release notes, not a local probe — verify on a v0.15+ machine before publishing.
+
 ## 3. The new spine
 
 ### CORE TRACK — felt outcomes
