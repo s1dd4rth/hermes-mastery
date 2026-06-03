@@ -5,87 +5,106 @@ import type { Module } from './types';
 export const MODULES_DATA: Module[] = [
   {
     id: 'm1',
-    title: 'M1: Install & Foundation',
-    shortTitle: 'M1 — Install',
+    title: 'M1: Your Agent, On Your Phone',
+    shortTitle: 'M1 — Live Agent',
     description:
-      'Install Hermes, configure your model, install the validator skill, and verify the gateway.',
-    icon: Server,
+      'By the end of this module you\'ll text a question to your own AI agent from your phone — and get an answer back. That\'s the whole pitch of Hermes: a persistent agent you can reach anywhere.',
+    icon: Send,
     phases: [
-      // ── Phase 1: Install ────────────────────────────────────────────────
+      // ── Phase 1: Build it — a running agent ─────────────────────────────
       {
-        id: 'install',
-        title: 'Phase 1: Install',
+        id: 'running-agent',
+        title: 'Phase 1: Get a Running Agent',
         icon: Server,
         steps: [
           {
             id: 'install-hermes',
             title: 'Install Hermes',
             learn:
-              'Hermes is a local-first AI orchestrator that runs on your machine. Install it with the canonical one-liner:\n\n```\ncurl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash\n```\n\nOnce installed, verify with:\n\n```\nhermes --version\n```\n\nYou should see a version string like `Hermes Agent v0.15.x`. If the command is not found, open a new shell so the `PATH` update from the installer takes effect, then try again.\n\n**Install location:** on a normal (non-root) macOS or Linux account, Hermes installs under `~/.hermes/hermes-agent` and adds its command to your `PATH`. That `PATH` change only applies to new shells — opening a fresh terminal is what clears a `command not found` immediately after install.',
+              '**The payoff for this module:** an agent that lives on your machine and answers you from your phone. First, get it installed.\n\nHermes is a local-first AI agent that runs on your own machine. Install it with the canonical one-liner:\n\n```\ncurl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash\n```\n\nThen confirm it\'s there:\n\n```\nhermes --version\n```\n\nYou should see something like `Hermes Agent v0.15.x`. If you get `command not found`, open a **fresh terminal** — the installer adds Hermes to your `PATH`, but that only takes effect in new shells. (On a normal macOS/Linux account it installs under `~/.hermes/hermes-agent`.)',
             selfChecks: [
               { id: 'hermes-installed', label: '`hermes --version` printed a version' },
             ],
           },
           {
-            id: 'setup-wizard',
-            title: 'Run the Setup Wizard',
+            id: 'setup-and-model',
+            title: 'Run Setup & Pick a Model',
             learn:
-              'After install, run the Hermes setup wizard:\n\n```\nhermes setup\n```\n\nThe wizard walks you through:\n1. Choosing a model provider and model (Anthropic, OpenAI, Google, or Nous Portal)\n2. Storing your API key in `~/.hermes/.env`\n3. Terminal, tools, and agent options\n\nWork through each prompt. To re-run just one section later: `hermes setup model` (also `tts`, `terminal`, `tools`, `agent`, `gateway`). For one-shot Nous Portal OAuth: `hermes setup --portal`.\n\nHermes is **terminal-first** — there is no web dashboard you have to open. Start a session anytime with `hermes` (classic CLI) or `hermes --tui` (recommended). An optional config/keys web UI is available via `hermes dashboard` if you want one, but it is not required for this course.',
-          },
-          {
-            id: 'choose-model',
-            title: 'Choose Your Model',
-            learn:
-              'Hermes supports several model providers. Your choice affects cost, personality, and latency:\n\n- **Anthropic (Claude):** Best for long-form writing and careful reasoning. Requires billing at [console.anthropic.com](https://console.anthropic.com).\n- **OpenAI (GPT):** Fast and widely compatible. Requires billing at [platform.openai.com](https://platform.openai.com).\n- **Google (Gemini):** Most cost-efficient; free tier at [aistudio.google.com](https://aistudio.google.com).\n- **Nous Portal:** OAuth login, no key juggling — `hermes setup --portal`.\n\nYour choice is stored under the nested `model` key in `~/.hermes/config.yaml` (`model.provider` plus `model.default`). Secrets (API keys) live separately in `~/.hermes/.env`.\n\n**View your current config:**\n```\nhermes config show\n```\n\n**Change provider/model** — re-run the model section of the wizard, or set it directly:\n```\nhermes setup model\nhermes config set model anthropic/claude-opus-4.6\n```',
+              'Run the setup wizard — it gets you from zero to a working agent in one flow:\n\n```\nhermes setup\n```\n\nIt walks you through: picking a model provider + model, pasting your API key (stored in `~/.hermes/.env`), and a few terminal/agent options.\n\n**Pick whichever provider you have access to:**\n- **Nous Portal** — easiest, OAuth login, no API key to manage: `hermes setup --portal`\n- **Anthropic (Claude)** — great reasoning/writing · [console.anthropic.com](https://console.anthropic.com)\n- **OpenAI (GPT)** — fast, widely compatible · [platform.openai.com](https://platform.openai.com)\n- **Google (Gemini)** — has a free tier · [aistudio.google.com](https://aistudio.google.com)\n\nYour choice is saved under the `model` key in `~/.hermes/config.yaml`. Check it any time with `hermes config show`. To change later: `hermes setup model`.',
             selfChecks: [
-              { id: 'model-configured', label: '`hermes config show` lists my model provider' },
-            ],
-          },
-        ],
-      },
-
-      // ── Phase 2: Validator ──────────────────────────────────────────────
-      {
-        id: 'validator',
-        title: 'Phase 2: Validator',
-        icon: Shield,
-        steps: [
-          {
-            id: 'install-validator-skill',
-            title: 'Install the Validator Skill',
-            learn:
-              'The course uses a companion Hermes skill called `hermes-mastery-validator` to verify your setup at the end of each module. Instead of ticking checkboxes by hand, the skill inspects your actual Hermes state — config values, files, the gateway — and returns a structured pass/fail JSON report this app reads.\n\nIt is read-only. It never modifies your setup, never displays secrets.\n\n**Install (v0.1.0-alpha):** Hub install (`hermes skills install …`) is not available yet in this alpha, so clone the repo and symlink it into your skills directory:\n\n```\ncd ~ && git clone https://github.com/s1dd4rth/hermes-mastery-validator.git\nln -sfn ~/hermes-mastery-validator ~/.hermes/skills/hermes-mastery-validator\ncd ~/hermes-mastery-validator && npm install\n```\n\nThe `npm install` step is required, not optional — the validator depends on `js-yaml`, and `verify.js` throws `Cannot find module \'js-yaml\'` without it.\n\nStart a fresh Hermes session so the new skill is picked up, then confirm it is registered:\n\n```\nhermes skills list\n```\n\n`hermes-mastery-validator` should appear in the listing with source `local`.',
-            selfChecks: [
-              { id: 'validator-skill-installed', label: '`~/.hermes/skills/hermes-mastery-validator/SKILL.md` is present' },
+              { id: 'model-configured', label: '`hermes config show` shows my model provider' },
             ],
           },
           {
-            id: 'verify-skill-loads',
-            title: 'Confirm the Skill Loads',
+            id: 'first-chat',
+            title: 'Say Hello',
             learn:
-              'Hermes is terminal-first: skills run **inside a Hermes session**, not behind a gateway or web server. (`hermes gateway` is for connecting messaging channels like Telegram or Discord — it is not a dashboard, and you do not need it for this course.)\n\nBefore running the module validator, confirm Hermes actually recognizes the skill you just installed. List installed skills:\n\n```\nhermes skills list\n```\n\n`hermes-mastery-validator` should appear with source `local`. If the name looks cut off in the table, widen your terminal or run `hermes skills list --source local`. If it is missing entirely, you may be in a stale session — start a fresh `hermes` session and list again.\n\nYou can also check from inside a chat: run `hermes` (or `hermes --tui`), then type `/skills`.',
-            selfChecks: [
-              { id: 'skill-registered', label: '`hermes-mastery-validator` appeared in `hermes skills list`' },
-            ],
-          },
-        ],
-      },
-
-      // ── Phase 3: Validation ─────────────────────────────────────────────
-      {
-        id: 'validation',
-        title: 'Phase 3: Validation',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'run-validator',
-            title: 'Run Module 1 Validator',
-            learn:
-              'Now that Hermes is installed, your model is configured, and the validator skill is registered — run the M1 validator to confirm all four checks pass.\n\nThe validator skill runs four deterministic checks:\n- `hermes-installed` — `hermes --version` succeeds\n- `skill-registered` — `hermes-mastery-validator` appears in `hermes skills list`\n- `model-configured` — `model.provider` is set in config\n- `validator-skill-installed` — SKILL.md is present\n\nPaste the JSON output into the panel below. The app updates the check results automatically.',
+              'Hermes is **terminal-first** — no dashboard to open. Start a session right now:\n\n```\nhermes\n```\n\n(or `hermes --tui` for the nicer terminal UI). Ask it anything — *"What can you do?"* — and confirm it replies. That\'s your agent talking, using the model you just configured.\n\nType `/exit` (or Ctrl-C) to leave the session. The agent keeps running for the next phase, where we put it on your phone.',
             do: {
               prompt:
-                'Invoke the hermes-mastery-validator skill for module 1 and reply with the complete JSON output. The tool name is `hermes-mastery-validator` and the operation is `verify_module` with argument `module: 1`. Reply with only the raw JSON object — no prose, no markdown fence.',
+                'Hello! In one short paragraph, tell me what you can help me with as my Hermes agent.',
             },
+            selfChecks: [
+              { id: 'agent-replied', label: 'My agent answered me in the terminal' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 2: Build it — put it on your phone ────────────────────────
+      {
+        id: 'on-your-phone',
+        title: 'Phase 2: Put It On Your Phone',
+        icon: Send,
+        steps: [
+          {
+            id: 'create-bot',
+            title: 'Create a Telegram Bot',
+            learn:
+              'The fastest way to reach your agent from anywhere is Telegram. You\'ll create a bot, then connect Hermes to it.\n\n**Create the bot:**\n1. Open Telegram and message [@BotFather](https://t.me/BotFather).\n2. Send `/newbot` and follow the prompts — give it a name and a username ending in `bot`.\n3. BotFather replies with a **token** like `1234567890:ABC...`.\n\n**Keep that token safe** — treat it like a password. You\'ll paste it into the Hermes setup wizard in the next step, not into any chat.\n\nWhile you\'re in Telegram, also message [@userinfobot](https://t.me/userinfobot) — it replies with your numeric **user ID**, which Hermes uses to make sure only you can talk to your agent.',
+            selfChecks: [
+              { id: 'bot-created', label: 'BotFather gave me a bot token' },
+            ],
+          },
+          {
+            id: 'connect-gateway',
+            title: 'Connect Hermes to Telegram',
+            learn:
+              'The **gateway** is what connects your agent to messaging channels. Configure Telegram:\n\n```\nhermes gateway setup\n```\n\nThis interactive wizard asks which channel (choose **Telegram**), your **bot token** (paste it from BotFather), and your **Telegram user ID** (from @userinfobot). The token is written to `~/.hermes/.env` — never echoed back.\n\nThen start the gateway so it begins listening:\n\n```\nhermes gateway start\n```\n\nCheck it\'s up with `hermes gateway status`. (`hermes gateway run` runs it in the foreground instead — handy for watching logs the first time.)',
+            selfChecks: [
+              { id: 'gateway-running', label: '`hermes gateway status` shows the gateway running with Telegram connected' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 3: See it happen + make it yours ──────────────────────────
+      {
+        id: 'see-it-happen',
+        title: 'Phase 3: See It Happen',
+        icon: MessageSquare,
+        steps: [
+          {
+            id: 'text-your-agent',
+            title: 'Text Your Agent',
+            learn:
+              '**This is the payoff.** Open Telegram on your phone, find the bot you created (search its `@username`), and send it `/start`, then a real question — *"What\'s a good way to plan my week?"*\n\nYour Hermes agent — running on your machine, using your model — answers you on your phone. You now have a persistent personal agent you can reach from anywhere.\n\n**No reply?** Make sure the gateway is running (`hermes gateway status`), that you sent `/start` first (Telegram requires it for new bots), and that the user ID you entered matches the one @userinfobot gave you. `hermes gateway logs` shows what happened.',
+            selfChecks: [
+              { id: 'replied-on-phone', label: 'My agent replied to me on Telegram' },
+            ],
+          },
+          {
+            id: 'make-it-yours-m1',
+            title: 'Make It Yours',
+            learn:
+              'Your agent works — now give it a touch of personality so it feels like *yours*. The quickest way is to just tell it, in chat (terminal or Telegram):\n\n> "From now on, keep your replies short and skip the pleasantries."\n> "Call me by my first name."\n\nHermes remembers preferences like these (that\'s M2 — Memory — next). For now, just confirm it adapts.\n\nThat\'s M1: installed, configured, reachable from your phone, and starting to feel like your own agent. Everything from here makes it *do more* for you.',
+            do: {
+              prompt:
+                'From now on, keep your replies short and skip the pleasantries. Got it?',
+            },
+            selfChecks: [
+              { id: 'agent-adapted', label: 'My agent acknowledged my preference' },
+            ],
           },
         ],
       },
