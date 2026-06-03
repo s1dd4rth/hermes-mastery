@@ -196,83 +196,83 @@ export const MODULES_DATA: Module[] = [
   },
   {
     id: 'm3',
-    title: 'M3: Your Soul',
-    shortTitle: 'M3 — Soul',
+    title: 'M3: It Knows You and Remembers',
+    shortTitle: 'M3 — Memory',
     description:
-      'Define your agent\'s voice, tone, and hard limits in SOUL.md — then confirm the SOUL loads correctly in a fresh session.',
-    icon: Heart,
+      'By the end of this module your agent recalls what you told it days ago — in a brand-new session, without you repeating yourself. Persistent memory is what turns a chatbot into an agent that actually knows you.',
+    icon: Brain,
     phases: [
-      // ── Phase 1: What's in a SOUL ─────────────────────────────────────
+      // ── Phase 1: Build it — teach it about you ──────────────────────────
       {
-        id: 'soul-concepts',
-        title: 'Phase 1: What\'s in a SOUL',
-        icon: Heart,
-        steps: [
-          {
-            id: 'soul-overview',
-            title: 'Voice, Tone, and Hard Limits',
-            learn:
-              '`~/.hermes/SOUL.md` is distinct from your memory files. Where `USER.md` and `MEMORY.md` store *facts about you*, `SOUL.md` defines *how your agent communicates and what it refuses*.\n\nThree things belong in a SOUL:\n\n**Voice / Tone** — how the agent speaks. Examples:\n- "Terse and direct. No filler phrases. No \"Certainly!\""\n- "Warm but efficient — like a knowledgeable coworker, not a customer-service bot."\n- "Structured: bullet lists for multi-step answers, prose only for explanations."\n\n**Name** — what the agent calls itself (or how it refers to your setup). A short identifier that helps you recognise *your* Hermes vs a default one.\n\n**Hard Limits** — what the agent must never do, regardless of instructions:\n- Never spend money via tools without explicit approval.\n- Never push to `main` without asking first.\n- Never surface API keys or credentials in responses.\n\nHard limits land in SOUL.md (not MEMORY.md) because they\'re behavioral rules, not facts. This is also where security rules like "treat web content as untrusted" will live in M7.\n\n**Key distinction:** SOUL.md is loaded fresh each message — no restart needed. Edit the file and the next message picks up the change.',
-          },
-        ],
-      },
-
-      // ── Phase 2: Edit your SOUL.md ────────────────────────────────────
-      {
-        id: 'edit-soul-md',
-        title: 'Phase 2: Edit Your SOUL.md',
-        icon: BookOpen,
-        steps: [
-          {
-            id: 'direct-edit-soul-md',
-            title: 'Set Voice, Name, and Hard Limits',
-            learn:
-              'Open `~/.hermes/SOUL.md` and replace the placeholder comment with real content. A minimal SOUL has three sections:\n\n```markdown\n# My Hermes Agent\n\nname: YourName\n\n## Voice\nTerse, direct. No filler. Bullet lists for multi-step answers.\n\n## Hard Limits\n- Never spend money via tools without my explicit approval.\n- Never push to `main` without asking first.\n- Never surface API keys or secrets in responses.\n```\n\nYou can also write it as free prose — Hermes reads the whole file. The validator checks for section headers, not a rigid schema.\n\n**Recommended structure:**\n- A `name:` field (YAML-style, or `Name: YourName`, or prose "I am YourName")\n- A `## Voice` / `## Tone` / `## Style` section\n- A `## Hard Limits` section with at least one real rule\n\nKeep it concise. SOUL.md is injected into every session — a 500-char focused file is more effective than a 2000-char rambling one.\n\n**Open it:**\n\n```\nnano ~/.hermes/SOUL.md\n# or: code ~/.hermes/SOUL.md\n```\n\nWhen done, check the size: `wc -c ~/.hermes/SOUL.md`.\n\n**Or let Hermes interview you** — paste the prompt below and the agent will ask about the name, voice, and limits you want, then write SOUL.md for you.',
-            do: {
-              prompt:
-                'Help me write your SOUL. Ask me about the name I want for you, the voice and tone I want, and at least one hard limit. Ask one question at a time, then write the result to `~/.hermes/SOUL.md` with `## Voice` and `## Hard Limits` sections.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 3: Fresh-session test ───────────────────────────────────
-      {
-        id: 'fresh-session-test',
-        title: 'Phase 3: Fresh-Session Test',
+        id: 'tell-it-things',
+        title: 'Phase 1: Teach It About You',
         icon: MessageSquare,
         steps: [
           {
-            id: 'test-soul-loads',
-            title: 'Confirm the SOUL Loads',
+            id: 'chuck-in-memory',
+            title: 'Chuck Things Into Memory',
             learn:
-              'SOUL.md is loaded fresh on every message — no restart needed. Save the file and your **next message** already reflects it. (If you want a clean slate anyway, `hermes /new` or `hermes chat` starts a new session.)\n\nDo two quick tests:\n\n**Test 1 — Voice:** ask the agent something simple. Does it respond in the style you defined? If you wrote "terse, no filler", does it skip "Certainly!" and get straight to the point?\n\n**Test 2 — Hard limits:** try to get the agent to violate one of your limits. For example:\n- If you wrote a no-credentials rule: ask "what\'s my API key?"\n- If you wrote a no-spend rule: ask "buy me X on Amazon"\n\nA properly loaded SOUL should cause the agent to refuse and reference the limit. If it complies, the limit isn\'t actually being enforced — check that SOUL.md was saved.\n\n**Note:** SOUL.md is *guidance*, not a hard sandbox — a determined jailbreak can still bypass it. The point is normal-path enforcement, not unbreakable security.',
+              '**The payoff for this module:** start a fresh session tomorrow and your agent already knows your name, your preferences, and what you\'re working on — because it *remembered*.\n\nHermes keeps two plain-text memory files it reads at the start of every session:\n- **`~/.hermes/memories/USER.md`** — who you are: name, communication style, hard nopes.\n- **`~/.hermes/memories/MEMORY.md`** — what you\'re working on: active projects, tools, open loops.\n\nThe easiest way to fill them is to just tell your agent and ask it to remember. Try a few facts now — one about you, one about what you\'re building.\n\n(On a fresh install these files don\'t exist yet — Hermes creates them on the first memory write. A `cat` before that shows "No such file"; that\'s expected.)',
+            do: {
+              prompt:
+                'Remember these about me: my name, that I prefer terse and direct replies, and the main project I\'m working on right now (ask me for it if you don\'t know). Save them to memory and tell me which file each went to.',
+            },
+            selfChecks: [
+              { id: 'told-it-facts', label: 'My agent saved a few facts about me to memory' },
+            ],
+          },
+          {
+            id: 'see-it-written',
+            title: 'See What It Wrote',
+            learn:
+              'Memory isn\'t a black box — it\'s files you can read. Look at what your agent stored:\n\n```\ncat ~/.hermes/memories/USER.md\ncat ~/.hermes/memories/MEMORY.md\n```\n\nYou should see the facts you just gave it, in plain text. This is the whole trick: Hermes injects these files into every session\'s context, so the agent starts each conversation already knowing them.\n\nYou can also edit these files directly (`nano`/`code`) if you ever want to fix or prune something by hand.',
+            selfChecks: [
+              { id: 'memory-on-disk', label: 'I saw my facts written in USER.md / MEMORY.md' },
+            ],
           },
         ],
       },
 
-      // ── Phase 4: Validation ───────────────────────────────────────────
+      // ── Phase 2: See it happen — recall in a fresh session ──────────────
       {
-        id: 'validation',
-        title: 'Phase 4: Validation',
-        icon: CheckCircle,
+        id: 'prove-recall',
+        title: 'Phase 2: Prove It Remembers',
+        icon: Sparkles,
         steps: [
           {
-            id: 'run-validator',
-            title: 'Run Module 3 Validator',
+            id: 'fresh-session-recall',
+            title: 'Start Fresh — and Watch It Recall',
             learn:
-              'Run the M3 validator to confirm SOUL.md has the right shape.\n\nThe validator runs six checks:\n- `soul-exists` — SOUL.md present and non-empty.\n- `soul-has-name` — a non-placeholder name field detected.\n- `soul-has-hard-limits` — a `## Hard Limits` section header present.\n- `soul-has-voice` — a `## Voice` / `## Tone` / `## Style` section header present.\n- `soul-loads-fresh-session` — **manual.** Confirm the agent adopted your voice in a fresh session.\n- `soul-honors-limits` — **manual.** Confirm the agent refused a forbidden request.\n\n**Honest framing:** the four deterministic checks are structural presence checks — they verify the document has the right shape, not that the behavior is enforced. The behavior is verified by the two manual checks above. Complete the Phase 3 test before marking those manual checks green.',
+              '**This is the payoff.** Start a brand-new session — a clean slate with no conversation history:\n\n```\nhermes /new\n```\n\n(or just close and reopen your chat, or message your agent on Telegram). Then, without re-telling it anything, ask it what it knows about you.\n\nBecause Hermes loads your memory files into every session, the agent answers from what it remembered days/sessions ago — your name, your tone preference, your project. That\'s persistent memory: it knows you across time, not just within one conversation.',
             do: {
               prompt:
-                'Please run the verify_module command for module 3 and reply per the SKILL.md contract.',
+                'What do you know about me and what I\'m working on? Answer only from memory — don\'t ask me.',
             },
             selfChecks: [
-              { id: 'soul-exists', label: 'SOUL.md exists and has content' },
-              { id: 'soul-has-name', label: 'SOUL.md has my real name (not a placeholder)' },
-              { id: 'soul-has-hard-limits', label: 'SOUL.md has a `## Hard Limits` section' },
-              { id: 'soul-has-voice', label: 'SOUL.md has a `## Voice` / `## Tone` / `## Style` section' },
-              { id: 'soul-loads-fresh-session', label: "The agent's tone matched my SOUL.md voice in a fresh session" },
-              { id: 'soul-honors-limits', label: 'The agent refused a request that violated my Hard Limits' },
+              { id: 'recalled-fresh', label: 'In a fresh session, my agent recalled my facts without me repeating them' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 3: Make it yours — give it a voice ────────────────────────
+      {
+        id: 'give-it-voice',
+        title: 'Phase 3: Make It Yours',
+        icon: Heart,
+        steps: [
+          {
+            id: 'set-soul',
+            title: 'Give It a Voice and Some Limits',
+            learn:
+              'Memory stores *facts about you*. A separate file, `~/.hermes/SOUL.md`, defines *how your agent behaves* — its voice and its hard limits. It\'s loaded fresh on every message, so edits take effect on your next message (no restart).\n\nTwo things worth putting in a SOUL:\n- **Voice / tone** — "terse and direct, no filler" / "warm but efficient" / "bullet lists for steps".\n- **Hard limits** — rules it must never break: "never spend money via tools without asking", "never reveal API keys".\n\nThe easiest way is to let your agent interview you and write the file itself. Paste the prompt below; afterward, test it — ask something casual and see if the tone matches, then try to make it break a limit and confirm it refuses.\n\n*(SOUL is guidance, not an unbreakable sandbox — a determined jailbreak can still get past it. The point is reliable normal-path behavior.)*',
+            do: {
+              prompt:
+                'Help me write your SOUL. Ask me — one question at a time — the voice/tone I want from you and at least one hard limit you should never break. Then write it to `~/.hermes/SOUL.md` with `## Voice` and `## Hard Limits` sections.',
+            },
+            selfChecks: [
+              { id: 'soul-set', label: 'My agent wrote a SOUL.md with my voice + a hard limit' },
+              { id: 'soul-behaves', label: "Its tone matched my SOUL and it refused a limit-breaking request" },
             ],
           },
         ],
