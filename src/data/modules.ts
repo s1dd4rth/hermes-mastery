@@ -281,91 +281,79 @@ export const MODULES_DATA: Module[] = [
   },
   {
     id: 'm4',
-    title: 'M4: Connect a Channel — Telegram',
-    shortTitle: 'M4 — Telegram',
+    title: 'M4: It Triages Your Inbox',
+    shortTitle: 'M4 — Inbox',
     description:
-      'Wire Hermes to Telegram: create a bot via BotFather, run gateway setup, confirm the bot is live, and complete the round-trip proof.',
-    icon: Send,
+      'By the end of this module your agent reads your real inbox and tells you what matters — and drafts replies that it never sends without your say-so. The heaviest setup in the course, and the most useful payoff.',
+    icon: Mail,
     phases: [
-      // ── Phase 1: Create a Telegram bot via BotFather ───────────────────
+      // ── Phase 1: Build it — connect Google ──────────────────────────────
       {
-        id: 'botfather',
-        title: 'Phase 1: Create a Bot via BotFather',
-        icon: Send,
+        id: 'connect-google',
+        title: 'Phase 1: Connect Google',
+        icon: Wrench,
         steps: [
           {
-            id: 'create-bot',
-            title: 'Create Your Hermes Bot',
+            id: 'install-gmail-skill',
+            title: 'Install a Google Workspace Skill',
             learn:
-              'Before configuring Hermes, you need a Telegram bot. Telegram bots are created and managed through **BotFather** — the official Telegram bot for managing bots.\n\n**Steps:**\n\n1. Open Telegram and search for [@BotFather](https://t.me/BotFather), or go to [t.me/BotFather](https://t.me/BotFather).\n2. Send `/newbot` to start the creation flow.\n3. When prompted, give your bot a **display name** (e.g., "My Hermes Agent").\n4. When prompted, give your bot a **username** — must end in `bot` (e.g., `myhermes_bot`).\n5. BotFather replies with your bot\'s **token** — a string like `1234567890:ABCDef...`.\n\n**Store this token securely.** You\'ll paste it into the Hermes setup wizard in the next phase. Do **not** paste it into any chat window, doc, or notes app — treat it like a password.\n\n**Important:** Your bot token is a credential. The validator will only confirm that the token *exists* in your config — it will never ask to see the value, and you should never share it with anyone.',
+              '**The payoff for this module:** *"Summarize my unread email and flag anything urgent"* — and your agent actually does it, against your real Gmail.\n\nGiving Hermes inbox access has two parts: a **skill** that knows how to call Gmail/Calendar, and **OAuth credentials** that authorize it. Start with the skill.\n\nSearch the hub for a Google Workspace / Gmail skill and install it by its identifier:\n\n```\nhermes skills search "google workspace"\nhermes skills install <identifier-from-the-results>\n```\n\n**If install fails with `Could not fetch ... from any source`** (hub coverage is uneven in this alpha): pick a different result, `hermes skills inspect <identifier>` to preview one, or clone a Google Workspace skill repo and symlink it into `~/.hermes/skills/` (the same clone+symlink method from M1\'s validator era). Then start a fresh session and confirm it loads with `hermes skills list`.',
+            selfChecks: [
+              { id: 'gmail-skill-installed', label: 'A Google Workspace / Gmail skill shows up in `hermes skills list`' },
+            ],
+          },
+          {
+            id: 'authorize-oauth',
+            title: 'Authorize It (OAuth)',
+            learn:
+              'The skill needs your permission to touch your account. This is the fiddly part — you set up a Google Cloud OAuth client and run the skill\'s auth flow once.\n\n**The shape of it:**\n1. In [Google Cloud Console](https://console.cloud.google.com), create (or reuse) a project, enable the **Gmail API** and **Google Calendar API**, and create an **OAuth client** (Desktop app).\n2. Run the skill\'s authorization flow (check the skill\'s own SKILL.md / README for the exact command — commonly something like `gws --auth-url`). It opens a Google consent screen; approve the Gmail + Calendar scopes.\n3. It writes a token file under `~/.hermes/` (e.g. `auth.json`). **Keep it private** — `chmod 600` it; never open or paste its contents.\n\nThis is a one-time setup. Follow the skill\'s instructions for the precise commands, since they vary by skill.',
+            selfChecks: [
+              { id: 'oauth-authorized', label: 'I completed the OAuth flow and a token file exists under ~/.hermes/' },
+            ],
           },
         ],
       },
 
-      // ── Phase 2: Run hermes gateway setup ─────────────────────────────
+      // ── Phase 2: See it happen — read the inbox ─────────────────────────
       {
-        id: 'gateway-setup',
-        title: 'Phase 2: Run `hermes gateway setup`',
-        icon: Server,
+        id: 'read-the-inbox',
+        title: 'Phase 2: See It Happen',
+        icon: Mail,
         steps: [
           {
-            id: 'run-gateway-setup',
-            title: 'Configure the Gateway',
+            id: 'summarize-inbox',
+            title: 'Summarize My Inbox',
             learn:
-              '`hermes gateway setup` is the interactive wizard that configures which channels (Telegram, Discord, WhatsApp) the Hermes gateway connects to.\n\n**Run:**\n\n```\nhermes gateway setup\n```\n\nThe wizard will ask:\n1. Which channel to configure (select **Telegram**)\n2. Your **bot token** — paste it from the secure location you stored it in the previous step\n3. Your **Telegram user ID** — this is the numeric ID of your Telegram account (not your @username). Get it by messaging [@userinfobot](https://t.me/userinfobot) on Telegram; it replies with your ID.\n\nThe wizard writes your token to `~/.hermes/.env`. It does **not** go into `config.yaml`.\n\n**After setup, start the gateway:**\n\n```\nhermes gateway start\n```\n\nOr run it in the foreground (better for first-time troubleshooting):\n\n```\nhermes gateway run\n```',
-          },
-        ],
-      },
-
-      // ── Phase 3: Verify with hermes gateway status ─────────────────────
-      {
-        id: 'gateway-status',
-        title: 'Phase 3: Verify with `hermes gateway status`',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'check-gateway-status',
-            title: 'Confirm the Bot is Running',
-            learn:
-              '`hermes gateway status` shows whether the gateway is running and which channels are connected.\n\n**Run:**\n\n```\nhermes gateway status\n```\n\nA healthy Telegram connection shows the gateway running with a Telegram channel listed as live or connected.\n\nIf the gateway is not running:\n```\nhermes gateway start\n```\n\nIf the gateway runs but Telegram shows an error, check the logs:\n```\nhermes gateway logs\n```\n\nCommon issues:\n- **Invalid token** — re-run `hermes gateway setup` with the correct token from BotFather\n- **Bot not started** — send `/start` to your bot on Telegram first\n- **User ID mismatch** — confirm your numeric Telegram user ID via [@userinfobot](https://t.me/userinfobot)',
-          },
-        ],
-      },
-
-      // ── Phase 4: Test the round trip ───────────────────────────────────
-      {
-        id: 'round-trip',
-        title: 'Phase 4: Test the Round Trip',
-        icon: MessageSquare,
-        steps: [
-          {
-            id: 'message-your-bot',
-            title: 'Message Your Bot and Confirm a Reply',
-            learn:
-              'The final proof is a live round-trip: you send a message to your Hermes bot from your phone or Telegram desktop, and your Hermes agent replies.\n\n**How to test:**\n\n1. Open Telegram and find the bot you created (search by the `@username` you set in BotFather).\n2. Send it a message — something simple like "Hello" or "What\'s your name?"\n3. Your Hermes agent (using the voice and soul you configured in M3) should reply.\n\n**If there\'s no reply:**\n- Confirm the gateway is running: `hermes gateway status`\n- Check the logs: `hermes gateway logs`\n- Make sure you sent `/start` to the bot first (Telegram requires this for new bots)\n- Confirm the Telegram user ID you entered during setup matches your actual ID\n\n**This round-trip is the load-bearing check for M4.** The deterministic validator checks only confirm your config is set and the gateway claims to be bound — this live message proves the whole pipe works.',
-          },
-        ],
-      },
-
-      // ── Phase 5: Validation ────────────────────────────────────────────
-      {
-        id: 'validation',
-        title: 'Phase 5: Validation',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'run-validator',
-            title: 'Run Module 4 Validator',
-            learn:
-              'Run the M4 validator to confirm the Telegram channel is configured and live.\n\nThe validator runs three checks:\n- `telegram-configured` — **deterministic.** `TELEGRAM_BOT_TOKEN` is present and non-placeholder in `~/.hermes/.env`. Presence-only — the value is never logged or displayed.\n- `gateway-bot-bound` — **deterministic.** `hermes gateway status` reports the gateway is running and the Telegram channel is live.\n- `telegram-responds` — **manual.** You sent a message to your bot and confirmed a reply. The two checks above only prove config + gateway wiring; this proves the full pipe works.\n\n**Security note:** the validator never asks to see your bot token, and you should never paste it here or in any chat. If `telegram-configured` fails, run `hermes gateway setup` — the wizard writes the token to `~/.hermes/.env` securely.',
+              '**This is the payoff.** Ask your agent to read your actual inbox and tell you what matters. Watch the tool calls go by — it\'s really hitting Gmail, not making things up.\n\nThen cross-check: open Gmail in a browser and confirm the summary matches reality (right senders, right subjects, nothing invented).',
             do: {
               prompt:
-                'Please run the verify_module command for module 4 and reply per the SKILL.md contract.',
+                'Summarize my unread email from today. Group by what needs a reply vs. FYI, and flag anything time-sensitive. Note if any relate to events on my calendar this week.',
             },
             selfChecks: [
-              { id: 'telegram-configured', label: '`TELEGRAM_BOT_TOKEN` is set in `~/.hermes/.env` (presence confirmed)' },
-              { id: 'gateway-bot-bound', label: '`hermes gateway status` showed the Telegram channel as live' },
-              { id: 'telegram-responds', label: 'My Hermes bot replied to a message from my phone' },
+              { id: 'inbox-summarized', label: 'My agent summarized my real inbox and it matched Gmail' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 3: Make it yours — the safety gate ────────────────────────
+      {
+        id: 'safe-sending',
+        title: 'Phase 3: Make It Safe to Send',
+        icon: Shield,
+        steps: [
+          {
+            id: 'approval-gate',
+            title: 'Draft, but Never Send Without Approval',
+            learn:
+              'An agent that can *send* email on your behalf is powerful and a little scary — a misread instruction (or a prompt-injection buried in an email) could fire off a message you never intended. So before letting it send, give it a hard rule: **always show the draft and wait for explicit approval.**\n\nThe cleanest place for that rule is your SOUL.md (from M3) — it\'s behavioral policy, loaded every message. Have your agent add it, then test the gate: ask it to send a test email to yourself and confirm it shows a draft and **stops** for your OK. Try cancelling — nothing should be sent.\n\n*(Composing a draft is safe; calling Gmail\'s send is the irreversible step. The approval gate is your last look before the point of no return. Note: a SOUL rule is strong normal-path policy, not an unbreakable sandbox.)*',
+            do: {
+              prompt:
+                'Add a section to my `~/.hermes/SOUL.md` called `## Outbound Email` with this rule: never send an email without first showing me the full draft (to, subject, body) and waiting for my explicit "send it"; if I say cancel/stop, do not send. Then write a test email to my own address so I can confirm you stop for approval — but do NOT send it yet.',
+            },
+            selfChecks: [
+              { id: 'approval-rule-set', label: 'My SOUL.md now requires draft + approval before any send' },
+              { id: 'gate-works', label: 'My agent showed a draft and waited (and sent nothing when I cancelled)' },
             ],
           },
         ],
