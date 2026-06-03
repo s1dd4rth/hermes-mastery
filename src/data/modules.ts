@@ -579,139 +579,78 @@ export const MODULES_DATA: Module[] = [
     ],
   },
 
-  // ── M8: Gmail + Calendar (OAuth) ─────────────────────────────────────────
+  // ── M8: A Team of Agents (delegation) ────────────────────────────────────
   {
     id: 'm8',
-    title: 'M8: Gmail + Calendar (OAuth)',
-    shortTitle: 'M8 — Gmail + Calendar',
+    title: 'M8: A Team of Agents',
+    shortTitle: 'M8 — Delegation',
     description:
-      'Connect Hermes to Gmail and Google Calendar via OAuth. Send and receive email through your Hermes, read your calendar, and add an outbound-email approval gate so the agent never sends without your explicit sign-off.',
-    icon: Mail,
+      'Power track. By the end of this module your agent breaks a big job into parts, hands each to a focused subagent working in parallel, and reports back a synthesized result — a team, not a soloist.',
+    icon: Users,
     phases: [
-      // ── Phase 1: Google Cloud Console OAuth Setup ─────────────────────────
+      // ── Phase 1: Understand — why delegate ──────────────────────────────
       {
-        id: 'gcp-oauth-setup',
-        title: 'Phase 1: Google Cloud Console OAuth Setup',
-        icon: Server,
+        id: 'why-delegate',
+        title: 'Phase 1: Why a Team',
+        icon: Users,
         steps: [
           {
-            id: 'enable-apis',
-            title: 'Enable Gmail + Calendar APIs and Create OAuth Credentials',
+            id: 'delegation-concept',
+            title: 'One Agent, Many Hands',
             learn:
-              'Before Hermes can access Gmail or Google Calendar, you need to authorize it through Google Cloud. This is a one-time setup that creates an OAuth 2.0 client that Hermes uses to request access to your account.\n\n**Steps:**\n\n1. Go to [Google Cloud Console](https://console.cloud.google.com/) and sign in with the Google account you want to connect.\n2. Create a new project (or select an existing one).\n3. In the left menu, go to **APIs & Services > Library**.\n4. Search for and enable: **Gmail API**, **Google Calendar API**.\n5. Go to **APIs & Services > Credentials > Create Credentials > OAuth client ID**.\n6. Choose **Desktop app** as the application type.\n7. Download the JSON credentials file — it will be named something like `client_secret_xxx.json`.\n8. Move it to `~/.hermes/google_client_secret.json`:\n\n```bash\nmv ~/Downloads/client_secret_*.json ~/.hermes/google_client_secret.json\nchmod 600 ~/.hermes/google_client_secret.json\n```\n\n**IMPORTANT — credential security:**\n- Treat `google_client_secret.json` like a password. Do NOT paste its contents into any chat window, document, or notes app.\n- Do NOT share it with anyone, including AI assistants.\n- Open it only in a text editor or file manager for visual inspection.\n- The validator will only `stat` this file — it NEVER reads or displays its contents.\n\n**If you see "OAuth consent screen not configured":** go to **APIs & Services > OAuth consent screen** and set up the screen. Choose **External** (unless you have a Google Workspace org). Add your own email as a test user.',
+              '**The payoff for this module:** give your agent a job too big for one pass, and watch it spin up helpers — each with its own focused context — then combine their work into one answer.\n\nHermes has a **delegate** capability: the main agent can spawn **subagents**, each with a fresh context window and a single sub-task, run them (often in parallel), and fold their results back together. Why this matters:\n- **Focus** — each subagent sees only its slice, so it doesn\'t get distracted or run out of context.\n- **Parallelism** — independent parts run at once instead of one long serial chain.\n- **Cleaner main thread** — your main agent\'s context stays uncluttered; it only sees the summaries.\n\nThis is an in-chat capability (a tool the agent uses), not a CLI command — you trigger it by asking for work that benefits from splitting up.',
+            selfChecks: [
+              { id: 'understand-delegation', label: 'I understand what subagent delegation is and when it helps' },
+            ],
           },
         ],
       },
 
-      // ── Phase 2: Install the Gmail Skill ─────────────────────────────────
+      // ── Phase 2: See it happen — delegate a real job ────────────────────
       {
-        id: 'install-gmail-skill',
-        title: 'Phase 2: Install a Gmail Skill from the Hub',
-        icon: Mail,
+        id: 'delegate-a-job',
+        title: 'Phase 2: Delegate a Real Job',
+        icon: Sparkles,
         steps: [
           {
-            id: 'install-skill',
-            title: 'Install the Google Workspace Skill',
+            id: 'run-delegation',
+            title: 'Hand Out the Work',
             learn:
-              'The Google Workspace skill gives Hermes access to Gmail, Calendar, Drive, Docs, and Sheets through a single unified skill. It bundles both Gmail and Calendar — no separate Calendar skill is required.\n\n**Install via the Hermes Hub:**\n\n```bash\nhermes skills install google-workspace\n```\n\n**Or install via the Hermes skills catalog UI** — search for "google-workspace" or "gmail".\n\nAfter installing, verify the skill is in place:\n\n```bash\nls ~/.hermes/skills/productivity/google-workspace/SKILL.md\n```\n\nYou should see the skill file. The validator checks for this file (and several common alternate paths) to confirm the skill is installed.\n\n**What the skill provides:**\n- Gmail: send, read, search, label messages\n- Calendar: list events, create events, read upcoming schedule\n- Drive, Docs, Sheets (bonus — also unlocked by this skill)\n\n**Name flexibility:** the validator accepts several Gmail skill names — `gmail`, `google-workspace`, `nous-gmail`, `mail`, and others — including nested paths like `productivity/google-workspace`. If your installation uses a different slug, the validator will detect it as long as there is a `SKILL.md` at the skill root.',
-          },
-        ],
-      },
-
-      // ── Phase 3: Authorize (First-Run OAuth Flow) ─────────────────────────
-      {
-        id: 'authorize-oauth',
-        title: 'Phase 3: Authorize — Run the OAuth Flow',
-        icon: Shield,
-        steps: [
-          {
-            id: 'run-oauth-flow',
-            title: 'Complete the OAuth Authorization Flow',
-            learn:
-              'Once the skill is installed and your `google_client_secret.json` is in place, run the OAuth authorization flow. This opens a browser window where you sign in with your Google account and grant Hermes access to Gmail and Calendar.\n\n**Run the auth flow:**\n\n```bash\n# Using the gws CLI (if installed with the skill)\ngws --auth-url --services email,calendar\n```\n\nOr ask your Hermes agent:\n\n```\nSet up Google OAuth for Gmail and Calendar access.\n```\n\n**What happens:**\n1. Hermes generates an authorization URL.\n2. Open the URL in your browser, sign in, and click "Allow".\n3. Google redirects back with an authorization code.\n4. Hermes exchanges the code for tokens and saves them to `~/.hermes/auth.json`.\n\n**After completing the flow, verify:**\n\n```bash\n# Stat only — DO NOT cat or open the file in chat\nls -la ~/.hermes/auth.json\n# Should show: -rw------- (mode 600)\n```\n\n**If the mode is wrong:**\n```bash\nchmod 600 ~/.hermes/auth.json\n```\n\n**CRITICAL security rule:**\n- NEVER paste the contents of `auth.json`, `google_token.json`, or any OAuth token file into chat.\n- NEVER ask your Hermes agent to display, print, or summarize any OAuth token or refresh token.\n- If you accidentally expose a token, revoke it immediately in [Google Cloud Console > Credentials](https://console.cloud.google.com/apis/credentials) and re-run the OAuth flow.\n- Token values look like `ya29.xxx` (access token) or `1//xxx` (refresh token). Treat them like passwords.',
-          },
-        ],
-      },
-
-      // ── Phase 4: Read Inbox + Cross-Reference Calendar ────────────────────
-      {
-        id: 'inbox-and-calendar',
-        title: 'Phase 4: Read Inbox and Cross-Reference Calendar',
-        icon: Brain,
-        steps: [
-          {
-            id: 'read-inbox',
-            title: 'Read Unread Mail in Context of Upcoming Meetings',
-            learn:
-              'With Gmail and Calendar access authorized, you can now use your Hermes to cross-reference email and calendar — a powerful workflow for meeting prep, follow-up tracking, and context-aware summaries.\n\n**Try it:**\n\n```\nSummarize my 5 most recent unread emails and check if any of them are related to upcoming meetings on my calendar this week.\n```\n\n```\nI have a meeting tomorrow at 10am — what emails have I received about it in the last week?\n```\n\n**What to observe:**\n- The agent issues Gmail API calls (you may see `gmail_search(...)` or `list_messages(...)` in the tool-use panel)\n- The agent also issues Calendar API calls to fetch upcoming events\n- The response contextualizes email content against your calendar\n\n**If the agent can access email but not calendar (or vice versa):**\n- Re-run the OAuth flow with both services: `gws --auth-url --services email,calendar`\n- Confirm both Gmail API and Google Calendar API are enabled in Google Cloud Console\n\n**Read-only for now:** in this phase, the agent only reads. Sending email happens in Phase 5, with the approval gate in place.',
+              '**This is the payoff.** Give your agent a job with naturally separable parts and explicitly invite it to delegate. A research-style task works well — several independent threads that merge into one brief.\n\nWatch the transcript: you should see the main agent spawn subagents, each working its piece, then a synthesis step where it combines them. Compare the feel to doing it in one serial pass — delegation is how Hermes handles work that\'s too big or too parallel for a single thread.\n\n(If your agent just does it solo, make the parallelism explicit: "spin up a separate subagent for each company so they run at once.")',
             do: {
               prompt:
-                'Summarize my 5 most recent unread emails and note if any are related to upcoming calendar events this week.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 5: Outbound Email + Approval Gate ───────────────────────────
-      {
-        id: 'outbound-email-gate',
-        title: 'Phase 5: Outbound Email + Approval Gate',
-        icon: Send,
-        steps: [
-          {
-            id: 'add-approval-rule',
-            title: 'Add Outbound Email Protocols to SOUL.md',
-            learn:
-              'An agent with Gmail send access can email anyone on your behalf. Without a guardrail, a misunderstood instruction — or a prompt-injection attack via email content — could send email you never intended to send.\n\n**Add an outbound-email approval rule to SOUL.md:**\n\n```markdown\n## Outbound Email Protocols\n\nNever send an email without showing the full draft and waiting for explicit approval.\nAlways show: To, Subject, and full body before sending.\nWait for "yes", "send it", or equivalent explicit confirmation before calling the send API.\nIf I say "cancel", "stop", or "never mind" at any point before confirming, do NOT send.\n```\n\nEdit `~/.hermes/SOUL.md` and add this section. SOUL.md is loaded fresh each message — no restart needed; your next message already reflects it.\n\n**Why this matters:**\n- Composing a draft is safe — drafts are not sent.\n- Calling Gmail\'s `messages.send` is irreversible — the email is delivered immediately.\n- The approval gate gives you a final review of To, Subject, and body before the point of no return.\n\n**§10 research note:** whether SOUL.md is consulted at tool-call time is an open question. If the agent sends without asking despite this rule, SOUL.md may be personality-only (loaded for voice/tone, not tool policy). In that case, the rule may need to move to a Hermes tool-policy surface. The `approval-gate-works` manual in the validation phase is the real test — report your findings there.\n\n**Or let Hermes add it for you** — paste the prompt below and the agent will append the approval rule to your existing SOUL.md (without clobbering what earlier modules wrote).',
-            do: {
-              prompt:
-                'Ask me how you should handle sending email on my behalf, then append an `## Outbound Email Protocols` section to `~/.hermes/SOUL.md` requiring you to show the full draft (To, Subject, body) and wait for my explicit approval before sending. Append — do not overwrite the rest of the file.',
-            },
-          },
-          {
-            id: 'send-test-email',
-            title: 'Send a Test Email with Approval Gate',
-            learn:
-              'With the outbound-email rule in SOUL.md and a fresh session loaded, send a test email to yourself. This confirms:\n1. The agent shows the draft before sending (approval gate works)\n2. The Gmail API `messages.send` call actually succeeds\n3. The email appears in both your inbox AND your Sent folder\n\n**Try it:**\n\n```\nSend a test email to my own address with subject "Hermes M8 test" and body "Testing M8 Gmail integration."\n```\n\n**What should happen:**\n1. The agent shows you a draft: To, Subject, and body — asks for confirmation.\n2. You say "yes, send it."\n3. The email is sent.\n4. You verify in Gmail: it appears in both Inbox and Sent.\n\n**The Sent-folder check is important:** inbox delivery alone could be faked by local mail rules or forwarding. Seeing the message in Sent proves the Gmail API send call was made under your OAuth grant.\n\n**If the agent sends without showing a draft:** the SOUL.md rule is not being honored. Start a fresh session (SOUL.md loads at startup). If still not honored after a fresh session, the rule may need to move to a different Hermes policy surface — log it as a §10 finding.',
-            do: {
-              prompt:
-                'Send a test email to my own address with subject "Hermes M8 test" and body "Testing M8 Gmail integration." Show me the draft and wait for my approval before sending.',
-            },
-          },
-        ],
-      },
-
-      // ── Phase 6: Validation ────────────────────────────────────────────────
-      {
-        id: 'validation',
-        title: 'Phase 6: Validation',
-        icon: CheckCircle,
-        steps: [
-          {
-            id: 'run-validator',
-            title: 'Run Module 8 Validator',
-            learn:
-              'Run the M8 validator to confirm Gmail + Calendar are wired up, OAuth credentials are present with safe permissions, and the outbound-email approval rule is in SOUL.md.\n\nThe validator runs 8 checks:\n\n**Deterministic (5):**\n- `gmail-skill-installed` — a Gmail skill SKILL.md exists at a known name (flat or nested path). Accepted names include `gmail`, `google-workspace`, `productivity/google-workspace`, and others.\n- `calendar-skill-or-tool-enabled` — Calendar is reachable via a separate Calendar skill, the Gmail skill bundling Calendar (SKILL.md mentions "calendar"), or a config flag.\n- `oauth-credentials-present` — `~/.hermes/auth.json` (or equivalent) exists with mode 600. **Stat only — contents NEVER read.**\n- `oauth-scopes-cover-mail-and-calendar` — Gmail and Calendar scope strings detected in the Gmail skill source code. This is the best available programmatic surface; the actual grant is verified behaviorally by the manual checks. **Token files are never read.**\n- `outbound-approval-rule` — SOUL.md (outside HTML comments) contains both "outbound email" and approval language. PRESENCE-ONLY — §10 caveat applies (see Phase 5). Enforcement is the `approval-gate-works` manual.\n\n**Manual (3):**\n- `test-email-sent-and-observable` — send a test email to yourself via the skill; confirm BOTH inbox arrival AND Sent-folder presence.\n- `calendar-event-read` — ask the agent to summarize your next 3 calendar events; confirm they match your actual calendar.\n- `approval-gate-works` — try to send an email, explicitly cancel at the approval prompt, then confirm Gmail Sent shows nothing was sent.\n\n**Common FAIL causes:**\n- `gmail-skill-installed` FAIL: install via `hermes skills install google-workspace`.\n- `calendar-skill-or-tool-enabled` FAIL: ensure the Gmail skill\'s SKILL.md mentions Calendar, or install a separate Calendar skill.\n- `oauth-credentials-present` FAIL: run the OAuth flow (`gws --auth-url`); then `chmod 600 ~/.hermes/auth.json`.\n- `oauth-scopes-cover-mail-and-calendar` FAIL: re-run OAuth with `--services email,calendar`.\n- `outbound-approval-rule` FAIL: add the "Outbound Email Protocols" section to SOUL.md (Phase 5).',
-            do: {
-              prompt:
-                'Please run the verify_module command for module 8 and reply per the SKILL.md contract.',
+                'Compare three AI agent frameworks for me — Hermes, plus two others. Delegate one subagent per framework to research it in parallel, then synthesize their findings into a single comparison table with a recommendation.',
             },
             selfChecks: [
-              { id: 'gmail-skill-installed', label: 'Gmail skill `SKILL.md` is present at a known path' },
-              { id: 'calendar-skill-or-tool-enabled', label: 'Calendar is reachable (via Gmail skill, separate skill, or config flag)' },
-              { id: 'oauth-credentials-present', label: '`~/.hermes/auth.json` exists with mode 600 (stat confirmed)' },
-              { id: 'oauth-scopes-cover-mail-and-calendar', label: 'Gmail and Calendar scope strings found in the skill source' },
-              { id: 'outbound-approval-rule', label: 'SOUL.md has an outbound-email approval rule' },
-              { id: 'test-email-sent-and-observable', label: 'Test email arrived in my inbox AND appears in Gmail Sent' },
-              { id: 'calendar-event-read', label: "The agent's next-3-events summary matched my actual calendar" },
-              { id: 'approval-gate-works', label: 'I cancelled at the approval prompt and nothing appeared in Gmail Sent' },
+              { id: 'delegated', label: 'My agent spun up subagents for the parts and synthesized their results' },
+            ],
+          },
+        ],
+      },
+
+      // ── Phase 3: Make it yours — a delegation skill ─────────────────────
+      {
+        id: 'delegation-skill',
+        title: 'Phase 3: Make It Yours',
+        icon: Heart,
+        steps: [
+          {
+            id: 'save-delegation-pattern',
+            title: 'Bottle the Pattern',
+            learn:
+              'If a delegated workflow was useful, save it as a skill so your agent reaches for the team automatically next time — no need to spell out "use subagents" every time.\n\nAsk your agent to save the just-run pattern as a reusable skill (it writes a `SKILL.md` describing when to fan out and how to synthesize). Confirm with `hermes skills list`.\n\nThat\'s delegation: your single agent is now a coordinator that can marshal a team whenever a job is big enough to warrant one.',
+            do: {
+              prompt:
+                'That parallel-research-and-synthesize approach was great. Save it as a reusable skill (call it "parallel-research") so you use this delegate-and-merge pattern automatically for multi-part research. Tell me where you saved it.',
+            },
+            selfChecks: [
+              { id: 'delegation-skill-saved', label: 'A reusable delegation skill shows up in `hermes skills list`' },
             ],
           },
         ],
       },
     ],
   },
-
   // ── M9: Multi-Profile / Specialist Agents ────────────────────────────────
   {
     id: 'm9',
