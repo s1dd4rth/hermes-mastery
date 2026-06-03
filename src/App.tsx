@@ -164,7 +164,6 @@ export default function App() {
         <StepEngine
             steps={currentPhase.steps}
             currentIndex={nav.stepIndex}
-            moduleId={nav.moduleId}
             userInputs={userInputs}
             isStepComplete={stepId =>
               isStepComplete(nav.moduleId, nav.phaseId, stepId)
@@ -175,7 +174,6 @@ export default function App() {
             onSaveInput={saveUserInput}
             onNavigateStep={index => setNav({ stepIndex: index })}
             module={currentModule}
-            moduleNumber={MODULES_DATA.findIndex(m => m.id === nav.moduleId) + 1}
             onAdvancePhase={handleAdvancePhase}
             nextPhaseLabel={nextPhaseLabel}
             getSelfCheckState={stepId =>

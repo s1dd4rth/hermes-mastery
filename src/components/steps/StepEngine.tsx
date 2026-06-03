@@ -8,7 +8,6 @@ import { SelfCheck } from './SelfCheck';
 interface StepEngineProps {
   steps: Step[];
   currentIndex: number;
-  moduleId: string;
   userInputs: Record<string, string>;
   isStepComplete: (stepId: string) => boolean;
   onExecute: (prompt: string, stepTitle: string) => void;
@@ -17,7 +16,6 @@ interface StepEngineProps {
   onSaveInput: (key: string, value: string) => void;
   onNavigateStep: (index: number) => void;
   module: Module;
-  moduleNumber: number;
   onAdvancePhase: () => void;
   nextPhaseLabel: string | null;
   getSelfCheckState: (stepId: string) => Record<string, boolean>;
@@ -35,7 +33,6 @@ export const StepEngine = ({
   onSaveInput,
   onNavigateStep,
   module,
-  moduleNumber,
   onAdvancePhase,
   nextPhaseLabel,
   getSelfCheckState,
