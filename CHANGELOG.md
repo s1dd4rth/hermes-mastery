@@ -2,6 +2,37 @@
 
 All notable changes to the Hermes Mastery web app.
 
+## [0.2.0] — 2026-06-03 — Outcome-first redesign
+
+Complete rethink. The course was a config tour ported from OpenClaw ("edit this file / run
+this command / paste validator JSON"); it's now an **outcome-first** course where every module
+is a felt win following **Hook → Build → See it → Make it yours**. All content verified against
+a live Hermes **v0.15.1** install. Spec: `docs/superpowers/specs/2026-06-02-hermes-course-redesign.md`;
+teardown plan: `docs/superpowers/plans/2026-06-02-validator-teardown-engine.md`.
+
+### Changed
+- **All 10 modules rewritten.** Core track: M1 *Your Agent, On Your Phone* (install + Telegram
+  on day one), M2 *It Greets You Every Morning* (cron heartbeat), M3 *It Knows You and Remembers*
+  (memory), M4 *It Triages Your Inbox* (Gmail + approval gate), M5 *It Researches and Reports Back*
+  (web + research skill + injection safety), M6 *It Improves Itself* (Curator + memory + skills).
+  Power track: M7 *Give It Superpowers* (MCP), M8 *A Team of Agents* (`hermes kanban swarm`),
+  M9 *Talk to It* (voice), M10 *It Writes Its Own Skills*.
+- **M1 leads with the desktop app** (macOS DMG / Windows EXE), terminal framed as the course's
+  tool; `pip install` noted as a third path.
+- Corrected several OpenClaw-era myths against real v0.15.1: no `:1919` dashboard (it's `:9119`),
+  `hermes onboard`→`hermes setup`, SOUL.md loaded fresh each message, Curator curates *skills*
+  not memory, no `hermes search` CLI, real `kanban swarm` flag syntax.
+
+### Removed
+- **The entire validator subsystem.** Retired the `hermes-mastery-validator` git submodule, the
+  paste-validator UI, `validator.ts` / `liveApi.ts` / `featureFlags.ts` / `ValidationDashboard` /
+  `CompletionCodeBanner` / `StepVerify` / `useLiveApiSettings`, and the deterministic `HMS-`
+  completion code (~1,900 lines net removed).
+
+### Added
+- **Step-based progress + self-checks.** `Step.selfChecks` ({id,label}) ticked by the learner;
+  progress counts completed steps. `CelebrationCard` is now a no-code finish card.
+
 ## [0.1.0-alpha.1] — 2026-05-29
 
 Post-launch polish. Browser smoke caught three bugs that automated checks missed; we also
